@@ -3190,7 +3190,8 @@ async function loadFromSheet() {
         // البيانات ممكن تكون في json.result أو في json مباشرة
         const data = (json && json.result) ? json.result : json;
 
-        if (data && (data.members || data.attendance || data.trips)) {
+        // نتحقق من إن الاتصال نجح (ok:true) مش من إن البيانات موجودة
+        if (json && json.ok === true && data) {
             members    = Array.isArray(data.members)    ? data.members    : members;
             trips      = Array.isArray(data.trips)      ? data.trips      : trips;
             if (data.servants) servants = data.servants;
