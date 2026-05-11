@@ -23,7 +23,69 @@
             --success: #388e3c;
             --warning: #f57c00;
             --sidebar-width: 270px;
+            /* Dark mode vars */
+            --dm-bg: #0f1117;
+            --dm-surface: #1a1d2e;
+            --dm-surface2: #242740;
+            --dm-border: rgba(255,255,255,0.08);
+            --dm-text: #e8eaf0;
+            --dm-text2: #9aa0b8;
+            --card-bg: var(--white);
+            --text-main: #222;
+            --text-sub: #555;
+            --border-color: #e8e8e8;
+            --input-bg: #fff;
+            --section-bg: #fafafa;
         }
+
+        /* ===== الوضع الليلي ===== */
+        body.dark-mode {
+            --bg: var(--dm-bg);
+            --white: var(--dm-surface);
+            --card-bg: var(--dm-surface);
+            --text-main: var(--dm-text);
+            --text-sub: var(--dm-text2);
+            --border-color: var(--dm-border);
+            --input-bg: var(--dm-surface2);
+            --section-bg: var(--dm-surface2);
+        }
+        body.dark-mode { background: var(--dm-bg); color: var(--dm-text); }
+        body.dark-mode .login-box { background: var(--dm-surface); color: var(--dm-text); box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+        body.dark-mode .login-box h2 { color: var(--accent); }
+        body.dark-mode .login-box p { color: var(--dm-text2); }
+        body.dark-mode .login-box input { background: var(--dm-surface2); border-color: var(--dm-border); color: var(--dm-text); }
+        body.dark-mode .modal-content { background: var(--dm-surface); color: var(--dm-text); }
+        body.dark-mode .modal-header { border-color: var(--dm-border); }
+        body.dark-mode .modal-footer { border-color: var(--dm-border); }
+        body.dark-mode .form-section { background: var(--dm-surface2); border-color: var(--dm-border); }
+        body.dark-mode input[type="text"], body.dark-mode input[type="email"],
+        body.dark-mode input[type="password"], body.dark-mode input[type="tel"],
+        body.dark-mode input[type="date"], body.dark-mode select, body.dark-mode textarea {
+            background: var(--dm-surface2); border-color: var(--dm-border); color: var(--dm-text);
+        }
+        body.dark-mode .card { background: var(--dm-surface); border-color: var(--dm-border); }
+        body.dark-mode .stat-card { background: var(--dm-surface); }
+        body.dark-mode .attendance-card { background: var(--dm-surface); }
+        body.dark-mode .trip-card { background: var(--dm-surface); }
+        body.dark-mode .page-header { background: var(--dm-surface); border-color: var(--dm-border); }
+        body.dark-mode .search-bar input { background: var(--dm-surface2); border-color: var(--dm-border); color: var(--dm-text); }
+        body.dark-mode .tab-pill { background: var(--dm-surface2); color: var(--dm-text2); }
+        body.dark-mode .att-btn { background: var(--dm-surface2); border-color: var(--dm-border); color: var(--dm-text); }
+        body.dark-mode .att-session-tab { background: var(--dm-surface2); border-color: var(--dm-border); color: var(--dm-text2); }
+        body.dark-mode .btn-light { background: var(--dm-surface2); color: var(--dm-text); }
+        body.dark-mode .form-row label { color: var(--dm-text2); }
+        body.dark-mode .main-content { background: var(--dm-bg); }
+        body.dark-mode #main-app { background: var(--dm-bg); }
+        body.dark-mode .sidebar { background: linear-gradient(180deg, #050d2e 0%, #0d1660 100%); }
+
+        /* Dark mode toggle button */
+        .dark-toggle-btn {
+            background: none; border: none; cursor: pointer;
+            color: rgba(255,255,255,0.7); font-size: 1em;
+            padding: 4px 8px; border-radius: 8px; transition: 0.2s;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .dark-toggle-btn:hover { background: rgba(255,255,255,0.1); color: white; }
 
         * { box-sizing: border-box; }
 
@@ -32,6 +94,7 @@
             background: var(--bg);
             margin: 0;
             overflow-x: hidden;
+            transition: background 0.3s, color 0.3s;
         }
 
         /* ===== شاشة الدخول ===== */
@@ -748,20 +811,24 @@
         <div style="background:linear-gradient(135deg,#071444,#1a237e); position:sticky; top:0; z-index:99;
                     box-shadow:0 2px 15px rgba(0,0,0,0.3);">
             <div style="display:flex; align-items:center; gap:10px; padding:11px 16px;">
-                <!-- زر رجوع -->
-                <button onclick="navigateBack()" title="رجوع" style="background:rgba(255,255,255,0.12); border:none;
-                        border-radius:10px; color:white; padding:9px 13px; cursor:pointer; font-size:0.9em;
-                        display:flex; align-items:center; gap:5px; flex-shrink:0;">
-                    <i class="fas fa-arrow-right"></i> رجوع
+                <!-- زر القائمة الجانبية — يسار -->
+                <button onclick="toggleDrawer()" title="القائمة" style="background:rgba(255,255,255,0.12); border:none;
+                        border-radius:10px; color:white; padding:9px 13px; cursor:pointer; font-size:0.9em; flex-shrink:0;">
+                    <i class="fas fa-bars"></i>
                 </button>
                 <!-- اسم الصفحة -->
                 <div style="flex:1; color:white; font-weight:700; font-size:1em; text-align:center;" id="innerPageTitle"></div>
                 <!-- اسم الخدمة -->
                 <div style="color:var(--accent); font-size:0.78em; font-weight:600; flex-shrink:0;" id="innerServiceLabel"></div>
-                <!-- زر القائمة الجانبية -->
-                <button onclick="toggleDrawer()" title="القائمة" style="background:rgba(255,255,255,0.12); border:none;
-                        border-radius:10px; color:white; padding:9px 13px; cursor:pointer; font-size:0.9em; flex-shrink:0;">
-                    <i class="fas fa-bars"></i>
+                <!-- زر الوضع الليلي -->
+                <button onclick="toggleDarkMode()" id="darkModeNavBtn" title="وضع ليلي" class="dark-toggle-btn" style="flex-shrink:0;">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <!-- زر رجوع — يمين -->
+                <button onclick="navigateBack()" title="رجوع" style="background:rgba(255,255,255,0.12); border:none;
+                        border-radius:10px; color:white; padding:9px 13px; cursor:pointer; font-size:0.9em;
+                        display:flex; align-items:center; gap:5px; flex-shrink:0;">
+                    رجوع <i class="fas fa-arrow-left"></i>
                 </button>
             </div>
         </div>
@@ -789,6 +856,19 @@
                 <div class="drawer-item" onclick="closeDrawerAndGo('reports')"><i class="fas fa-chart-bar"></i> التقارير</div>
                 <div class="drawer-item" onclick="closeDrawerAndGo('memberAttReport')"><i class="fas fa-user-check"></i> تقرير حضور فردي</div>
                 <div class="drawer-item admin-only" onclick="closeDrawerAndGo('servants')"><i class="fas fa-user-shield"></i> إدارة الخدام</div>
+                <div style="border-top:1px solid rgba(255,255,255,0.1); margin:8px 16px;"></div>
+                <!-- وضع ليلي -->
+                <div class="drawer-item" onclick="toggleDarkMode()" id="darkModeDrawerItem" style="color:#a5d8ff;">
+                    <i class="fas fa-moon"></i> <span id="darkModeLabel">الوضع الليلي</span>
+                </div>
+                <!-- تصدير واستيراد -->
+                <div class="drawer-item" onclick="exportData(); toggleDrawer();" style="color:#b2f2bb;">
+                    <i class="fas fa-file-export"></i> تصدير البيانات
+                </div>
+                <div class="drawer-item" onclick="document.getElementById('importFileInput').click(); toggleDrawer();" style="color:#ffd8a8;">
+                    <i class="fas fa-file-import"></i> استيراد البيانات
+                </div>
+                <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importData(event)">
                 <div style="border-top:1px solid rgba(255,255,255,0.1); margin:8px 16px;"></div>
                 <div class="drawer-item" onclick="openDateTimeSettings(); toggleDrawer();" style="color:#a5d8ff;"><i class="fas fa-cog"></i> إعدادات العرض</div>
                 <div style="border-top:1px solid rgba(255,255,255,0.1); margin:8px 16px;"></div>
@@ -3634,8 +3714,102 @@ document.getElementById('loginPass').addEventListener('keydown', e => {
 
 <script>
 // ================================================================
-//  إعدادات الوقت والتاريخ
+//  الوضع الليلي
 // ================================================================
+function applyDarkMode(enabled) {
+    if (enabled) {
+        document.body.classList.add('dark-mode');
+        document.getElementById('darkModeLabel').textContent = 'الوضع النهاري';
+        const btn = document.getElementById('darkModeNavBtn');
+        if (btn) { btn.innerHTML = '<i class="fas fa-sun"></i>'; btn.title = 'وضع نهاري'; }
+        const drawerItem = document.getElementById('darkModeDrawerItem');
+        if (drawerItem) drawerItem.style.color = '#ffd43b';
+    } else {
+        document.body.classList.remove('dark-mode');
+        document.getElementById('darkModeLabel').textContent = 'الوضع الليلي';
+        const btn = document.getElementById('darkModeNavBtn');
+        if (btn) { btn.innerHTML = '<i class="fas fa-moon"></i>'; btn.title = 'وضع ليلي'; }
+        const drawerItem = document.getElementById('darkModeDrawerItem');
+        if (drawerItem) drawerItem.style.color = '#a5d8ff';
+    }
+}
+
+function toggleDarkMode() {
+    const isNowDark = !document.body.classList.contains('dark-mode');
+    localStorage.setItem('cm_dark_mode', isNowDark ? '1' : '0');
+    applyDarkMode(isNowDark);
+    showToast(isNowDark ? '🌙 تم تفعيل الوضع الليلي' : '☀️ تم تفعيل الوضع النهاري');
+}
+
+// تطبيق الوضع المحفوظ عند التحميل
+(function initDarkMode() {
+    const saved = localStorage.getItem('cm_dark_mode');
+    if (saved === '1') applyDarkMode(true);
+})();
+
+// ================================================================
+//  تصدير واستيراد البيانات
+// ================================================================
+function exportData() {
+    try {
+        const data = {
+            exportedAt: new Date().toISOString(),
+            version: '1.0',
+            members:    JSON.parse(localStorage.getItem('cm_members')    || '[]'),
+            servants:   JSON.parse(localStorage.getItem('cm_servants')   || '[]'),
+            trips:      JSON.parse(localStorage.getItem('cm_trips')      || '[]'),
+            attendance: JSON.parse(localStorage.getItem('cm_attendance') || '{}'),
+        };
+        const json = JSON.stringify(data, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        const date = new Date().toLocaleDateString('ar-EG').replace(/\//g, '-');
+        a.href     = url;
+        a.download = `children-of-jesus-backup-${date}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('✅ تم تصدير البيانات بنجاح', 'success');
+    } catch(e) {
+        showToast('❌ فشل التصدير: ' + e.message, 'error');
+    }
+}
+
+function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            // التحقق من صحة الملف
+            if (!data.version || (!data.members && !data.servants)) {
+                showToast('❌ الملف غير صالح أو تالف', 'error');
+                return;
+            }
+            // تأكيد قبل الاستيراد
+            const confirm = window.confirm(
+                `هل تريد استيراد البيانات؟\n` +
+                `📁 المخدومون: ${(data.members||[]).length}\n` +
+                `🛡️ الخدام: ${(data.servants||[]).length}\n` +
+                `🚌 الرحلات: ${(data.trips||[]).length}\n\n` +
+                `⚠️ سيتم استبدال البيانات الحالية!`
+            );
+            if (!confirm) return;
+            if (data.members)    localStorage.setItem('cm_members',    JSON.stringify(data.members));
+            if (data.servants)   localStorage.setItem('cm_servants',   JSON.stringify(data.servants));
+            if (data.trips)      localStorage.setItem('cm_trips',      JSON.stringify(data.trips));
+            if (data.attendance) localStorage.setItem('cm_attendance', JSON.stringify(data.attendance));
+            showToast('✅ تم استيراد البيانات — جاري إعادة التحميل...', 'success');
+            setTimeout(() => location.reload(), 1500);
+        } catch(err) {
+            showToast('❌ خطأ في قراءة الملف: ' + err.message, 'error');
+        } finally {
+            event.target.value = '';
+        }
+    };
+    reader.readAsText(file);
+}
 
 // القيم الافتراضية
 const defaultDTSettings = {
