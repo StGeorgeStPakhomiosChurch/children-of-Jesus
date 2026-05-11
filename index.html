@@ -1664,7 +1664,7 @@ function onSubServiceChange() {
 
 function updatePageTitle() {
     document.getElementById('membersPageTitle').innerHTML =
-        `<i class="fas fa-users"></i> مخدومو — ${activeMain} / ${activeSub}`;
+        `<i class="fas fa-users"></i> مخدومين — ${activeMain} / ${activeSub}`;
 }
 
 function populateMemberGradeModal() {
@@ -1814,7 +1814,7 @@ function renderAttReport() {
     if (search) serviceMs = serviceMs.filter(m => (m.name||'').toLowerCase().includes(search));
 
     if (serviceMs.length === 0) {
-        grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-users-slash"></i><p>لا يوجد مخدومون</p></div>';
+        grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-users-slash"></i><p>لا يوجد مخدومين</p></div>';
         return;
     }
 
@@ -1901,7 +1901,7 @@ function getMemberImgSrc(m) {
 }
 
 // ================================================================
-//  المخدومون
+//  المخدومين
 // ================================================================
 function getServiceMembers() {
     return members.filter(m => m.grade === activeSub);
@@ -1953,7 +1953,7 @@ function renderMembers() {
     if (list.length === 0) {
         grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
             <i class="fas fa-users-slash"></i>
-            <p>لا يوجد مخدومون في هذه الخدمة بعد</p>
+            <p>لا يوجد مخدومين في هذه الخدمة بعد</p>
             <button class="btn btn-primary" onclick="openMemberModal()"><i class="fas fa-plus"></i> إضافة أول مخدوم</button>
         </div>`;
         return;
@@ -2333,7 +2333,7 @@ function loadAttendanceList() {
     const serviceMembers = getServiceMembers();
     if (serviceMembers.length === 0) {
         list.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
-            <i class="fas fa-user-slash"></i><p>لا يوجد مخدومون في هذه الخدمة</p></div>`;
+            <i class="fas fa-user-slash"></i><p>لا يوجد مخدومين في هذه الخدمة</p></div>`;
         return;
     }
 
