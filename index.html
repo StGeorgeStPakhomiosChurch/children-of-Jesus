@@ -87,6 +87,180 @@
         }
         .dark-toggle-btn:hover { background: rgba(255,255,255,0.1); color: white; }
 
+        /* ================================================================
+           نظام الثيمات
+        ================================================================ */
+
+        /* ثيم 1: الكنيسة (الافتراضي — أزرق ملكي + ذهبي) */
+        body[data-theme="church"] {
+            --primary: #1a237e; --accent: #d4af37; --bg: #f0f2f8;
+            --theme-grad1: #071444; --theme-grad2: #0d1f6e; --theme-grad3: #1a237e;
+            --theme-nav1: #071444; --theme-nav2: #1a237e;
+            --theme-radius: 14px; --theme-card-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+
+        /* ثيم 2: الطبيعة (أخضر زيتي + ذهبي فاتح) */
+        body[data-theme="nature"] {
+            --primary: #1b5e20; --accent: #f9a825; --bg: #f1f8f2;
+            --theme-grad1: #0a2e0f; --theme-grad2: #1b4d20; --theme-grad3: #2e7d32;
+            --theme-nav1: #0a2e0f; --theme-nav2: #1b5e20;
+            --theme-radius: 18px; --theme-card-shadow: 0 4px 16px rgba(27,94,32,0.10);
+        }
+        body[data-theme="nature"] .btn-primary { background: #2e7d32; }
+        body[data-theme="nature"] .tab-pill.active { background: #2e7d32; }
+        body[data-theme="nature"] .stat-card .stat-num { color: #2e7d32; }
+        body[data-theme="nature"] .modal-header h3 { color: #2e7d32; }
+        body[data-theme="nature"] .form-section h4 { color: #2e7d32; }
+        body[data-theme="nature"] .page-header h2 { color: #2e7d32; }
+        body[data-theme="nature"] .contact-link { color: #2e7d32; }
+        body[data-theme="nature"] input:focus, body[data-theme="nature"] select:focus { border-color: #2e7d32; }
+        body[data-theme="nature"] .att-session-tab.active { background: #2e7d32; border-color: #2e7d32; }
+
+        /* ثيم 3: الغروب (بنفسجي + وردي) */
+        body[data-theme="sunset"] {
+            --primary: #6a1b9a; --accent: #f48fb1; --bg: #fdf4ff;
+            --theme-grad1: #2d0047; --theme-grad2: #6a1b9a; --theme-grad3: #9c27b0;
+            --theme-nav1: #2d0047; --theme-nav2: #6a1b9a;
+            --theme-radius: 20px; --theme-card-shadow: 0 4px 20px rgba(106,27,154,0.12);
+        }
+        body[data-theme="sunset"] .btn-primary { background: #7b1fa2; }
+        body[data-theme="sunset"] .tab-pill.active { background: #7b1fa2; }
+        body[data-theme="sunset"] .stat-card .stat-num { color: #7b1fa2; }
+        body[data-theme="sunset"] .modal-header h3 { color: #7b1fa2; }
+        body[data-theme="sunset"] .form-section h4 { color: #7b1fa2; }
+        body[data-theme="sunset"] .page-header h2 { color: #7b1fa2; }
+        body[data-theme="sunset"] .contact-link { color: #7b1fa2; }
+        body[data-theme="sunset"] input:focus, body[data-theme="sunset"] select:focus { border-color: #7b1fa2; }
+        body[data-theme="sunset"] .att-session-tab.active { background: #7b1fa2; border-color: #7b1fa2; }
+
+        /* ثيم 4: المحيط (فيروزي + أبيض) */
+        body[data-theme="ocean"] {
+            --primary: #00695c; --accent: #80deea; --bg: #e8f5f4;
+            --theme-grad1: #00251a; --theme-grad2: #00695c; --theme-grad3: #00897b;
+            --theme-nav1: #00251a; --theme-nav2: #00695c;
+            --theme-radius: 16px; --theme-card-shadow: 0 3px 14px rgba(0,105,92,0.10);
+        }
+        body[data-theme="ocean"] .btn-primary { background: #00796b; }
+        body[data-theme="ocean"] .tab-pill.active { background: #00796b; }
+        body[data-theme="ocean"] .stat-card .stat-num { color: #00796b; }
+        body[data-theme="ocean"] .modal-header h3 { color: #00796b; }
+        body[data-theme="ocean"] .form-section h4 { color: #00796b; }
+        body[data-theme="ocean"] .page-header h2 { color: #00796b; }
+        body[data-theme="ocean"] .contact-link { color: #00796b; }
+        body[data-theme="ocean"] input:focus, body[data-theme="ocean"] select:focus { border-color: #00796b; }
+        body[data-theme="ocean"] .att-session-tab.active { background: #00796b; border-color: #00796b; }
+
+        /* ثيم 5: الصحراء (بني دافئ + نحاسي) */
+        body[data-theme="desert"] {
+            --primary: #4e342e; --accent: #ff8f00; --bg: #fdf6f0;
+            --theme-grad1: #1c0a00; --theme-grad2: #4e342e; --theme-grad3: #6d4c41;
+            --theme-nav1: #1c0a00; --theme-nav2: #4e342e;
+            --theme-radius: 10px; --theme-card-shadow: 0 2px 12px rgba(78,52,46,0.10);
+        }
+        body[data-theme="desert"] .btn-primary { background: #5d4037; }
+        body[data-theme="desert"] .tab-pill.active { background: #5d4037; }
+        body[data-theme="desert"] .stat-card .stat-num { color: #5d4037; }
+        body[data-theme="desert"] .modal-header h3 { color: #5d4037; }
+        body[data-theme="desert"] .form-section h4 { color: #5d4037; }
+        body[data-theme="desert"] .page-header h2 { color: #5d4037; }
+        body[data-theme="desert"] .contact-link { color: #5d4037; }
+        body[data-theme="desert"] input:focus, body[data-theme="desert"] select:focus { border-color: #5d4037; }
+        body[data-theme="desert"] .att-session-tab.active { background: #5d4037; border-color: #5d4037; }
+
+        /* ثيم 6: الثلج (رمادي فاتح + أزرق باهت) */
+        body[data-theme="snow"] {
+            --primary: #37474f; --accent: #90caf9; --bg: #f5f7fa;
+            --theme-grad1: #102027; --theme-grad2: #37474f; --theme-grad3: #546e7a;
+            --theme-nav1: #102027; --theme-nav2: #37474f;
+            --theme-radius: 12px; --theme-card-shadow: 0 2px 8px rgba(55,71,79,0.08);
+        }
+        body[data-theme="snow"] .btn-primary { background: #455a64; }
+        body[data-theme="snow"] .tab-pill.active { background: #455a64; }
+        body[data-theme="snow"] .stat-card .stat-num { color: #455a64; }
+        body[data-theme="snow"] .modal-header h3 { color: #455a64; }
+        body[data-theme="snow"] .form-section h4 { color: #455a64; }
+        body[data-theme="snow"] .page-header h2 { color: #455a64; }
+        body[data-theme="snow"] .contact-link { color: #455a64; }
+        body[data-theme="snow"] input:focus, body[data-theme="snow"] select:focus { border-color: #455a64; }
+        body[data-theme="snow"] .att-session-tab.active { background: #455a64; border-color: #455a64; }
+
+        /* ثيم 7: الشروق (برتقالي + أحمر دافئ) */
+        body[data-theme="sunrise"] {
+            --primary: #bf360c; --accent: #ffd54f; --bg: #fff8f5;
+            --theme-grad1: #3e0a00; --theme-grad2: #bf360c; --theme-grad3: #e64a19;
+            --theme-nav1: #3e0a00; --theme-nav2: #bf360c;
+            --theme-radius: 16px; --theme-card-shadow: 0 3px 14px rgba(191,54,12,0.10);
+        }
+        body[data-theme="sunrise"] .btn-primary { background: #d84315; }
+        body[data-theme="sunrise"] .tab-pill.active { background: #d84315; }
+        body[data-theme="sunrise"] .stat-card .stat-num { color: #d84315; }
+        body[data-theme="sunrise"] .modal-header h3 { color: #d84315; }
+        body[data-theme="sunrise"] .form-section h4 { color: #d84315; }
+        body[data-theme="sunrise"] .page-header h2 { color: #d84315; }
+        body[data-theme="sunrise"] .contact-link { color: #d84315; }
+        body[data-theme="sunrise"] input:focus, body[data-theme="sunrise"] select:focus { border-color: #d84315; }
+        body[data-theme="sunrise"] .att-session-tab.active { background: #d84315; border-color: #d84315; }
+
+        /* ثيم 8: الليل النجمي (أسود + ذهبي فاخر) */
+        body[data-theme="starnight"] {
+            --primary: #1a1a2e; --accent: #e2b96f; --bg: #12121f;
+            --theme-grad1: #050510; --theme-grad2: #1a1a2e; --theme-grad3: #16213e;
+            --theme-nav1: #050510; --theme-nav2: #1a1a2e;
+            --theme-radius: 16px; --theme-card-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        body[data-theme="starnight"] { color: #e8e8f0; }
+        body[data-theme="starnight"] .btn-primary { background: #e2b96f; color: #1a1a2e; }
+        body[data-theme="starnight"] .tab-pill.active { background: #e2b96f; color: #1a1a2e; }
+        body[data-theme="starnight"] .stat-card { background: #1e1e35; }
+        body[data-theme="starnight"] .attendance-card { background: #1e1e35; }
+        body[data-theme="starnight"] .trip-card { background: #1e1e35; }
+        body[data-theme="starnight"] .modal-content { background: #1e1e35; color: #e8e8f0; }
+        body[data-theme="starnight"] .form-section { background: #252542; border-color: rgba(255,255,255,0.06); }
+        body[data-theme="starnight"] .page-header { background: #1e1e35; }
+        body[data-theme="starnight"] .search-bar input { background: #252542; color: #e8e8f0; border-color: rgba(255,255,255,0.1); }
+        body[data-theme="starnight"] input[type="text"], body[data-theme="starnight"] input[type="email"],
+        body[data-theme="starnight"] input[type="password"], body[data-theme="starnight"] input[type="tel"],
+        body[data-theme="starnight"] input[type="date"], body[data-theme="starnight"] select, body[data-theme="starnight"] textarea {
+            background: #252542; color: #e8e8f0; border-color: rgba(255,255,255,0.1);
+        }
+        body[data-theme="starnight"] .stat-card .stat-num { color: #e2b96f; }
+        body[data-theme="starnight"] .modal-header h3 { color: #e2b96f; }
+        body[data-theme="starnight"] .form-section h4 { color: #e2b96f; }
+        body[data-theme="starnight"] .page-header h2 { color: #e2b96f; }
+        body[data-theme="starnight"] .tab-pill { background: #252542; color: #9090b0; }
+        body[data-theme="starnight"] .btn-light { background: #252542; color: #e8e8f0; }
+        body[data-theme="starnight"] .att-btn { background: #252542; border-color: rgba(255,255,255,0.1); color: #e8e8f0; }
+        body[data-theme="starnight"] .att-session-tab.active { background: #e2b96f; color: #1a1a2e; border-color: #e2b96f; }
+        body[data-theme="starnight"] .main-content { background: #12121f; }
+        body[data-theme="starnight"] .contact-link { color: #e2b96f; }
+
+        /* تطبيق المتغيرات الديناميكية على العناصر المهمة */
+        #main-app, #page-home { background: linear-gradient(160deg, var(--theme-grad1,#071444) 0%, var(--theme-grad2,#0d1f6e) 50%, var(--theme-grad3,#1a237e) 100%) !important; }
+        #sideDrawer { background: linear-gradient(180deg, var(--theme-nav1,#071444) 0%, var(--theme-nav2,#1a237e) 100%) !important; }
+        #innerPages > div:nth-child(2) > div { background: linear-gradient(135deg, var(--theme-nav1,#071444), var(--theme-nav2,#1a237e)) !important; }
+
+        /* بطاقات + زوايا */
+        .stat-card, .attendance-card, .trip-card, .modal-content, .form-section {
+            border-radius: var(--theme-radius, 14px);
+            box-shadow: var(--theme-card-shadow, 0 2px 10px rgba(0,0,0,0.06));
+        }
+
+        /* مودال اختيار الثيم */
+        .theme-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; margin-top: 4px; }
+        .theme-card {
+            border-radius: 16px; overflow: hidden; cursor: pointer;
+            border: 3px solid transparent; transition: all 0.25s;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.10);
+        }
+        .theme-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.18); }
+        .theme-card.active { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent); }
+        .theme-card-header { height: 60px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .theme-card-body { padding: 10px 12px; background: #fff; }
+        .theme-card-name { font-weight: 700; font-size: 0.88em; color: #333; }
+        .theme-card-desc { font-size: 0.74em; color: #888; margin-top: 2px; }
+        .theme-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.5); }
+
+
         * { box-sizing: border-box; }
 
         body {
@@ -714,6 +888,11 @@
                         border-radius:10px; color:rgba(255,255,255,0.8); padding:8px 12px; cursor:pointer; font-size:0.82em; transition:0.2s;">
                     <i class="fas fa-moon"></i>
                 </button>
+                <button onclick="openThemeModal()" title="تغيير الثيم"
+                        style="background:rgba(255,215,100,0.15); border:1px solid rgba(255,215,100,0.35);
+                        border-radius:10px; color:#ffd54f; padding:8px 12px; cursor:pointer; font-size:0.82em; transition:0.2s;">
+                    <i class="fas fa-palette"></i>
+                </button>
                 <button onclick="openDateTimeSettings()" title="إعدادات الوقت والتاريخ"
                         style="background:rgba(212,175,55,0.15); border:1px solid rgba(212,175,55,0.35);
                         border-radius:10px; color:var(--accent); padding:8px 12px; cursor:pointer; font-size:0.82em; transition:0.2s;">
@@ -881,6 +1060,7 @@
                 <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importData(event)">
                 <div style="border-top:1px solid rgba(255,255,255,0.1); margin:8px 16px;"></div>
                 <div class="drawer-item" onclick="openDateTimeSettings(); toggleDrawer();" style="color:#a5d8ff;"><i class="fas fa-cog"></i> إعدادات العرض</div>
+                <div class="drawer-item" onclick="openThemeModal(); toggleDrawer();" style="color:#ffd8a8;"><i class="fas fa-palette"></i> تغيير الثيم</div>
                 <div style="border-top:1px solid rgba(255,255,255,0.1); margin:8px 16px;"></div>
                 <div class="drawer-item" style="color:#ff8a80;" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</div>
             </nav>
@@ -3625,6 +3805,27 @@ document.getElementById('loginPass').addEventListener('keydown', e => {
 });
 </script>
 
+<!-- ===== مودال الثيمات ===== -->
+<div id="modalThemes" class="modal" style="z-index:2000;">
+  <div class="modal-content" style="max-width:600px;">
+    <div class="modal-header">
+      <h3><i class="fas fa-palette" style="margin-left:8px; color:var(--accent);"></i> اختر ثيم التطبيق</h3>
+      <button class="modal-close" onclick="closeModal('modalThemes')"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div class="theme-grid" id="themeGrid"></div>
+
+    <div style="margin-top:20px; padding:14px; background:#f8f8f8; border-radius:12px; font-size:0.84em; color:#777; display:flex; align-items:center; gap:8px;">
+      <i class="fas fa-info-circle" style="color:var(--accent);"></i>
+      الثيم يُطبَّق فوراً ويُحفظ تلقائياً. يمكنك تفعيل الوضع الليلي مع أي ثيم.
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-light" onclick="closeModal('modalThemes')"><i class="fas fa-times"></i> إغلاق</button>
+    </div>
+  </div>
+</div>
+
 <!-- ===== مودال إعدادات الوقت والتاريخ ===== -->
 <div id="modalDateTimeSettings" class="modal" style="z-index:2000;">
   <div class="modal-content" style="max-width:520px;">
@@ -3726,6 +3927,101 @@ document.getElementById('loginPass').addEventListener('keydown', e => {
 </div>
 
 <script>
+// ================================================================
+//  نظام الثيمات
+// ================================================================
+const themes = [
+    {
+        id: 'church', name: 'الكنيسة', desc: 'أزرق ملكي • ذهبي',
+        grad1: '#071444', grad2: '#1a237e', accent: '#d4af37',
+        emoji: '⛪'
+    },
+    {
+        id: 'nature', name: 'الطبيعة', desc: 'أخضر زيتي • ذهبي فاتح',
+        grad1: '#0a2e0f', grad2: '#2e7d32', accent: '#f9a825',
+        emoji: '🌿'
+    },
+    {
+        id: 'sunset', name: 'الغروب', desc: 'بنفسجي • وردي',
+        grad1: '#2d0047', grad2: '#9c27b0', accent: '#f48fb1',
+        emoji: '🌇'
+    },
+    {
+        id: 'ocean', name: 'المحيط', desc: 'فيروزي • أبيض',
+        grad1: '#00251a', grad2: '#00897b', accent: '#80deea',
+        emoji: '🌊'
+    },
+    {
+        id: 'desert', name: 'الصحراء', desc: 'بني دافئ • نحاسي',
+        grad1: '#1c0a00', grad2: '#6d4c41', accent: '#ff8f00',
+        emoji: '🏜️'
+    },
+    {
+        id: 'snow', name: 'الثلج', desc: 'رمادي فاتح • أزرق',
+        grad1: '#102027', grad2: '#546e7a', accent: '#90caf9',
+        emoji: '❄️'
+    },
+    {
+        id: 'sunrise', name: 'الشروق', desc: 'برتقالي • أحمر دافئ',
+        grad1: '#3e0a00', grad2: '#e64a19', accent: '#ffd54f',
+        emoji: '🌅'
+    },
+    {
+        id: 'starnight', name: 'الليل النجمي', desc: 'أسود فاخر • ذهبي',
+        grad1: '#050510', grad2: '#16213e', accent: '#e2b96f',
+        emoji: '✨'
+    },
+];
+
+function getCurrentTheme() {
+    return localStorage.getItem('cm_theme') || 'church';
+}
+
+function applyTheme(id) {
+    document.body.setAttribute('data-theme', id);
+    localStorage.setItem('cm_theme', id);
+    // تحديث حالة البطاقات المختارة
+    document.querySelectorAll('.theme-card').forEach(c => {
+        c.classList.toggle('active', c.dataset.theme === id);
+    });
+    // تحديث شريط nav الداخلي يدوياً لأن CSS variable لا يصل لـ inline styles
+    const t = themes.find(x => x.id === id);
+    if (t) {
+        const navBar = document.querySelector('#innerPages > div:nth-child(2)');
+        if (navBar) navBar.style.background = `linear-gradient(135deg,${t.grad1},${t.grad2})`;
+        const dateBar = document.querySelector('#innerPages > div:first-child');
+        if (dateBar) dateBar.style.background = `${t.grad1}cc`;
+        const drawer = document.getElementById('sideDrawer');
+        if (drawer) drawer.style.background = `linear-gradient(180deg,${t.grad1} 0%,${t.grad2} 100%)`;
+        const mainApp = document.getElementById('main-app');
+        if (mainApp) mainApp.style.background = `linear-gradient(160deg,${t.grad1} 0%,${t.grad2} 50%,${t.grad2} 100%)`;
+    }
+}
+
+function openThemeModal() {
+    const grid = document.getElementById('themeGrid');
+    const current = getCurrentTheme();
+    grid.innerHTML = themes.map(t => `
+        <div class="theme-card ${t.id === current ? 'active' : ''}" data-theme="${t.id}" onclick="applyTheme('${t.id}')">
+            <div class="theme-card-header" style="background:linear-gradient(135deg,${t.grad1},${t.grad2});">
+                <span style="font-size:1.6em;">${t.emoji}</span>
+                <div class="theme-dot" style="background:${t.accent};"></div>
+            </div>
+            <div class="theme-card-body">
+                <div class="theme-card-name">${t.name}</div>
+                <div class="theme-card-desc">${t.desc}</div>
+            </div>
+        </div>
+    `).join('');
+    document.getElementById('modalThemes').style.display = 'block';
+}
+
+// تطبيق الثيم المحفوظ عند التحميل
+(function initTheme() {
+    const saved = localStorage.getItem('cm_theme') || 'church';
+    applyTheme(saved);
+})();
+
 // ================================================================
 //  الوضع الليلي
 // ================================================================
