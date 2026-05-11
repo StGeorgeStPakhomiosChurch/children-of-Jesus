@@ -3132,7 +3132,7 @@ function closeModal(id) {
 //  ضع هنا رابط الـ Web App بتاعك من Google Apps Script
 // ================================================================
 // ⬇️ ضع هنا رابط الـ Web App بتاعك من Google Apps Script بعد النشر
-const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxfHz5UtxvHZtejM1AQlyByDSqE1qWBfBJczY8C3Qqc6YlOdhPYqDovdjSUDWE73004/exec";
+const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbyfqVQVD4d0Q2rjQ1lkMOluAEqClYT4DcUeW72h3ScaiBORWQiUsP-aI27Who2xBE9f/exec";
 
 // هل الـ Google Sheets مفعّل؟
 function isSheetEnabled() {
@@ -3153,18 +3153,26 @@ async function saveData() {
     if (!isSheetEnabled()) return;
 
     try {
+        // تحويل attendance من object إلى array عشان Google Sheets يقدر يحفظه
+        const attArray = Object.entries(attendance).map(([dayKey, recs]) => ({
+            dayKey,
+            records: JSON.stringify(recs)
+        }));
+
         const payload = {
-            action: "saveAll",
-            members:    members,
-            servants:   servants,
-            trips:      trips,
-            attendance: attendance
+            action:     "saveAll",
+            members:    members.length    ? members    : [],
+            servants:   servants.length   ? servants   : [],
+            trips:      trips.length      ? trips      : [],
+            attendance: attArray
         };
-        await fetch(SHEET_API_URL, {
+        const res = await fetch(SHEET_API_URL, {
             method: "POST",
             headers: { "Content-Type": "text/plain" },
             body: JSON.stringify(payload)
         });
+        const result = await res.json();
+        if (!result.ok) console.warn("Sheets save error:", result.error);
     } catch(e) {
         console.warn("Google Sheets save failed (offline?)", e);
     }
@@ -3176,14 +3184,29 @@ async function loadFromSheet() {
 
     try {
         showToast("⏳ جاري تحميل البيانات...", "success");
-        const res  = await fetch(SHEET_API_URL + "?action=loadAll", { method: "GET" });
-        const data = await res.json();
+        const res  = await fetch(SHEET_API_URL + "?action=load", { method: "GET" });
+        const json = await res.json();
 
-        if (data && data.members) {
-            members    = data.members    || [];
-            servants   = data.servants   || servants;
-            trips      = data.trips      || [];
-            attendance = data.attendance || {};
+        // البيانات ممكن تكون في json.result أو في json مباشرة
+        const data = (json && json.result) ? json.result : json;
+
+        if (data && (data.members || data.attendance || data.trips)) {
+            members    = Array.isArray(data.members)    ? data.members    : members;
+            trips      = Array.isArray(data.trips)      ? data.trips      : trips;
+            if (data.servants) servants = data.servants;
+
+            // الـ attendance بيتحفظ كـ array — نرجعه لـ object
+            if (Array.isArray(data.attendance)) {
+                attendance = {};
+                data.attendance.forEach(row => {
+                    if (row.dayKey) {
+                        try { attendance[row.dayKey] = JSON.parse(row.records || '{}'); }
+                        catch { attendance[row.dayKey] = {}; }
+                    }
+                });
+            } else if (data.attendance && typeof data.attendance === 'object') {
+                attendance = data.attendance;
+            }
 
             localStorage.setItem('cm_members',    JSON.stringify(members));
             localStorage.setItem('cm_servants',   JSON.stringify(servants));
