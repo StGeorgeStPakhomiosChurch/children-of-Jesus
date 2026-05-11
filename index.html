@@ -2294,58 +2294,61 @@ function renderMembers() {
         const imgSrc = getMemberImgSrc(m);
         // رحلات المخدوم في الخدمة الحالية
         const memberTrips = trips.filter(t => t.service === activeSub && t.targetType !== 'servants' && (t.members || []).includes(m.id));
-
-        // قسم الرحلات في الكارت — بدون nested backticks
+        let tripBadgeHtml = '';
+        if (memberTrips.length > 0) {
+            tripBadgeHtml = `<div style="margin:8px 0 0; display:flex; flex-wrap:wrap; gap:5px;">`;
+            memberTrips.forEach(t => {
+                const cost = parseFloat(t.cost) || 0;
+                const paid = parseFloat((t.payments || {})[m.id] || 0);
+                const remaining = cost - paid;
+                const isFullyPaid = cost > 0 && remaining <= 0;
+                tripBadgeHtml += `<span style="display:inline-flex; align-items:center; gap:4px; background:${isFullyPaid?'#e8f5e9':'#fff3e0'}; border:1px solid ${isFullyPaid?'#a5d6a7':'#ffcc80'}; border-radius:12px; padding:3px 8px; font-size:0.75em; cursor:pointer;" onclick="openTripPayFromMember('${m.id}','${t.id}')">
+                    <i class="fas fa-bus" style="color:${isFullyPaid?'#388e3c':'#e65100'};"></i>
+                    ${t.name}
+                    ${cost > 0 ? (isFullyPaid
+                        ? `<span style="color:#388e3c; font-weight:700;"><i class="fas fa-check-circle"></i> مدفوع كامل</span>`
+                        : `<span style="color:#e65100;">دفع: ${paid} / متبقي: <strong>${remaining}</strong></span>`
+                    ) : ''}
+                </span>`;
+            });
+            tripBadgeHtml += `</div>`;
+        }
+        // رحلات المخدوم — قسم واضح
         let tripsSection = '';
         if (memberTrips.length > 0) {
-            tripsSection = '<div style="margin-top:12px; border-top:2px solid #e8eaf6; padding-top:12px;">'
-                + '<p style="font-size:0.82em; font-weight:800; color:#1a237e; margin:0 0 8px;">'
-                + '<i class="fas fa-bus" style="color:#d4af37;"></i> الرحلات المشترك فيها</p>';
-            memberTrips.forEach(function(t) {
-                var cost = parseFloat(t.cost) || 0;
-                var paid = parseFloat((t.payments || {})[m.id] || 0);
-                var remaining = cost - paid;
-                var isFullyPaid = cost > 0 && remaining <= 0;
-                var bgColor = isFullyPaid ? '#e8f5e9' : '#fff8f0';
-                var bdColor = isFullyPaid ? '#a5d6a7' : '#ffcc80';
-
-                var statusBadge = '';
-                if (isFullyPaid) {
-                    statusBadge = '<span style="background:#e8f5e9;color:#388e3c;font-size:0.8em;font-weight:700;padding:2px 10px;border-radius:20px;border:1px solid #a5d6a7;"><i class="fas fa-check-circle"></i> مدفوع كامل</span>';
-                } else if (cost > 0) {
-                    statusBadge = '<span style="background:#fff3e0;color:#e65100;font-size:0.8em;font-weight:700;padding:2px 10px;border-radius:20px;border:1px solid #ffcc80;"><i class="fas fa-exclamation-circle"></i> متبقي: ' + remaining + ' جنيه</span>';
-                } else {
-                    statusBadge = '<span style="background:#e8eaf6;color:#1a237e;font-size:0.8em;padding:2px 10px;border-radius:20px;">مشترك</span>';
-                }
-
-                var dateHtml = t.date ? ('<span style="font-weight:400;font-size:0.78em;color:#999;margin-right:6px;">' + t.date + '</span>') : '';
-
-                var payDetails = '';
-                if (cost > 0) {
-                    var remainingRow = !isFullyPaid ? ('<span style="color:#e65100;"><i class="fas fa-clock"></i> متبقي: <strong>' + remaining + '</strong> جنيه</span>') : '';
-                    payDetails = '<div style="display:flex;gap:12px;font-size:0.8em;color:#666;margin-bottom:8px;flex-wrap:wrap;">'
-                        + '<span><i class="fas fa-tag" style="color:#1a237e;"></i> التكلفة: <strong>' + cost + '</strong> جنيه</span>'
-                        + '<span style="color:#388e3c;"><i class="fas fa-coins"></i> دفع: <strong>' + paid + '</strong> جنيه</span>'
-                        + remainingRow
-                        + '</div>';
-                }
-
-                tripsSection += '<div style="background:' + bgColor + ';border:2px solid ' + bdColor + ';border-radius:12px;padding:10px 14px;margin-bottom:8px;">'
-                    + '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:6px;">'
-                    + '<span style="font-size:0.9em;font-weight:700;color:#1a237e;"><i class="fas fa-bus"></i> ' + t.name + ' ' + dateHtml + '</span>'
-                    + statusBadge
-                    + '</div>'
-                    + payDetails
-                    + '<button class="btn btn-accent btn-sm" style="font-size:0.8em;padding:5px 14px;width:100%;" onclick="openTripPayFromMember('' + m.id + '','' + t.id + '')">'
-                    + '<i class="fas fa-coins"></i> تسجيل / تحديث الدفع</button>'
-                    + '</div>';
+            tripsSection = `<div style="margin-top:10px; border-top:1px solid #f0f0f0; padding-top:10px;">
+                <p style="font-size:0.78em; font-weight:700; color:#888; margin:0 0 6px;"><i class="fas fa-bus"></i> الرحلات</p>`;
+            memberTrips.forEach(t => {
+                const cost = parseFloat(t.cost) || 0;
+                const paid = parseFloat((t.payments || {})[m.id] || 0);
+                const remaining = cost - paid;
+                const isFullyPaid = cost > 0 && remaining <= 0;
+                tripsSection += `
+                <div style="background:${isFullyPaid?'#e8f5e9':'#fff8f0'}; border:1px solid ${isFullyPaid?'#a5d6a7':'#ffcc80'}; border-radius:10px; padding:8px 12px; margin-bottom:6px;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">
+                        <span style="font-size:0.85em; font-weight:700; color:#1a237e;"><i class="fas fa-bus"></i> ${t.name}</span>
+                        ${isFullyPaid
+                            ? `<span style="color:#388e3c; font-size:0.8em; font-weight:700;"><i class="fas fa-check-circle"></i> مدفوع كامل</span>`
+                            : cost > 0
+                                ? `<span style="color:#e65100; font-size:0.8em; font-weight:700;">متبقي: <strong>${remaining}</strong> جنيه</span>`
+                                : `<span style="color:#888; font-size:0.8em;">مشترك</span>`
+                        }
+                    </div>
+                    ${cost > 0 ? `<div style="display:flex; gap:10px; margin-top:4px; font-size:0.78em; color:#555;">
+                        <span>التكلفة: ${cost} جنيه</span>
+                        <span style="color:#388e3c;">دفع: ${paid} جنيه</span>
+                    </div>` : ''}
+                    <button class="btn btn-accent btn-sm" style="margin-top:6px; font-size:0.78em; padding:4px 10px;" onclick="openTripPayFromMember('${m.id}','${t.id}')">
+                        <i class="fas fa-coins"></i> تسجيل دفع
+                    </button>
+                </div>`;
             });
-            tripsSection += '</div>';
+            tripsSection += `</div>`;
         } else {
-            tripsSection = '<div style="margin-top:12px;border-top:2px solid #f0f0f0;padding-top:10px;text-align:center;">'
-                + '<p style="font-size:0.82em;color:#ccc;margin:4px 0;"><i class="fas fa-bus"></i> غير مشترك في رحلات</p></div>';
+            tripsSection = `<div style="margin-top:10px; border-top:1px solid #f0f0f0; padding-top:10px;">
+                <p style="font-size:0.8em; color:#bbb; text-align:center;"><i class="fas fa-bus"></i> غير مشترك في رحلات</p>
+            </div>`;
         }
-        const tripBadgeHtml = ''; // لم يعد مستخدماً
 
         const card = document.createElement('div');
         card.className = "m-card";
