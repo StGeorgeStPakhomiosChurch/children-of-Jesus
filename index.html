@@ -565,7 +565,7 @@
         <button class="login-btn" onclick="handleLogin()"><i class="fas fa-sign-in-alt"></i> دخول</button>
         <div class="login-links">
             <a href="#" onclick="forgotPassword()">نسيت كلمة السر؟</a> |
-            <a href="#" onclick="showRegisterModal()">تسجيل خادم جديد</a>
+            <a href="#" onclick="showRegisterModal(true)">تسجيل خادم جديد</a>
         </div>
     </div>
 </div>
@@ -1364,10 +1364,26 @@ function showToast(msg, type = "success") {
 // ================================================================
 //  تسجيل الدخول
 // ================================================================
-function handleLogin() {
+async function handleLogin() {
     const email = document.getElementById('loginEmail').value.trim();
     const pass  = document.getElementById('loginPass').value;
-    const user  = servants.find(u => u.email === email && u.pass === pass);
+
+    // نحمل البيانات من Sheets أولاً عشان نضمن إن الخدام المضافين من أجهزة تانية موجودين
+    if (isSheetEnabled()) {
+        try {
+            const res  = await fetch(SHEET_API_URL + "?action=load", { method: "GET" });
+            const json = await res.json();
+            const data = (json && json.result) ? json.result : json;
+            if (json && json.ok && data && Array.isArray(data.servants) && data.servants.length > 0) {
+                servants = data.servants;
+                localStorage.setItem('cm_servants', JSON.stringify(servants));
+            }
+        } catch(e) {
+            console.warn("Could not load servants from Sheets on login", e);
+        }
+    }
+
+    const user = servants.find(u => u.email === email && u.pass === pass);
 
     if (user) {
         currentUser = user;
@@ -2817,12 +2833,13 @@ function onRegisterRoleChange() {
     }
 }
 
-function showRegisterModal() {
-    if (!currentUser) {
+function showRegisterModal(fromLogin = false) {
+    // لو من شاشة الدخول، نسمح بالتسجيل بدون currentUser
+    if (!fromLogin && !currentUser) {
         showToast('يرجى تسجيل الدخول أولاً', 'error');
         return;
     }
-    if (currentUser.role === 'Servant') {
+    if (!fromLogin && currentUser && currentUser.role === 'Servant') {
         showToast('ليس لديك صلاحية إضافة خدام — هذه الصلاحية لأمين الخدمة والكاهن فقط', 'error');
         return;
     }
@@ -2838,8 +2855,11 @@ function showRegisterModal() {
 
     var roleSelect = document.getElementById('rRole');
     roleSelect.innerHTML = '';
+
+    // لو من شاشة الدخول — خادم فقط (pending موافقة الأدمن)
+    // لو من داخل التطبيق — حسب صلاحية المستخدم
     var baseOptions = [{ value: 'Servant', label: 'خادم' }];
-    if (currentUser.role === 'Admin' || currentUser.role === 'Priest') {
+    if (currentUser && (currentUser.role === 'Admin' || currentUser.role === 'Priest')) {
         baseOptions.push({ value: 'ServiceLeader', label: 'أمين خدمة' });
         baseOptions.push({ value: 'Priest', label: 'كاهن' });
     }
@@ -2850,23 +2870,41 @@ function showRegisterModal() {
         roleSelect.appendChild(o);
     });
     roleSelect.value = 'Servant';
+
+    // تخزين إذا كان من شاشة الدخول
+    document.getElementById('registerModal').dataset.fromLogin = fromLogin ? '1' : '0';
+    document.getElementById('rSaveLbl').textContent = fromLogin ? 'إرسال طلب التسجيل' : 'حفظ';
+    document.getElementById('registerModalTitle').innerHTML = fromLogin
+        ? '<i class="fas fa-user-plus"></i> تسجيل كخادم جديد'
+        : '<i class="fas fa-user-plus"></i> إضافة خادم';
+
     onRegisterRoleChange();
     document.getElementById('registerModal').style.display = 'block';
 }
 
-function registerServant() {
+async function registerServant() {
     var name    = document.getElementById('rName').value.trim();
     var email   = document.getElementById('rEmail').value.trim();
     var pass    = document.getElementById('rPass').value;
     var role    = document.getElementById('rRole').value;
     var imgData = document.getElementById('rImgData').value;
     var imgUrl  = document.getElementById('rImg').value.trim();
+    var fromLogin = document.getElementById('registerModal').dataset.fromLogin === '1';
 
     if (!name || !email || !pass) { showToast("يرجى ملء الحقول المطلوبة", "error"); return; }
-    if (servants.find(function(s){ return s.email === email; })) { showToast("البريد مستخدم مسبقاً", "error"); return; }
     if (role === 'Admin') { showToast("لا يمكن إضافة أدمن ثاني", "error"); return; }
-    if (currentUser.role === 'Servant') { showToast("ليس لديك صلاحية", "error"); return; }
-    if (currentUser.role === 'ServiceLeader' && role !== 'Servant') { showToast("أمين الخدمة يضيف خدام فقط", "error"); return; }
+    if (!fromLogin && currentUser && currentUser.role === 'Servant') { showToast("ليس لديك صلاحية", "error"); return; }
+    if (!fromLogin && currentUser && currentUser.role === 'ServiceLeader' && role !== 'Servant') { showToast("أمين الخدمة يضيف خدام فقط", "error"); return; }
+
+    // لو من شاشة الدخول — نحمل البيانات من Sheets أولاً عشان نتحقق من التكرار
+    if (fromLogin && isSheetEnabled()) {
+        showToast("⏳ جاري التحقق...", "success");
+        await loadFromSheet();
+    }
+
+    if (servants.find(function(s){ return s.email === email; })) {
+        showToast("البريد الإلكتروني مستخدم مسبقاً", "error"); return;
+    }
 
     var checkedServices;
     if (role === 'Priest') {
@@ -2878,11 +2916,31 @@ function registerServant() {
         }
     }
 
-    servants.push({ id: Date.now().toString(), name: name, email: email, pass: pass, role: role, img: imgUrl || '', imgData: imgData || '', services: checkedServices });
-    saveData();
+    var newServant = {
+        id: Date.now().toString(),
+        name: name,
+        email: email,
+        pass: pass,
+        role: role,
+        img: imgUrl || '',
+        imgData: imgData || '',
+        services: checkedServices,
+        pending: fromLogin ? true : false  // لو من شاشة الدخول بيحتاج موافقة الأدمن
+    };
+
+    servants.push(newServant);
+    await saveData();
     closeModal('registerModal');
-    renderServants();
-    showToast("تم تسجيل الخادم بنجاح ✅");
+
+    if (fromLogin) {
+        showToast("✅ تم إرسال طلب التسجيل — انتظر موافقة الأدمن أو سجل دخولك الآن");
+        // ملء بيانات الدخول تلقائياً
+        document.getElementById('loginEmail').value = email;
+        document.getElementById('loginPass').value  = pass;
+    } else {
+        renderServants();
+        showToast("تم تسجيل الخادم بنجاح ✅");
+    }
 }
 
 function renderServants() {
