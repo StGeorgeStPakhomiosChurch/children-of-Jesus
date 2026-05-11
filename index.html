@@ -346,138 +346,21 @@
         }
         .page-header h2 { margin: 0; color: var(--primary); font-size: 1.6em; }
 
-        /* ===== الكروت - شبكة ===== */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 22px; }
-
-        /* ===== الكارت التعريفي الجديد ===== */
+        /* ===== الكروت ===== */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 22px; }
         .m-card {
             background: var(--white);
-            border-radius: 22px;
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 6px 28px rgba(0,0,0,0.10), 0 0 0 1px rgba(212,175,55,0.15);
+            box-shadow: 0 3px 15px rgba(0,0,0,0.07);
+            border-top: 4px solid var(--accent);
             transition: 0.3s;
         }
-        .m-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(0,0,0,0.16), 0 0 0 1px rgba(212,175,55,0.3); }
-
-        /* رأس الكارت */
-        .mc-header {
-            background: linear-gradient(135deg, #071444 0%, #0d1660 55%, #1a237e 100%);
-            padding: 22px 18px 16px;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .mc-header::after {
-            content: '';
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, var(--accent), #f0d060, var(--accent), transparent);
-        }
-        .mc-service-badge {
-            position: absolute;
-            top: 10px; left: 12px;
-            background: rgba(212,175,55,0.18);
-            border: 1px solid rgba(212,175,55,0.4);
-            color: var(--accent);
-            font-size: 0.68em; font-weight: 700;
-            padding: 2px 9px; border-radius: 20px;
-        }
-        .mc-avatar {
-            flex-shrink: 0;
-            width: 74px; height: 74px;
-            border-radius: 50%;
-            border: 3px solid var(--accent);
-            box-shadow: 0 0 0 3px rgba(212,175,55,0.2);
-            overflow: hidden;
-            background: #1a237e;
-            margin-top: 16px;
-            cursor: pointer;
-        }
-        .mc-avatar img { width:100%; height:100%; object-fit:cover; display:block; }
-        .mc-head-info { flex:1; padding-top: 18px; }
-        .mc-name { color:white; font-size:1.05em; font-weight:900; line-height:1.3; margin-bottom:5px; }
-        .mc-grade-pill {
-            display:inline-flex; align-items:center; gap:4px;
-            background:rgba(212,175,55,0.2); border:1px solid rgba(212,175,55,0.45);
-            color:var(--accent); font-size:0.74em; font-weight:700;
-            padding:2px 10px; border-radius:20px;
-        }
-        .mc-gender { color:rgba(255,255,255,0.55); font-size:0.76em; margin-top:5px; display:flex; align-items:center; gap:4px; }
-
-        /* جسم الكارت */
-        .mc-body { padding: 14px 16px 8px; }
-        .mc-info-row {
-            display:flex; align-items:flex-start; gap:9px;
-            padding: 8px 10px; border-radius:9px; transition:background 0.15s;
-        }
-        .mc-info-row:hover { background:#f8f9ff; }
-        .mc-icon {
-            width:28px; height:28px; border-radius:7px;
-            display:flex; align-items:center; justify-content:center;
-            font-size:0.8em; flex-shrink:0; margin-top:1px;
-        }
-        .mc-lbl { font-size:0.68em; color:#888; font-weight:600; margin-bottom:1px; }
-        .mc-val { font-size:0.87em; font-weight:700; color:#1a1a2e; }
-        .mc-val.empty { color:#ccc; font-weight:400; font-size:0.8em; }
-
-        /* فاصل قسم */
-        .mc-divider {
-            display:flex; align-items:center; gap:8px;
-            padding:10px 10px 4px;
-            font-size:0.72em; font-weight:800; color:var(--primary); letter-spacing:0.4px;
-        }
-        .mc-divider::before, .mc-divider::after {
-            content:''; flex:1; height:1px;
-        }
-        .mc-divider::before { background: linear-gradient(90deg, #e8eaf6, transparent); }
-        .mc-divider::after  { background: linear-gradient(90deg, transparent, #e8eaf6); }
-
-        /* قسم الأسرة */
-        .mc-parents { background:#fafbff; border-top:1px solid #eef0fb; padding:10px 16px 8px; }
-        .mc-parent-row {
-            display:flex; align-items:center; gap:9px;
-            padding: 7px 0;
-        }
-        .mc-parent-row + .mc-parent-row { border-top:1px solid #eef0fb; }
-        .mc-parent-icon { width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:0.85em; flex-shrink:0; }
-        .mc-parent-meta { flex:1; min-width:0; }
-        .mc-parent-name { font-size:0.84em; font-weight:700; color:#1a1a2e; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-        .mc-parent-job  { font-size:0.7em; color:#888; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-        .mc-parent-phone { font-size:0.74em; color:var(--primary); font-weight:700; text-decoration:none; white-space:nowrap; display:flex; align-items:center; gap:3px; }
-
-        /* أزرار سريعة */
-        .mc-actions { display:flex; gap:6px; padding:10px 16px 12px; background:white; }
-        .mc-action-btn {
-            flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
-            padding:8px 4px; border-radius:10px; border:none; cursor:pointer;
-            font-family:inherit; font-size:0.68em; font-weight:700; text-decoration:none;
-            transition:all 0.2s;
-        }
-        .mc-action-btn i { font-size:1.2em; }
-        .mc-action-btn:hover { transform:translateY(-2px); filter:brightness(1.08); }
-        .mc-action-btn.call      { background:#e8f5e9; color:#2e7d32; }
-        .mc-action-btn.whatsapp  { background:#e8faf0; color:#128c7e; }
-        .mc-action-btn.telegram  { background:#e6f3ff; color:#0088cc; }
-        .mc-action-btn.facebook  { background:#e8f0fe; color:#1877f2; }
-        .mc-action-btn.map       { background:#fff3e0; color:#e65100; }
-        .mc-action-btn.edit-btn  { background:#f3f4f6; color:#374151; }
-        .mc-action-btn.del-btn   { background:#ffebee; color:#c62828; }
-        .mc-action-btn.detail-btn{ background:#eef0fb; color:#1a237e; }
-
-        /* تذييل الكارت */
-        .mc-footer {
-            background:linear-gradient(135deg,#071444,#0d1660);
-            padding:10px 16px;
-            display:flex; align-items:center; justify-content:space-between;
-        }
-        .mc-footer-logo { color:var(--accent); font-size:0.8em; font-weight:700; display:flex; align-items:center; gap:5px; opacity:0.9; }
-        .mc-footer-id   { font-size:0.65em; color:rgba(255,255,255,0.3); font-weight:600; letter-spacing:1px; font-family:monospace; }
-
-        /* ملاحظة */
-        .mc-note { padding:6px 10px; margin:4px 10px 8px; background:#fffbeb; border-radius:8px; border-right:3px solid var(--accent); font-size:0.76em; color:#7a5c00; }
+        .m-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
+        .m-card img { width: 100%; height: 200px; object-fit: cover; cursor: pointer; }
+        .m-card-body { padding: 18px; }
+        .m-card-body h3 { margin: 0 0 5px; color: #1a1a1a; font-size: 1.1em; }
+        .m-card-body p { margin: 4px 0; font-size: 0.85em; color: #666; }
 
         /* ===== الأزرار ===== */
         .btn {
@@ -1759,14 +1642,9 @@ async function handleLogin() {
     const user = servants.find(u => u.email === email && u.pass === pass);
 
     if (user) {
-        // تحقق إن الحساب لم يعد معلقاً
-        if (user.pending) {
-            showToast("حسابك لا يزال قيد المراجعة — انتظر موافقة الأدمن", "error");
-            return;
-        }
         currentUser = user;
-        // حفظ الجلسة في localStorage (بدون كلمة السر في النص الواضح)
-        localStorage.setItem('cm_session', JSON.stringify({ email: user.email, token: btoa(user.email + ':' + user.pass) }));
+        // حفظ الجلسة في localStorage
+        localStorage.setItem('cm_session', JSON.stringify({ email: user.email, pass: user.pass }));
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('main-app').style.display = 'flex';
         document.getElementById('userName').innerText  = user.name;
@@ -1783,10 +1661,7 @@ async function handleLogin() {
 
         // إظهار زر إدارة الخدام في الهوم (للكاهن وأمين الخدمة فقط — الخادم لا يراه)
         if (canAdmin || isLeader) {
-            document.querySelectorAll('.admin-only').forEach(el => {
-                // احترم نوع العنصر: block أو inline-flex أو grid
-                el.style.display = el.tagName === 'BUTTON' || el.tagName === 'A' ? 'inline-flex' : '';
-            });
+            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'flex');
         }
         if (canAdmin || isLeader) {
             const btn = document.getElementById('btnTripServants');
@@ -2144,8 +2019,8 @@ function closeDrawerAndGo(page) {
 
 function navigateBack() {
     if (pageHistory.length >= 2) {
-        pageHistory.pop(); // إزالة الصفحة الحالية
-        const prev = pageHistory[pageHistory.length - 1]; // إطلالة على السابقة بدون حذف
+        pageHistory.pop(); // الصفحة الحالية
+        const prev = pageHistory.pop(); // الصفحة السابقة
         if (prev === 'home') goHome();
         else showPage(prev);
     } else {
@@ -2171,10 +2046,7 @@ function updateHomeStats() {
     if (elt) elt.textContent = trips.filter(t => t.service === activeSub).length + ' رحلة';
 
     // حضور اليوم
-    const todayDateStr = new Date().toISOString().split('T')[0];
-    const sessionSuffix = (typeof activeSessionType !== 'undefined' && activeSessionType !== 'friday')
-        ? `__session_${activeSessionType}` : '';
-    const todayKey = `${todayDateStr}_${activeSub}${sessionSuffix}`;
+    const todayKey = new Date().toISOString().split('T')[0] + '_' + activeSub;
     const todayRec = attendance[todayKey] || {};
     const present  = Object.values(todayRec).filter(v => v && v.status === 'present').length;
     const elA = document.getElementById('hstat-att');
@@ -2187,12 +2059,7 @@ function updateHomeStats() {
     // birthday banner
     const curMonth = new Date().getMonth() + 1;
     const monthNames = ['','يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
-    const bdays = sm.filter(m => {
-        if (!m.dob) return false;
-        const parts = m.dob.split('-');
-        const month = parts.length >= 2 ? parseInt(parts[1]) : new Date(m.dob).getMonth() + 1;
-        return month === curMonth;
-    });
+    const bdays = sm.filter(m => m.dob && new Date(m.dob).getMonth()+1 === curMonth);
     const hbb = document.getElementById('homeBirthdayBanner');
     if (hbb) {
         if (bdays.length > 0) {
@@ -2264,15 +2131,13 @@ function renderAttReport() {
 
     // جمع كل مفاتيح الحضور لهذا الشهر والخدمة الفرعية
     const dayKeys = Object.keys(attendance).filter(k => {
-        // key format: YYYY-MM-DD_serviceName  OR  YYYY-MM-DD_serviceName__session_X
-        const dateMatch = k.match(/^(\d{4}-\d{2}-\d{2})_(.+)$/);
-        if (!dateMatch) return false;
-        const datePart = dateMatch[1];
-        const restPart = dateMatch[2];
-        // الخدمة الفرعية هي الجزء قبل __session_ (إن وُجد)
-        const svcPart = restPart.split('__session_')[0];
+        // key format: YYYY-MM-DD_serviceName
+        const [datePart, svc] = k.split('_').reduce((acc, part, i, arr) => {
+            if (i === 0) return [part, arr.slice(1).join('_')];
+            return acc;
+        }, ['', '']);
         const d = new Date(datePart);
-        return svcPart === activeSub && d.getFullYear() === year && d.getMonth()+1 === month;
+        return svc === activeSub && d.getFullYear() === year && d.getMonth()+1 === month;
     });
 
     // كل مخدومي الخدمة
@@ -2292,8 +2157,7 @@ function renderAttReport() {
 
         dayKeys.forEach(k => {
             const rec = attendance[k][m.id];
-            const dateMatch = k.match(/^(\d{4}-\d{2}-\d{2})/);
-            const datePart = dateMatch ? dateMatch[1] : k.split('_')[0];
+            const datePart = k.split('_')[0];
             const dateLabel = formatDateDMY(datePart);
             const status = rec ? rec.status : 'absent';
             if (status === 'present') { presentCount++; sessionDetails.push({date:dateLabel, status:'present'}); }
@@ -2392,14 +2256,12 @@ function renderMembers() {
     if (monthFilter) {
         list = list.filter(m => {
             if (!m.dob) return false;
-            const parts = m.dob.split('-');
-            const month = parts.length >= 2 ? parseInt(parts[1]) : new Date(m.dob).getMonth() + 1;
-            return month === parseInt(monthFilter);
+            return new Date(m.dob).getMonth() + 1 === parseInt(monthFilter);
         });
         // ترتيب حسب يوم الميلاد داخل الشهر
         list.sort((a, b) => {
-            const dayA = parseInt((a.dob || '').split('-')[2] || 0);
-            const dayB = parseInt((b.dob || '').split('-')[2] || 0);
+            const dayA = new Date(a.dob).getDate();
+            const dayB = new Date(b.dob).getDate();
             return dayA - dayB;
         });
     }
@@ -2409,21 +2271,11 @@ function renderMembers() {
     if (banner) {
         const curMonth = new Date().getMonth() + 1;
         const monthNames = ['','يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
-        const bdays = getServiceMembers().filter(m => {
-            if (!m.dob) return false;
-            const parts = m.dob.split('-');
-            const month = parts.length >= 2 ? parseInt(parts[1]) : new Date(m.dob).getMonth() + 1;
-            const day   = parts.length >= 3 ? parseInt(parts[2]) : new Date(m.dob).getDate();
-            return month === curMonth;
-        });
+        const bdays = getServiceMembers().filter(m => m.dob && new Date(m.dob).getMonth()+1 === curMonth);
         if (bdays.length > 0 && !monthFilter) {
             banner.style.display = 'flex';
             banner.innerHTML = `<i class="fas fa-birthday-cake" style="font-size:1.4em; color:#d4af37;"></i>
-                <span><strong>🎉 مواليد ${monthNames[curMonth]}:</strong> ${bdays.map(m=>{
-                    const parts = (m.dob||'').split('-');
-                    const day = parts.length >= 3 ? parseInt(parts[2]) : '?';
-                    return `<strong>${m.name}</strong> (${day})`;
-                }).join(' — ')}</span>`;
+                <span><strong>🎉 مواليد ${monthNames[curMonth]}:</strong> ${bdays.map(m=>`<strong>${m.name}</strong> (${m.dob ? new Date(m.dob).getDate() : '?'})`).join(' — ')}</span>`;
         } else {
             banner.style.display = 'none';
         }
@@ -2441,194 +2293,72 @@ function renderMembers() {
     list.forEach(m => {
         const imgSrc = getMemberImgSrc(m);
         // رحلات المخدوم في الخدمة الحالية
-        const memberTrips = trips.filter(t => t.service === activeSub && t.targetType !== 'servants' && (t.members || []).includes(m.id));
-
-        // قسم الرحلات في الكارت — بدون nested backticks
-        let tripsSection = '';
+        var memberTrips = trips.filter(function(t){ return t.service === activeSub && t.targetType !== 'servants' && (t.members||[]).includes(m.id); });
+        var tripsSection = '';
         if (memberTrips.length > 0) {
-            tripsSection = '<div style="margin-top:12px; border-top:2px solid #e8eaf6; padding-top:12px;">'
-                + '<p style="font-size:0.82em; font-weight:800; color:#1a237e; margin:0 0 8px;">'
-                + '<i class="fas fa-bus" style="color:#d4af37;"></i> الرحلات المشترك فيها</p>';
-            memberTrips.forEach(function(t) {
-                var cost = parseFloat(t.cost) || 0;
-                var paid = parseFloat((t.payments || {})[m.id] || 0);
-                var remaining = cost - paid;
-                var isFullyPaid = cost > 0 && remaining <= 0;
-                var bgColor = isFullyPaid ? '#e8f5e9' : '#fff8f0';
-                var bdColor = isFullyPaid ? '#a5d6a7' : '#ffcc80';
-
-                var statusBadge = '';
-                if (isFullyPaid) {
-                    statusBadge = '<span style="background:#e8f5e9;color:#388e3c;font-size:0.8em;font-weight:700;padding:2px 10px;border-radius:20px;border:1px solid #a5d6a7;"><i class="fas fa-check-circle"></i> مدفوع كامل</span>';
+            tripsSection += '<div style="margin-top:12px;border-top:2px solid #e8eaf6;padding-top:12px;">';
+            tripsSection += '<p style="font-size:0.82em;font-weight:800;color:#1a237e;margin:0 0 8px;"><i class="fas fa-bus" style="color:#d4af37;"></i> الرحلات المشترك فيها</p>';
+            memberTrips.forEach(function(t){
+                var cost = parseFloat(t.cost)||0;
+                var paid = parseFloat((t.payments||{})[m.id]||0);
+                var rem  = cost - paid;
+                var full = cost>0 && rem<=0;
+                var bg = full ? '#e8f5e9' : '#fff8f0';
+                var bd = full ? '#a5d6a7' : '#ffcc80';
+                var badge = '';
+                if (full) {
+                    badge = '<span style="background:#e8f5e9;color:#388e3c;font-size:0.78em;font-weight:700;padding:2px 8px;border-radius:20px;"><i class="fas fa-check-circle"></i> مدفوع</span>';
                 } else if (cost > 0) {
-                    statusBadge = '<span style="background:#fff3e0;color:#e65100;font-size:0.8em;font-weight:700;padding:2px 10px;border-radius:20px;border:1px solid #ffcc80;"><i class="fas fa-exclamation-circle"></i> متبقي: ' + remaining + ' جنيه</span>';
+                    badge = '<span style="background:#fff3e0;color:#e65100;font-size:0.78em;font-weight:700;padding:2px 8px;border-radius:20px;">متبقي: ' + rem + ' ج</span>';
                 } else {
-                    statusBadge = '<span style="background:#e8eaf6;color:#1a237e;font-size:0.8em;padding:2px 10px;border-radius:20px;">مشترك</span>';
+                    badge = '<span style="background:#e8eaf6;color:#1a237e;font-size:0.78em;padding:2px 8px;border-radius:20px;">مشترك</span>';
                 }
-
-                var dateHtml = t.date ? ('<span style="font-weight:400;font-size:0.78em;color:#999;margin-right:6px;">' + t.date + '</span>') : '';
-
-                var payDetails = '';
+                var payRow = '';
                 if (cost > 0) {
-                    var remainingRow = !isFullyPaid ? ('<span style="color:#e65100;"><i class="fas fa-clock"></i> متبقي: <strong>' + remaining + '</strong> جنيه</span>') : '';
-                    payDetails = '<div style="display:flex;gap:12px;font-size:0.8em;color:#666;margin-bottom:8px;flex-wrap:wrap;">'
-                        + '<span><i class="fas fa-tag" style="color:#1a237e;"></i> التكلفة: <strong>' + cost + '</strong> جنيه</span>'
-                        + '<span style="color:#388e3c;"><i class="fas fa-coins"></i> دفع: <strong>' + paid + '</strong> جنيه</span>'
-                        + remainingRow
-                        + '</div>';
+                    payRow  = '<div style="font-size:0.78em;color:#666;margin:5px 0;display:flex;gap:10px;flex-wrap:wrap;">';
+                    payRow += '<span><i class="fas fa-tag" style="color:#1a237e;"></i> ' + cost + ' ج</span>';
+                    payRow += '<span style="color:#388e3c;"><i class="fas fa-coins"></i> دفع: ' + paid + ' ج</span>';
+                    if (!full) { payRow += '<span style="color:#e65100;">متبقي: ' + rem + ' ج</span>'; }
+                    payRow += '</div>';
                 }
-
-                tripsSection += '<div style="background:' + bgColor + ';border:2px solid ' + bdColor + ';border-radius:12px;padding:10px 14px;margin-bottom:8px;">'
-                    + '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:6px;">'
-                    + '<span style="font-size:0.9em;font-weight:700;color:#1a237e;"><i class="fas fa-bus"></i> ' + t.name + ' ' + dateHtml + '</span>'
-                    + statusBadge
-                    + '</div>'
-                    + payDetails
-                    + '<button class="btn btn-accent btn-sm" style="font-size:0.8em;padding:5px 14px;width:100%;" onclick="openTripPayFromMember(\'' + m.id + '\',\'' + t.id + '\')">'
-                    + '<i class="fas fa-coins"></i> تسجيل / تحديث الدفع</button>'
-                    + '</div>';
+                var mid = m.id;
+                var tid = t.id;
+                var tname = t.name;
+                var row  = '<div style="background:' + bg + ';border:1px solid ' + bd + ';border-radius:10px;padding:8px 12px;margin-bottom:6px;">';
+                    row += '<div style="display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;">';
+                    row += '<span style="font-size:0.85em;font-weight:700;color:#1a237e;"><i class="fas fa-bus"></i> ' + tname + '</span>';
+                    row += badge + '</div>';
+                    row += payRow;
+                    row += '<button class="btn btn-accent btn-sm" style="margin-top:6px;font-size:0.78em;padding:4px 10px;width:100%;"';
+                    row += ' onclick="openTripPayFromMember(' + JSON.stringify(mid) + ',' + JSON.stringify(tid) + ')">';
+                    row += '<i class="fas fa-coins"></i> تسجيل دفع</button></div>';
+                tripsSection += row;
             });
             tripsSection += '</div>';
         } else {
-            tripsSection = '<div style="margin-top:12px;border-top:2px solid #f0f0f0;padding-top:10px;text-align:center;">'
-                + '<p style="font-size:0.82em;color:#ccc;margin:4px 0;"><i class="fas fa-bus"></i> غير مشترك في رحلات</p></div>';
+            tripsSection  = '<div style="margin-top:10px;border-top:1px solid #f0f0f0;padding-top:8px;text-align:center;">';
+            tripsSection += '<p style="font-size:0.8em;color:#ccc;margin:4px 0;"><i class="fas fa-bus"></i> غير مشترك في رحلات</p></div>';
         }
-        // ===== بناء الكارت التعريفي الجديد =====
-        var genderIcon = m.gender === 'أنثى' ? 'fa-female' : 'fa-male';
+        var tripBadgeHtml = '';
 
-        // أزرار التواصل السريع
-        var qaButtons = '';
-        if (m.phone)    qaButtons += '<a href="tel:' + m.phone + '" class="mc-action-btn call"><i class="fas fa-phone"></i>اتصال</a>';
-        if (m.whatsapp) qaButtons += '<a href="https://wa.me/' + normalizePhone(m.whatsapp) + '" target="_blank" class="mc-action-btn whatsapp"><i class="fab fa-whatsapp"></i>واتساب</a>';
-        if (m.telegram) qaButtons += '<a href="https://t.me/' + (m.telegram||'').replace('@','') + '" target="_blank" class="mc-action-btn telegram"><i class="fab fa-telegram"></i>تليجرام</a>';
-        if (m.loc || m.address) qaButtons += '<button class="mc-action-btn map" onclick="openAddressMapFor(\'' + (m.loc||'') + '\',\'' + encodeURIComponent(m.address||'') + '\')"><i class="fas fa-map-marked-alt"></i>الموقع</button>';
-        qaButtons += '<button class="mc-action-btn detail-btn" onclick="viewMemberDetail(\'' + m.id + '\')"><i class="fas fa-eye"></i>التفاصيل</button>';
-        qaButtons += '<button class="mc-action-btn edit-btn" onclick="editMember(\'' + m.id + '\')"><i class="fas fa-edit"></i>تعديل</button>';
-        qaButtons += '<button class="mc-action-btn del-btn" onclick="deleteMember(\'' + m.id + '\')"><i class="fas fa-trash"></i>حذف</button>';
-
-        // تاريخ الميلاد
-        var dobHtml = '';
-        if (m.dob) {
-            dobHtml = '<div class="mc-info-row">'
-                + '<div class="mc-icon" style="background:#fff3e0; color:#e65100;"><i class="fas fa-birthday-cake"></i></div>'
-                + '<div><div class="mc-lbl">تاريخ الميلاد</div>'
-                + '<div class="mc-val">' + formatDateDMY(m.dob) + '</div></div>'
-                + '</div>';
-        }
-
-        // العنوان
-        var addressHtml = '';
-        if (m.address) {
-            addressHtml = '<div class="mc-info-row" style="cursor:pointer;" onclick="openAddressMapFor(\'' + (m.loc||'') + '\',\'' + encodeURIComponent(m.address||'') + '\')">'
-                + '<div class="mc-icon" style="background:#e8f5e9; color:#2e7d32;"><i class="fas fa-map-marker-alt"></i></div>'
-                + '<div><div class="mc-lbl">العنوان</div>'
-                + '<div class="mc-val">' + m.address + '</div></div>'
-                + '</div>';
-        }
-
-        // الموبايل
-        var phoneHtml = '';
-        if (m.phone) {
-            phoneHtml = '<div class="mc-divider"><i class="fas fa-phone"></i> التواصل</div>'
-                + '<a href="tel:' + m.phone + '" class="mc-info-row" style="text-decoration:none; color:inherit;">'
-                + '<div class="mc-icon" style="background:#e8f5e9; color:#2e7d32;"><i class="fas fa-phone"></i></div>'
-                + '<div><div class="mc-lbl">الموبايل</div>'
-                + '<div class="mc-val">' + m.phone + '</div></div>'
-                + '</a>';
-        }
-
-        // الملاحظات
-        var notesHtml = '';
-        if (m.notes) {
-            notesHtml = '<div class="mc-note"><i class="fas fa-sticky-note"></i> ' + m.notes + '</div>';
-        }
-
-        // العمر
-        var ageHtml = '';
-        if (m.age) {
-            ageHtml = ' &middot; <i class="fas fa-birthday-cake" style="color:#f0d060;"></i> ' + m.age + ' سنة';
-        }
-
-        // قسم الأب
-        var fatherHtml = '';
-        if (m.fName || m.fPhone) {
-            var fJobArr = [];
-            if (m.fJob) fJobArr.push(m.fJob);
-            if (m.fConf) fJobArr.push('أب اعتراف: ' + m.fConf);
-            var fJobStr = fJobArr.length ? fJobArr.join(' · ') : 'الأب';
-            var fPhoneLink = m.fPhone ? '<a href="tel:' + m.fPhone + '" class="mc-parent-phone"><i class="fas fa-phone-alt"></i>' + m.fPhone + '</a>' : '';
-            fatherHtml = '<div class="mc-parent-row">'
-                + '<div class="mc-parent-icon" style="background:#e8eaf6; color:#1a237e;"><i class="fas fa-male"></i></div>'
-                + '<div class="mc-parent-meta">'
-                + '<div class="mc-parent-name">' + (m.fName || '—') + '</div>'
-                + '<div class="mc-parent-job">' + fJobStr + '</div>'
-                + '</div>' + fPhoneLink + '</div>';
-        }
-
-        // قسم الأم
-        var motherHtml = '';
-        if (m.moName || m.moPhone) {
-            var moJobArr = [];
-            if (m.moJob) moJobArr.push(m.moJob);
-            if (m.moConf) moJobArr.push('أب اعتراف: ' + m.moConf);
-            var moJobStr = moJobArr.length ? moJobArr.join(' · ') : 'الأم';
-            var moPhoneLink = m.moPhone ? '<a href="tel:' + m.moPhone + '" class="mc-parent-phone"><i class="fas fa-phone-alt"></i>' + m.moPhone + '</a>' : '';
-            motherHtml = '<div class="mc-parent-row">'
-                + '<div class="mc-parent-icon" style="background:#fce4ec; color:#c2185b;"><i class="fas fa-female"></i></div>'
-                + '<div class="mc-parent-meta">'
-                + '<div class="mc-parent-name">' + (m.moName || '—') + '</div>'
-                + '<div class="mc-parent-job">' + moJobStr + '</div>'
-                + '</div>' + moPhoneLink + '</div>';
-        }
-
-        // قسم الأسرة
-        var parentsHtml = '';
-        if (fatherHtml || motherHtml) {
-            parentsHtml = '<div class="mc-parents">'
-                + '<div class="mc-divider" style="padding-top:0;"><i class="fas fa-users"></i> الأسرة</div>'
-                + fatherHtml + motherHtml
-                + '</div>';
-        }
-
-        // رقم ID
-        var memberId = m.id ? m.id.toString().slice(-6).toUpperCase() : '------';
-
-        // تجميع الكارت كامل بدون nested backticks
-        var cardHtml = ''
-            + '<div class="mc-header">'
-            +   '<span class="mc-service-badge"><i class="fas fa-layer-group" style="font-size:0.85em;"></i> ' + activeMain + ' &middot; ' + m.grade + '</span>'
-            +   '<div class="mc-avatar" onclick="zoomImg(\'' + imgSrc.replace(/'/g, "\\'") + '\')">'
-            +     '<img src="' + imgSrc + '" onerror="this.src=\'https://ui-avatars.com/api/?name=' + encodeURIComponent(m.name) + '&background=1a237e&color=fff&size=200\'" alt="' + m.name + '">'
-            +   '</div>'
-            +   '<div class="mc-head-info">'
-            +     '<div class="mc-name">' + m.name + '</div>'
-            +     '<div class="mc-grade-pill"><i class="fas fa-graduation-cap" style="font-size:0.85em;"></i> ' + m.grade + '</div>'
-            +     '<div class="mc-gender"><i class="fas ' + genderIcon + '"></i> ' + (m.gender||'') + ageHtml + '</div>'
-            +   '</div>'
-            + '</div>'
-            + '<div class="mc-body">'
-            +   '<div class="mc-info-row">'
-            +     '<div class="mc-icon" style="background:#eef0fb; color:#1a237e;"><i class="fas fa-hand-holding-heart"></i></div>'
-            +     '<div><div class="mc-lbl">أب الاعتراف</div>'
-            +     '<div class="mc-val' + (m.conf ? '' : ' empty') + '">' + (m.conf || 'غير محدد') + '</div></div>'
-            +   '</div>'
-            +   dobHtml
-            +   addressHtml
-            +   phoneHtml
-            +   notesHtml
-            +   tripsSection
-            + '</div>'
-            + parentsHtml
-            + '<div class="mc-actions">' + qaButtons + '</div>'
-            + '<div class="mc-footer">'
-            +   '<div class="mc-footer-logo"><i class="fas fa-cross" style="font-size:0.8em;"></i> أبناء يسوع</div>'
-            +   '<div class="mc-footer-id">#MB-' + memberId + '</div>'
-            + '</div>';
-
-        var card = document.createElement('div');
-        card.className = 'm-card';
-        card.innerHTML = cardHtml;
-        grid.appendChild(card);
+        const card = document.createElement('div');
+        card.className = "m-card";
+        card.innerHTML = `
+            <img src="${imgSrc}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(m.name)}&background=1a237e&color=fff&size=300'"
+                 onclick="zoomImg('${imgSrc}')" alt="${m.name}">
+            <div class="m-card-body">
+                <h3>${m.name}</h3>
+                <p style="margin:4px 0; font-size:0.85em; color:#666;"><i class="fas fa-graduation-cap" style="color:var(--primary);"></i> ${m.grade}</p>
+                <p style="margin:4px 0; font-size:0.85em; color:#666;"><i class="fas fa-hand-holding-heart" style="color:var(--accent);"></i> ${m.conf || 'أب الاعتراف غير محدد'}</p>
+                ${tripsSection}
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; padding-top:10px; border-top:1px solid #f0f0f0;">
+                    <button class="btn btn-light btn-sm" onclick="viewMemberDetail('${m.id}')"><i class="fas fa-eye"></i> التفاصيل</button>
+                    <div style="display:flex; gap:6px;">
+                        <button class="btn btn-light btn-sm" onclick="editMember('${m.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteMember('${m.id}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            </div>`;
         grid.appendChild(card);
     });
 }
@@ -2655,9 +2385,6 @@ function openMemberModal() {
     document.getElementById('editId').value = "";
     document.getElementById('mImgData').value = "";
     document.getElementById('mImgPreview').src = `https://ui-avatars.com/api/?name=صورة&background=1a237e&color=fff&size=200`;
-    // إعادة ضبط مدخل الملف
-    const fileInput = document.getElementById('mImgFile');
-    if (fileInput) fileInput.value = '';
     document.getElementById('memberModalTitle').innerHTML = '<i class="fas fa-user-plus"></i> إضافة مخدوم جديد';
     document.getElementById('mMainGrade').value = activeMain;
     populateSubGradeInModal();
@@ -2724,113 +2451,90 @@ function viewMemberDetail(id) {
     if (!m) return;
     const imgSrc = getMemberImgSrc(m);
 
-    // ===== رأس الكارت =====
-    let html = '';
-    html += '<div style="display:flex; gap:25px; flex-wrap:wrap; align-items:flex-start;">';
-    html += '<img src="' + imgSrc + '" style="width:120px; height:120px; border-radius:14px; object-fit:cover; border:3px solid var(--accent); cursor:pointer;" onclick="zoomImg(\'' + imgSrc.replace(/'/g, "\\'") + '\')">';
-    html += '<div style="flex:1;">';
-    html += '<h2 style="margin:0 0 5px; color:var(--primary);">' + m.name + '</h2>';
-    html += '<span style="background:var(--accent); color:var(--primary); padding:3px 12px; border-radius:20px; font-size:0.85em; font-weight:700;">' + m.grade + '</span>';
-    html += '</div></div>';
-
-    // ===== شبكة المعلومات =====
-    html += '<div class="form-grid" style="margin-top:20px;">';
-
-    // — البيانات الأساسية
-    html += '<div class="form-section">';
-    html += '<h4><i class="fas fa-info-circle"></i> البيانات الأساسية</h4>';
-    html += row('النوع', m.gender);
-    html += row('تاريخ الميلاد', formatDateDMY(m.dob));
-    html += row('العمر', m.age);
-    html += row('أب الاعتراف', m.conf);
-    if (m.address) {
-        var locColor = m.loc ? 'var(--accent)' : '#d32f2f';
-        html += '<p style="margin:6px 0; font-size:0.9em;"><strong style="color:#555;">العنوان:</strong>'
-              + ' <span onclick="openAddressMapFor(\'' + (m.loc || '') + '\',\'' + encodeURIComponent(m.address) + '\')" style="cursor:pointer; color:var(--primary); text-decoration:underline;">'
-              + '<i class="fas fa-map-marker-alt" style="color:' + locColor + ';"></i> ' + m.address + '</span>';
-        if (!m.loc) {
-            html += '<span style="display:block; margin-top:4px; font-size:0.82em; color:#d32f2f; background:#fff3f3; border-radius:8px; padding:3px 10px; font-weight:600;"><i class="fas fa-exclamation-triangle"></i> برجاء إضافة لوكيشن GPS للمخدوم</span>';
-        }
-        html += '</p>';
-    }
-    if (m.notes) html += '<p style="margin:6px 0; font-size:0.9em;"><strong style="color:#555;">ملاحظات:</strong> ' + m.notes + '</p>';
-    html += '</div>';
-
-    // — التواصل
-    html += '<div class="form-section">';
-    html += '<h4><i class="fas fa-phone"></i> التواصل</h4>';
-    if (m.phone)    html += '<p style="margin:6px 0;"><strong style="color:#555; font-size:0.9em;">الموبايل:</strong> <a href="tel:' + m.phone + '" class="contact-link">' + m.phone + '</a></p>';
-    if (m.landline) html += '<p style="margin:6px 0;"><strong style="color:#555; font-size:0.9em;">أرضي:</strong> <a href="tel:' + m.landline + '" class="contact-link">' + m.landline + '</a></p>';
-    if (m.whatsapp) html += '<p style="margin:6px 0;"><strong style="color:#555; font-size:0.9em;">واتساب:</strong> <a href="https://wa.me/' + normalizePhone(m.whatsapp) + '" target="_blank" class="contact-link" style="color:#25d366;"><i class="fab fa-whatsapp"></i> ' + m.whatsapp + '</a></p>';
-    if (m.telegram) html += '<p style="margin:6px 0;"><strong style="color:#555; font-size:0.9em;">تليجرام:</strong> <a href="https://t.me/' + m.telegram.replace('@','') + '" target="_blank" class="contact-link" style="color:#0088cc;"><i class="fab fa-telegram"></i> ' + m.telegram + '</a></p>';
-    if (m.facebook) html += '<p style="margin:6px 0;"><strong style="color:#555; font-size:0.9em;">فيسبوك:</strong> <a href="' + getFacebookUrl(m.facebook) + '" target="_blank" class="contact-link" style="color:#1877f2;"><i class="fab fa-facebook"></i> فيسبوك</a></p>';
-    html += '</div>';
-
-    // — الأب
-    html += '<div class="form-section">';
-    html += '<h4><i class="fas fa-male"></i> الأب</h4>';
-    html += row('الاسم', m.fName);
-    html += row('الوظيفة', m.fJob);
-    if (m.fPhone)    html += '<p style="margin:6px 0; font-size:0.9em;"><strong style="color:#555;">الموبايل:</strong> <a href="tel:' + m.fPhone + '" class="contact-link">' + m.fPhone + '</a></p>';
-    if (m.fLandline) html += '<p style="margin:6px 0; font-size:0.9em;"><strong style="color:#555;">أرضي:</strong> <a href="tel:' + m.fLandline + '" class="contact-link">' + m.fLandline + '</a></p>';
-    html += row('أب الاعتراف', m.fConf);
-    html += '</div>';
-
-    // — الأم
-    html += '<div class="form-section">';
-    html += '<h4><i class="fas fa-female"></i> الأم</h4>';
-    html += row('الاسم', m.moName);
-    html += row('الوظيفة', m.moJob);
-    if (m.moPhone)    html += '<p style="margin:6px 0; font-size:0.9em;"><strong style="color:#555;">الموبايل:</strong> <a href="tel:' + m.moPhone + '" class="contact-link">' + m.moPhone + '</a></p>';
-    if (m.moLandline) html += '<p style="margin:6px 0; font-size:0.9em;"><strong style="color:#555;">أرضي:</strong> <a href="tel:' + m.moLandline + '" class="contact-link">' + m.moLandline + '</a></p>';
-    html += row('أب الاعتراف', m.moConf);
-    html += '</div>';
-
-    html += '</div>'; // end form-grid
-
-    // ===== أزرار التذييل =====
-    html += '<div class="modal-footer">';
-    html += '<button class="btn btn-primary" onclick="editMember(\'' + m.id + '\'); closeModal(\'memberDetailModal\')"><i class="fas fa-edit"></i> تعديل</button>';
-    if (m.whatsapp) html += '<a href="https://wa.me/' + normalizePhone(m.whatsapp) + '" target="_blank" class="btn btn-whatsapp"><i class="fab fa-whatsapp"></i> واتساب</a>';
-    if (m.telegram) html += '<a href="https://t.me/' + m.telegram.replace('@','') + '" target="_blank" class="btn btn-telegram"><i class="fab fa-telegram"></i> تليجرام</a>';
-    if (m.facebook) html += '<a href="' + getFacebookUrl(m.facebook) + '" target="_blank" class="btn btn-facebook"><i class="fab fa-facebook"></i> فيسبوك</a>';
-    if (m.loc || m.address) html += '<button class="btn btn-accent" onclick="openAddressMapFor(\'' + (m.loc||'') + '\',\'' + encodeURIComponent(m.address||'') + '\')"><i class="fas fa-map-marked-alt"></i> الموقع</button>';
-    html += '</div>';
-
-    // ===== الرحلات =====
-    var memberTrips = trips.filter(function(t){ return t.targetType !== 'servants' && (t.members||[]).includes(m.id); });
-    if (memberTrips.length > 0) {
-        html += '<div class="form-section" style="margin-top:10px;">';
-        html += '<h4><i class="fas fa-bus" style="color:var(--primary);"></i> الرحلات المشترك فيها</h4>';
-        memberTrips.forEach(function(t) {
-            var cost = parseFloat(t.cost) || 0;
-            var paid = parseFloat((t.payments||{})[m.id] || 0);
-            var remaining = cost - paid;
-            var isFullyPaid = cost > 0 && remaining <= 0;
-            var bgColor = isFullyPaid ? '#e8f5e9' : '#fff8f0';
-            var bdColor = isFullyPaid ? '#a5d6a7' : '#ffcc80';
-            html += '<div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; padding:10px; margin:6px 0; background:' + bgColor + '; border-radius:10px; border:1px solid ' + bdColor + ';">';
-            html += '<div>';
-            html += '<strong style="color:#1a237e;"><i class="fas fa-bus"></i> ' + t.name + '</strong>';
-            if (t.date) html += '<span style="font-size:0.8em; color:#888; margin-right:8px;"><i class="fas fa-calendar"></i> ' + formatDateDMY(t.date) + '</span>';
+    document.getElementById('memberDetailContent').innerHTML = `
+        <div style="display:flex; gap:25px; flex-wrap:wrap; align-items:flex-start;">
+            <img src="${imgSrc}" style="width:120px; height:120px; border-radius:14px; object-fit:cover; border:3px solid var(--accent); cursor:pointer;" onclick="zoomImg('${imgSrc}')">
+            <div style="flex:1;">
+                <h2 style="margin:0 0 5px; color:var(--primary);">${m.name}</h2>
+                <span style="background:var(--accent); color:var(--primary); padding:3px 12px; border-radius:20px; font-size:0.85em; font-weight:700;">${m.grade}</span>
+            </div>
+        </div>
+        <div class="form-grid" style="margin-top:20px;">
+            <div class="form-section">
+                <h4><i class="fas fa-info-circle"></i> البيانات الأساسية</h4>
+                ${row("النوع", m.gender)}
+                ${row("تاريخ الميلاد", formatDateDMY(m.dob))}
+                ${row("العمر", m.age)}
+                ${row("أب الاعتراف", m.conf)}
+                ${m.address ? `<p style="margin:6px 0; font-size:0.9em;"><strong style="color:#555;">العنوان:</strong>
+                    <span onclick="openAddressMapFor('${m.loc||''}','${encodeURIComponent(m.address)}')" style="cursor:pointer; color:var(--primary); text-decoration:underline;">
+                    <i class="fas fa-map-marker-alt" style="color:${m.loc ? 'var(--accent)' : '#d32f2f'};"></i> ${m.address}</span>
+                    ${!m.loc ? `<span style="display:block; margin-top:4px; font-size:0.82em; color:#d32f2f; background:#fff3f3; border-radius:8px; padding:3px 10px; font-weight:600;"><i class="fas fa-exclamation-triangle"></i> برجاء إضافة لوكيشن GPS للمخدوم</span>` : ''}
+                    </p>` : ''}
+                ${m.notes ? `<p style="margin:6px 0; font-size:0.9em;"><strong style="color:#555;">ملاحظات:</strong> ${m.notes}</p>` : ''}
+            </div>
+            <div class="form-section">
+                <h4><i class="fas fa-phone"></i> التواصل</h4>
+                ${m.phone    ? `<p style="margin:6px 0;"><strong style="color:#555; font-size:0.9em;">الموبايل:</strong> <a href="tel:${m.phone}" class="contact-link">${m.phone}</a></p>` : ''}
+                ${m.landline ? `<p style="margin:6px 0;"><strong style="color:#555; font-size:0.9em;">أرضي:</strong> <a href="tel:${m.landline}" class="contact-link">${m.landline}</a></p>` : ''}
+                ${m.whatsapp ? `<p style="margin:6px 0;"><strong style="color:#555; font-size:0.9em;">واتساب:</strong> <a href="https://wa.me/2${m.whatsapp}" target="_blank" class="contact-link" style="color:#25d366;"><i class="fab fa-whatsapp"></i> ${m.whatsapp}</a></p>` : ''}
+                ${m.telegram ? `<p style="margin:6px 0;"><strong style="color:#555; font-size:0.9em;">تليجرام:</strong> <a href="https://t.me/${m.telegram.replace('@','')}" target="_blank" class="contact-link" style="color:#0088cc;"><i class="fab fa-telegram"></i> ${m.telegram}</a></p>` : ''}
+                ${m.facebook ? `<p style="margin:6px 0;"><strong style="color:#555; font-size:0.9em;">فيسبوك:</strong> <a href="${getFacebookUrl(m.facebook)}" target="_blank" class="contact-link" style="color:#1877f2;"><i class="fab fa-facebook"></i> فيسبوك</a></p>` : ''}
+            </div>
+            <div class="form-section">
+                <h4><i class="fas fa-male"></i> الأب</h4>
+                ${row("الاسم", m.fName)}
+                ${row("الوظيفة", m.fJob)}
+                ${m.fPhone    ? `<p style="margin:6px 0; font-size:0.9em;"><strong style="color:#555;">الموبايل:</strong> <a href="tel:${m.fPhone}" class="contact-link">${m.fPhone}</a></p>` : ''}
+                ${m.fLandline ? `<p style="margin:6px 0; font-size:0.9em;"><strong style="color:#555;">أرضي:</strong> <a href="tel:${m.fLandline}" class="contact-link">${m.fLandline}</a></p>` : ''}
+                ${row("أب الاعتراف", m.fConf)}
+            </div>
+            <div class="form-section">
+                <h4><i class="fas fa-female"></i> الأم</h4>
+                ${row("الاسم", m.moName)}
+                ${row("الوظيفة", m.moJob)}
+                ${m.moPhone    ? `<p style="margin:6px 0; font-size:0.9em;"><strong style="color:#555;">الموبايل:</strong> <a href="tel:${m.moPhone}" class="contact-link">${m.moPhone}</a></p>` : ''}
+                ${m.moLandline ? `<p style="margin:6px 0; font-size:0.9em;"><strong style="color:#555;">أرضي:</strong> <a href="tel:${m.moLandline}" class="contact-link">${m.moLandline}</a></p>` : ''}
+                ${row("أب الاعتراف", m.moConf)}
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" onclick="editMember('${m.id}'); closeModal('memberDetailModal')"><i class="fas fa-edit"></i> تعديل</button>
+            ${m.whatsapp ? `<a href="https://wa.me/2${m.whatsapp}" target="_blank" class="btn btn-whatsapp"><i class="fab fa-whatsapp"></i> واتساب</a>` : ''}
+            ${m.telegram ? `<a href="https://t.me/${m.telegram.replace('@','')}" target="_blank" class="btn btn-telegram"><i class="fab fa-telegram"></i> تليجرام</a>` : ''}
+            ${m.facebook ? `<a href="${getFacebookUrl(m.facebook)}" target="_blank" class="btn btn-facebook"><i class="fab fa-facebook"></i> فيسبوك</a>` : ''}
+            ${(m.loc||m.address) ? `<button class="btn btn-accent" onclick="openAddressMapFor('${m.loc||''}','${encodeURIComponent(m.address||'')}')"><i class="fas fa-map-marked-alt"></i> الموقع</button>` : ''}
+        </div>
+        <!-- رحلات المخدوم -->
+        ${(function(){
+            const memberTrips = trips.filter(t => t.targetType !== 'servants' && (t.members||[]).includes(m.id));
+            if (memberTrips.length === 0) return '';
+            let html = `<div class="form-section" style="margin-top:10px;">
+                <h4><i class="fas fa-bus" style="color:var(--primary);"></i> الرحلات المشترك فيها</h4>`;
+            memberTrips.forEach(t => {
+                const cost = parseFloat(t.cost) || 0;
+                const paid = parseFloat((t.payments||{})[m.id] || 0);
+                const remaining = cost - paid;
+                const isFullyPaid = cost > 0 && remaining <= 0;
+                html += `<div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; padding:10px; margin:6px 0; background:${isFullyPaid?'#e8f5e9':'#fff8f0'}; border-radius:10px; border:1px solid ${isFullyPaid?'#a5d6a7':'#ffcc80'};">
+                    <div>
+                        <strong style="color:#1a237e;"><i class="fas fa-bus"></i> ${t.name}</strong>
+                        ${t.date ? `<span style="font-size:0.8em; color:#888; margin-right:8px;"><i class="fas fa-calendar"></i> ${formatDateDMY(t.date)}</span>` : ''}
+                    </div>
+                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                        ${cost > 0 ? `<span style="font-size:0.82em; color:#555;">تكلفة: ${cost} جنيه</span>
+                        <span style="font-size:0.82em; color:#388e3c;">دفع: ${paid} جنيه</span>
+                        ${isFullyPaid
+                            ? `<span style="color:#388e3c; font-weight:700; font-size:0.85em;"><i class="fas fa-check-circle"></i> مدفوع كامل</span>`
+                            : `<span style="color:#e65100; font-size:0.82em; font-weight:700;">متبقي: ${remaining} جنيه</span>`
+                        }` : ''}
+                        <button class="btn btn-accent btn-sm" onclick="openTripPayFromMember('${m.id}','${t.id}')"><i class="fas fa-coins"></i> تحديث الدفع</button>
+                    </div>
+                </div>`;
+            });
             html += '</div>';
-            html += '<div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">';
-            if (cost > 0) {
-                html += '<span style="font-size:0.82em; color:#555;">تكلفة: ' + cost + ' جنيه</span>';
-                html += '<span style="font-size:0.82em; color:#388e3c;">دفع: ' + paid + ' جنيه</span>';
-                if (isFullyPaid) {
-                    html += '<span style="color:#388e3c; font-weight:700; font-size:0.85em;"><i class="fas fa-check-circle"></i> مدفوع كامل</span>';
-                } else {
-                    html += '<span style="color:#e65100; font-size:0.82em; font-weight:700;">متبقي: ' + remaining + ' جنيه</span>';
-                }
-            }
-            html += '<button class="btn btn-accent btn-sm" onclick="openTripPayFromMember(\'' + m.id + '\',\'' + t.id + '\')"><i class="fas fa-coins"></i> تحديث الدفع</button>';
-            html += '</div></div>';
-        });
-        html += '</div>';
-    }
-
-    document.getElementById('memberDetailContent').innerHTML = html;
+            return html;
+        })()}`;
     document.getElementById('memberDetailModal').style.display = 'block';
 }
 
@@ -2842,12 +2546,6 @@ function row(label, val) {
 // تنسيق التاريخ: يوم / شهر / سنة
 function formatDateDMY(dateStr) {
     if (!dateStr) return '';
-    // تجنب مشكلة الـ timezone: نقرأ الأجزاء مباشرة
-    const parts = dateStr.split('-');
-    if (parts.length === 3) {
-        const year = parts[0], month = parts[1], day = parts[2].substring(0, 2);
-        return `${day}/${month}/${year}`;
-    }
     const d = new Date(dateStr);
     if (isNaN(d)) return dateStr;
     const day   = String(d.getDate()).padStart(2, '0');
@@ -2859,9 +2557,6 @@ function formatDateDMY(dateStr) {
 document.getElementById('memberForm').onsubmit = function(e) {
     e.preventDefault();
     const id = document.getElementById('editId').value || Date.now().toString();
-    // حساب العمر تلقائياً لو dob موجود
-    const dobVal = document.getElementById('mDob').value;
-    if (dobVal) calculateAge(dobVal);
     const newMember = {
         id,
         name:      document.getElementById('mName').value.trim(),
@@ -2958,7 +2653,7 @@ function deleteCustomAttDay(day) {
     localStorage.setItem('cm_customAttDays', JSON.stringify(customAttDays));
     // حذف بيانات الحضور المرتبطة بهذا اليوم
     Object.keys(attendance).forEach(k => {
-        if (k.includes(`__session_${day}`)) delete attendance[k];
+        if (k.includes(`__session_${day}_`)) delete attendance[k];
     });
     saveData();
     if (activeSessionType === day) activeSessionType = 'friday';
@@ -3030,36 +2725,7 @@ function setAttendance(memberId, date, service, status) {
     const dayKey = getAttDayKey(date, service);
     if (!attendance[dayKey]) attendance[dayKey] = {};
     attendance[dayKey][memberId] = { status, reason: '' };
-
-    // تحديث بصري للكارت بدون إعادة رسم كاملة (لتجنب فقدان التمرير)
-    const card = document.getElementById(`attcard_${memberId}`);
-    if (card) {
-        card.querySelectorAll('.att-btn').forEach(btn => {
-            btn.classList.remove('present-active','absent-active','excused-active');
-        });
-        const btns = card.querySelectorAll('.att-btn');
-        if (status === 'present' && btns[0]) btns[0].classList.add('present-active');
-        if (status === 'absent'  && btns[1]) btns[1].classList.add('absent-active');
-        if (status === 'excused' && btns[2]) btns[2].classList.add('excused-active');
-        // إزالة سبب الاعتذار القديم لو غيّر الحالة
-        const reasonDiv = card.querySelector('.att-reason-div');
-        if (reasonDiv) reasonDiv.remove();
-    }
-
-    // تحديث الإحصائيات فقط
-    const statsEl = document.getElementById('attStats');
-    const serviceMembers = getServiceMembers();
-    const rec = attendance[dayKey] || {};
-    const presentCount = Object.values(rec).filter(v => v && v.status === 'present').length;
-    const excusedCount = Object.values(rec).filter(v => v && v.status === 'excused').length;
-    const absentCount  = serviceMembers.length - presentCount - excusedCount;
-    const sessionLabel = activeSessionType === 'friday' ? 'يوم الجمعة' : activeSessionType;
-    if (statsEl) statsEl.innerHTML = `
-        <span style="color:#888; font-weight:700; font-size:0.82em;"><i class="fas fa-calendar-day"></i> ${sessionLabel}</span>
-        <span style="color:var(--success);"><i class="fas fa-check-circle"></i> حاضر: <strong>${presentCount}</strong></span>
-        <span style="color:var(--danger);"><i class="fas fa-times-circle"></i> غائب: <strong>${absentCount}</strong></span>
-        <span style="color:var(--warning);"><i class="fas fa-clock"></i> معتذر: <strong>${excusedCount}</strong></span>
-        <span><i class="fas fa-users"></i> الإجمالي: <strong>${serviceMembers.length}</strong></span>`;
+    loadAttendanceList();
 }
 
 // مودال سبب الاعتذار
@@ -3076,43 +2742,12 @@ function openExcuseModal(memberId, date, service) {
 function confirmExcuse() {
     const dayKey = getAttDayKey(pendingExcuseDate, pendingExcuseService);
     if (!attendance[dayKey]) attendance[dayKey] = {};
-    const reason = document.getElementById('excuseReason').value.trim();
-    attendance[dayKey][pendingExcuseMemberId] = { status: 'excused', reason };
+    attendance[dayKey][pendingExcuseMemberId] = {
+        status: 'excused',
+        reason: document.getElementById('excuseReason').value.trim()
+    };
     closeModal('excuseModal');
-
-    // تحديث بصري للكارت
-    const card = document.getElementById(`attcard_${pendingExcuseMemberId}`);
-    if (card) {
-        card.querySelectorAll('.att-btn').forEach(btn => btn.classList.remove('present-active','absent-active','excused-active'));
-        const btns = card.querySelectorAll('.att-btn');
-        if (btns[2]) btns[2].classList.add('excused-active');
-        // تحديث/إضافة سبب الاعتذار
-        let reasonDiv = card.querySelector('.att-reason-div');
-        if (!reasonDiv) {
-            reasonDiv = document.createElement('div');
-            reasonDiv.className = 'att-reason-div';
-            reasonDiv.style.cssText = 'width:100%; font-size:0.82em; color:var(--warning); padding-top:6px;';
-            card.appendChild(reasonDiv);
-        }
-        reasonDiv.innerHTML = reason ? `<i class="fas fa-comment-alt"></i> سبب الاعتذار: ${reason}` : '';
-    }
-
-    // تحديث الإحصائيات
-    setAttendance.__updateStats && setAttendance.__updateStats();
-    // إعادة حساب الإحصائيات
-    const statsEl = document.getElementById('attStats');
-    const serviceMembers = getServiceMembers();
-    const rec = attendance[dayKey] || {};
-    const presentCount = Object.values(rec).filter(v => v && v.status === 'present').length;
-    const excusedCount = Object.values(rec).filter(v => v && v.status === 'excused').length;
-    const absentCount  = serviceMembers.length - presentCount - excusedCount;
-    const sessionLabel = activeSessionType === 'friday' ? 'يوم الجمعة' : activeSessionType;
-    if (statsEl) statsEl.innerHTML = `
-        <span style="color:#888; font-weight:700; font-size:0.82em;"><i class="fas fa-calendar-day"></i> ${sessionLabel}</span>
-        <span style="color:var(--success);"><i class="fas fa-check-circle"></i> حاضر: <strong>${presentCount}</strong></span>
-        <span style="color:var(--danger);"><i class="fas fa-times-circle"></i> غائب: <strong>${absentCount}</strong></span>
-        <span style="color:var(--warning);"><i class="fas fa-clock"></i> معتذر: <strong>${excusedCount}</strong></span>
-        <span><i class="fas fa-users"></i> الإجمالي: <strong>${serviceMembers.length}</strong></span>`;
+    loadAttendanceList();
 }
 
 function saveAttendance() {
@@ -3141,12 +2776,7 @@ function sendAbsenceMessages(absents, date) {
         const msg = encodeURIComponent(
             `السلام عليكم،\nنُعلمكم بأن ابنكم / ابنتكم (${m.name}) لم يحضر اجتماع خدمة ${activeSub} بتاريخ ${formattedDate}.\nنرجو التكرم بإبلاغنا بسبب الغياب.\nشكراً جزيلاً 🙏`
         );
-        // تطبيع رقم الهاتف: إزالة أي مسافات، ثم إضافة كود الدولة 20 إن لزم
-        let phone = parentPhone.replace(/\s+/g, '');
-        if (phone.startsWith('00')) phone = phone.slice(2);        // 0020... → 20...
-        else if (phone.startsWith('0'))  phone = '2' + phone;       // 01... → 201...
-        // لو بيبدأ بـ 2 أو + فتركه كما هو
-        phone = phone.replace(/^\+/, '');                           // +20... → 20...
+        const phone = parentPhone.startsWith('0') ? `2${parentPhone}` : parentPhone;
         window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
     });
     showToast(`تم فتح رسائل واتساب لـ ${absents.length} ولي أمر`);
@@ -3434,8 +3064,7 @@ function updateTripPayStatus() {
 function confirmTripPay() {
     const t = trips.find(x => x.id === pendingPayTripId);
     if (!t) return;
-    let newPaid = parseFloat(document.getElementById('tripPayAmount').value) || 0;
-    if (newPaid < 0) newPaid = 0; // لا يسمح بقيم سالبة
+    const newPaid = parseFloat(document.getElementById('tripPayAmount').value) || 0;
     if (!t.payments) t.payments = {};
     t.payments[pendingPayMemberId] = newPaid;
     saveData();
@@ -3467,26 +3096,12 @@ function initCharts() {
         <div class="stat-card"><div class="stat-icon">👨‍💼</div><div class="stat-num">${servants.length}</div><div class="stat-label">خدام</div></div>`;
 
     destroyChart('chartAttendance');
-    // بناء بيانات الحضور الحقيقية: آخر 4 جمع
-    const today = new Date();
-    const attLabels = [];
-    const attDataReal = [];
-    for (let i = 3; i >= 0; i--) {
-        const d = new Date(today);
-        // إيجاد آخر 4 جمع (أو أقرب تواريخ)
-        d.setDate(d.getDate() - i * 7);
-        const dateStr = d.toISOString().split('T')[0];
-        const key = `${dateStr}_${activeSub}`;
-        const rec = attendance[key] || {};
-        const presentCnt = Object.values(rec).filter(v => v && v.status === 'present').length;
-        const total = serviceMembers.length || 1;
-        attLabels.push(formatDateDMY(dateStr));
-        attDataReal.push(Math.round(presentCnt / total * 100));
-    }
+    const weeks = ['الأسبوع 1','الأسبوع 2','الأسبوع 3','الأسبوع 4'];
+    const attData = weeks.map(() => Math.floor(Math.random() * 30 + 60));
     chartInstances['chartAttendance'] = new Chart(document.getElementById('chartAttendance'), {
         type: 'bar',
-        data: { labels: attLabels, datasets: [{ label: 'نسبة الحضور %', data: attDataReal, backgroundColor: '#1a237e', borderRadius: 8 }] },
-        options: { plugins: { legend: { display: false }, title: { display: true, text: 'نسبة الحضور (آخر 4 أسابيع)', font: { size: 14 } } }, scales: { y: { min: 0, max: 100 } } }
+        data: { labels: weeks, datasets: [{ label: 'نسبة الحضور %', data: attData, backgroundColor: '#1a237e', borderRadius: 8 }] },
+        options: { plugins: { legend: { display: false }, title: { display: true, text: 'نسبة الحضور الشهرية', font: { size: 14 } } } }
     });
 
     destroyChart('chartGender');
@@ -3500,7 +3115,7 @@ function initCharts() {
 
     destroyChart('chartGrades');
     const gradeCount = {};
-    serviceMembers.forEach(m => { gradeCount[m.grade] = (gradeCount[m.grade] || 0) + 1; });
+    members.forEach(m => { gradeCount[m.grade] = (gradeCount[m.grade] || 0) + 1; });
     const gradeLabels = Object.keys(gradeCount);
     const gradeVals   = gradeLabels.map(g => gradeCount[g]);
     const colors      = gradeLabels.map((_, i) => `hsl(${220 + i*25}, 60%, ${40 + i*5}%)`);
@@ -3863,24 +3478,10 @@ function deleteServant(id) {
 // ================================================================
 //  أدوات مساعدة
 // ================================================================
-function normalizePhone(phone) {
-    if (!phone) return '';
-    let p = phone.replace(/\s+/g, '');
-    if (p.startsWith('00')) p = p.slice(2);
-    else if (p.startsWith('0')) p = '2' + p;
-    p = p.replace(/^\+/, '');
-    return p;
-}
-
 function calculateAge(dob) {
     if (!dob) return;
     const today = new Date();
-    // تجنب مشكلة الـ timezone: نقرأ الأجزاء مباشرة
-    const parts = dob.split('-');
-    const birth = parts.length === 3
-        ? new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]))
-        : new Date(dob);
-    if (isNaN(birth)) return;
+    const birth = new Date(dob);
     let age = today.getFullYear() - birth.getFullYear();
     if (today < new Date(today.getFullYear(), birth.getMonth(), birth.getDate())) age--;
     document.getElementById('mAge').value = age + " سنة";
@@ -4077,14 +3678,11 @@ function gregorianToJDN(y, m, d) {
 function jdnToCoptic(jdn) {
     const jdnCopticEpoch = 1825030; // JDN of 1 Tout 1 AM
     let n = jdn - jdnCopticEpoch;
-    if (n < 0) n = 0; // تجنب التواريخ قبل البداية
-    const year  = Math.floor(n / 365) + 1;
-    // احسب بداية السنة بدقة
-    const yearStart = (year - 1) * 365 + Math.floor((year - 1) / 4);
-    const dayOfYear = n - yearStart;
-    const month = Math.min(Math.floor(dayOfYear / 30) + 1, 13);
-    const day   = dayOfYear - (month - 1) * 30 + 1;
-    return { year, month: Math.min(month, 13), day: Math.max(1, Math.min(day, 30)) };
+    const year  = Math.floor(n / 365.25 - 0.25) + 1;
+    n = n - Math.floor((year - 1) * 365.25 + 0.75);
+    const month = Math.floor(n / 30) + 1;
+    const day   = n - (month - 1) * 30 + 1;
+    return { year, month: Math.min(month, 13), day: Math.max(1, day) };
 }
 
 function formatCopticDate(date) {
@@ -4637,20 +4235,14 @@ setTimeout(function() {
         const savedSession = localStorage.getItem('cm_session');
         if (savedSession) {
             try {
-                const session = JSON.parse(savedSession);
-                // دعم الصيغة القديمة (email+pass) والجديدة (email+token)
+                const { email, pass } = JSON.parse(savedSession);
+                // reload servants from storage first
                 const srv = JSON.parse(localStorage.getItem('cm_servants') || '[]');
-                let user = null;
-                if (session.token) {
-                    user = srv.find(u => session.token === btoa(u.email + ':' + u.pass) && u.email === session.email);
-                } else if (session.pass) {
-                    // صيغة قديمة — ترقية تلقائية
-                    user = srv.find(u => u.email === session.email && u.pass === session.pass);
-                }
+                const user = srv.find(u => u.email === email && u.pass === pass);
                 if (user) {
                     // auto-login
-                    document.getElementById('loginEmail').value = user.email;
-                    document.getElementById('loginPass').value = user.pass;
+                    document.getElementById('loginEmail').value = email;
+                    document.getElementById('loginPass').value = pass;
                     handleLogin();
                     return;
                 }
