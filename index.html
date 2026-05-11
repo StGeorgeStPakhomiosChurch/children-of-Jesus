@@ -505,6 +505,15 @@
             background: white; cursor: pointer; font-size: 0.88em; font-weight: 700;
             color: #555; display: flex; align-items: center; gap: 6px; transition: 0.2s;
         }
+        /* القائمة الجانبية */
+        .drawer-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 13px 20px; color: rgba(255,255,255,0.85);
+            font-size: 0.92em; font-weight: 600; cursor: pointer;
+            transition: background 0.15s;
+        }
+        .drawer-item:hover { background: rgba(255,255,255,0.08); }
+        .drawer-item i { width: 20px; text-align: center; color: var(--accent); }
         .att-session-tab.active {
             background: var(--primary); color: white; border-color: var(--primary);
         }
@@ -719,35 +728,70 @@
     <!-- ===== الصفحات الداخلية (مع top nav bar) ===== -->
     <div id="innerPages" style="display:none; flex-direction:column; min-height:100vh;">
 
-        <!-- Inner top bar -->
+        <!-- ① شريط الوقت والتاريخ — أول شيء فوق خالص -->
+        <div style="background:rgba(0,0,0,0.45); padding:8px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08);">
+            <span style="color:rgba(255,255,255,0.9); font-size:0.8em; font-weight:600; display:flex; align-items:center; gap:5px; flex:1;">
+                <i class="fas fa-calendar" style="color:var(--accent); font-size:0.8em;"></i>
+                <span id="innerMiladiTxt"></span>
+            </span>
+            <span style="display:flex; align-items:center; gap:5px; flex:0 0 auto;">
+                <span id="innerClock" style="color:white; font-size:1.05em; font-weight:800; letter-spacing:2px; font-variant-numeric:tabular-nums;"></span>
+                <span id="innerAmpm" style="color:var(--accent); font-size:0.72em; font-weight:700;"></span>
+            </span>
+            <span style="color:var(--accent); font-size:0.8em; font-weight:700; display:flex; align-items:center; gap:5px; flex:1; justify-content:flex-end;">
+                <i class="fas fa-cross" style="font-size:0.75em;"></i>
+                <span id="innerCopticTxt"></span>
+            </span>
+        </div>
+
+        <!-- ② شريط اسم الصفحة + زر رجوع + زر القائمة -->
         <div style="background:linear-gradient(135deg,#071444,#1a237e); position:sticky; top:0; z-index:99;
                     box-shadow:0 2px 15px rgba(0,0,0,0.3);">
-            <div style="display:flex; align-items:center; gap:12px; padding:12px 20px;">
-                <button onclick="goHome()" style="background:rgba(255,255,255,0.12); border:none;
-                        border-radius:10px; color:white; padding:9px 14px; cursor:pointer; font-size:0.9em; display:flex; align-items:center; gap:6px;">
-                    <i class="fas fa-home"></i> الرئيسية
+            <div style="display:flex; align-items:center; gap:10px; padding:11px 16px;">
+                <!-- زر رجوع -->
+                <button onclick="navigateBack()" title="رجوع" style="background:rgba(255,255,255,0.12); border:none;
+                        border-radius:10px; color:white; padding:9px 13px; cursor:pointer; font-size:0.9em;
+                        display:flex; align-items:center; gap:5px; flex-shrink:0;">
+                    <i class="fas fa-arrow-right"></i> رجوع
                 </button>
-                <div style="flex:1; color:white; font-weight:700; font-size:1em;" id="innerPageTitle"></div>
-                <div style="color:var(--accent); font-size:0.8em; font-weight:600;" id="innerServiceLabel"></div>
+                <!-- اسم الصفحة -->
+                <div style="flex:1; color:white; font-weight:700; font-size:1em; text-align:center;" id="innerPageTitle"></div>
+                <!-- اسم الخدمة -->
+                <div style="color:var(--accent); font-size:0.78em; font-weight:600; flex-shrink:0;" id="innerServiceLabel"></div>
+                <!-- زر القائمة الجانبية -->
+                <button onclick="toggleDrawer()" title="القائمة" style="background:rgba(255,255,255,0.12); border:none;
+                        border-radius:10px; color:white; padding:9px 13px; cursor:pointer; font-size:0.9em; flex-shrink:0;">
+                    <i class="fas fa-bars"></i>
+                </button>
             </div>
-            <!-- شريط التاريخ مصغر للصفحات الداخلية -->
-            <div style="background:rgba(0,0,0,0.2); padding:8px 20px; display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.07);">
-                <!-- الميلادي يمين -->
-                <span id="innerMiladi" style="color:rgba(255,255,255,0.9); font-size:0.8em; font-weight:600; display:flex; align-items:center; gap:5px; flex:1;">
-                    <i class="fas fa-calendar" style="color:var(--accent); font-size:0.8em;"></i>
-                    <span id="innerMiladiTxt"></span>
-                </span>
-                <!-- الساعة وسط -->
-                <span style="display:flex; align-items:center; gap:5px; flex:0 0 auto;">
-                    <span id="innerClock" style="color:white; font-size:1.1em; font-weight:800; letter-spacing:2px; font-variant-numeric:tabular-nums;"></span>
-                    <span id="innerAmpm" style="color:var(--accent); font-size:0.75em; font-weight:700;"></span>
-                </span>
-                <!-- القبطي شمال -->
-                <span id="innerCoptic" style="color:var(--accent); font-size:0.8em; font-weight:700; display:flex; align-items:center; gap:5px; flex:1; justify-content:flex-end;">
-                    <i class="fas fa-cross" style="font-size:0.75em;"></i>
-                    <span id="innerCopticTxt"></span>
-                </span>
+        </div>
+
+        <!-- ③ Drawer — القائمة الجانبية المنسدلة -->
+        <div id="drawerOverlay" onclick="toggleDrawer()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:200;"></div>
+        <div id="sideDrawer" style="position:fixed; top:0; left:-280px; width:270px; height:100vh; z-index:201;
+             background:linear-gradient(180deg,#071444 0%,#1a237e 100%); box-shadow:4px 0 20px rgba(0,0,0,0.4);
+             transition:left 0.3s ease; display:flex; flex-direction:column; overflow-y:auto;">
+            <!-- رأس الـ Drawer -->
+            <div style="padding:24px 20px 16px; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; align-items:center; gap:12px;">
+                <img id="drawerAvatar" src="https://i.pravatar.cc/150?u=default" style="width:46px;height:46px;border-radius:50%;border:2px solid var(--accent);object-fit:cover;">
+                <div>
+                    <div id="drawerName" style="color:white; font-weight:700; font-size:0.95em;"></div>
+                    <div id="drawerRole" style="color:var(--accent); font-size:0.78em; font-weight:600;"></div>
+                </div>
+                <button onclick="toggleDrawer()" style="margin-right:auto; background:none; border:none; color:rgba(255,255,255,0.5); font-size:1.1em; cursor:pointer;"><i class="fas fa-times"></i></button>
             </div>
+            <!-- عناصر القائمة -->
+            <nav style="padding:12px 0; flex:1;">
+                <div class="drawer-item" onclick="closeDrawerAndGo('home')"><i class="fas fa-home"></i> الرئيسية</div>
+                <div class="drawer-item" onclick="closeDrawerAndGo('members')"><i class="fas fa-users"></i> المخدومين</div>
+                <div class="drawer-item" onclick="closeDrawerAndGo('attendance')"><i class="fas fa-clipboard-check"></i> الحضور</div>
+                <div class="drawer-item" onclick="closeDrawerAndGo('trips')"><i class="fas fa-bus"></i> الرحلات</div>
+                <div class="drawer-item" onclick="closeDrawerAndGo('reports')"><i class="fas fa-chart-bar"></i> التقارير</div>
+                <div class="drawer-item" onclick="closeDrawerAndGo('memberAttReport')"><i class="fas fa-user-check"></i> تقرير حضور فردي</div>
+                <div class="drawer-item admin-only" onclick="closeDrawerAndGo('servants')"><i class="fas fa-user-shield"></i> إدارة الخدام</div>
+                <div style="border-top:1px solid rgba(255,255,255,0.1); margin:8px 16px;"></div>
+                <div class="drawer-item" style="color:#ff8a80;" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</div>
+            </nav>
         </div>
 
         <div class="main-content" style="margin-right:0; padding:20px;">
@@ -1062,8 +1106,17 @@
                     <div style="position:relative;">
                         <input type="password" id="rPass" placeholder="كلمة مرور قوية" style="padding-left:40px;">
                         <button type="button" onclick="togglePassVis('rPass','eyeR')"
-                                style="position:absolute;left:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#aaa;">
+                                style="position:absolute;left:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#888;font-size:1em;">
                             <i class="fas fa-eye" id="eyeR"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-row"><label>تأكيد كلمة المرور *</label>
+                    <div style="position:relative;">
+                        <input type="password" id="rPassConfirm" placeholder="أعد كتابة كلمة المرور" style="padding-left:40px;">
+                        <button type="button" onclick="togglePassVis('rPassConfirm','eyeRC')"
+                                style="position:absolute;left:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#888;font-size:1em;">
+                            <i class="fas fa-eye" id="eyeRC"></i>
                         </button>
                     </div>
                 </div>
@@ -1081,11 +1134,11 @@
                 <div class="form-row"><label>رقم الموبايل</label><input type="tel" id="rPhone" placeholder="01xxxxxxxxx"></div>
                 <div class="form-row"><label>العنوان</label><input type="text" id="rAddress" placeholder="الشارع، الحي، المدينة"></div>
                 <div class="form-row">
-                    <label>إحداثيات GPS</label>
+                    <label>الموقع على الخريطة</label>
                     <div style="display:flex; gap:8px;">
-                        <input type="text" id="rLoc" placeholder="latitude,longitude" readonly style="flex:1;">
-                        <button type="button" class="btn btn-accent btn-sm" onclick="getServantLocation()" title="تحديد موقعي">
-                            <i class="fas fa-map-marker-alt"></i>
+                        <input type="text" id="rLoc" placeholder="سيُملأ تلقائياً عند الضغط على الزر" readonly style="flex:1; font-size:0.82em;">
+                        <button type="button" class="btn btn-accent btn-sm" onclick="getServantLocation()" title="تحديد موقعي الحالي">
+                            <i class="fas fa-map-marker-alt"></i> تحديد موقعي
                         </button>
                     </div>
                 </div>
@@ -1507,16 +1560,41 @@ function postLoginInit() {
 }
 function forgotPassword() { showToast("تواصل مع الأدمن لإعادة ضبط كلمة السر", "error"); }
 
-function togglePassVis() {
-    const inp  = document.getElementById('loginPass');
-    const icon = document.getElementById('togglePassIcon');
+function togglePassVis(fieldId, iconId) {
+    // لو اتعملت بدون arguments → شاشة الدخول
+    if (!fieldId) {
+        fieldId = 'loginPass';
+        iconId  = 'togglePassIcon';
+    }
+    const inp  = document.getElementById(fieldId);
+    const icon = document.getElementById(iconId);
+    if (!inp) return;
     if (inp.type === 'password') {
         inp.type = 'text';
-        icon.className = 'fas fa-eye-slash';
+        if (icon) icon.className = 'fas fa-eye-slash';
     } else {
         inp.type = 'password';
-        icon.className = 'fas fa-eye';
+        if (icon) icon.className = 'fas fa-eye';
     }
+}
+
+// تحديد موقع الخادم عند التسجيل
+function getServantLocation() {
+    if (!navigator.geolocation) {
+        showToast("المتصفح لا يدعم تحديد الموقع", "error"); return;
+    }
+    showToast("⏳ جاري تحديد موقعك...", "success");
+    navigator.geolocation.getCurrentPosition(
+        function(pos) {
+            const coords = pos.coords.latitude.toFixed(6) + "," + pos.coords.longitude.toFixed(6);
+            document.getElementById('rLoc').value = coords;
+            showToast("✅ تم تحديد الموقع بنجاح");
+        },
+        function(err) {
+            showToast("تعذّر تحديد الموقع — تأكد من إذن الموقع في المتصفح", "error");
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+    );
 }
 
 // ================================================================
@@ -1701,12 +1779,59 @@ const pageTitles = {
     servants:        '<i class="fas fa-user-shield"></i> إدارة الخدام',
 };
 
+// ================================================================
+//  القائمة الجانبية (Drawer) وزر الرجوع
+// ================================================================
+let pageHistory = [];  // سجل الصفحات للرجوع
+
+function toggleDrawer() {
+    const drawer  = document.getElementById('sideDrawer');
+    const overlay = document.getElementById('drawerOverlay');
+    const isOpen  = drawer.style.left === '0px';
+    drawer.style.left   = isOpen ? '-280px' : '0px';
+    overlay.style.display = isOpen ? 'none' : 'block';
+
+    // تحديث بيانات المستخدم في الـ drawer
+    if (!isOpen && currentUser) {
+        document.getElementById('drawerName').textContent = currentUser.name || '';
+        const roleNames = { Admin:'أدمن', Priest:'كاهن', ServiceLeader:'أمين خدمة', Servant:'خادم' };
+        document.getElementById('drawerRole').textContent = roleNames[currentUser.role] || currentUser.role || '';
+        const av = document.getElementById('drawerAvatar');
+        if (av) av.src = currentUser.img || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name||'?')}&background=1a237e&color=fff&size=100`;
+        // إظهار/إخفاء عناصر الأدمن
+        document.querySelectorAll('#sideDrawer .admin-only').forEach(el => {
+            el.style.display = ['Admin','Priest','ServiceLeader'].includes(currentUser.role) ? 'flex' : 'none';
+        });
+    }
+}
+
+function closeDrawerAndGo(page) {
+    const drawer  = document.getElementById('sideDrawer');
+    const overlay = document.getElementById('drawerOverlay');
+    drawer.style.left   = '-280px';
+    overlay.style.display = 'none';
+    if (page === 'home') goHome();
+    else showPage(page);
+}
+
+function navigateBack() {
+    if (pageHistory.length >= 2) {
+        pageHistory.pop(); // الصفحة الحالية
+        const prev = pageHistory.pop(); // الصفحة السابقة
+        if (prev === 'home') goHome();
+        else showPage(prev);
+    } else {
+        goHome();
+    }
+}
+
 function goHome() {
     document.getElementById('page-home').style.display = 'flex';
     document.getElementById('innerPages').style.display = 'none';
     document.querySelectorAll('.page').forEach(p => {
         if (p.id !== 'page-home') p.style.display = 'none';
     });
+    pageHistory = ['home'];
     updateHomeStats();
 }
 
@@ -1747,6 +1872,9 @@ function showPage(pageId) {
     // إخفاء الهوم وإظهار الصفحات الداخلية
     document.getElementById('page-home').style.display = 'none';
     document.getElementById('innerPages').style.display = 'flex';
+
+    // تسجيل الصفحة في السجل
+    if (pageHistory[pageHistory.length - 1] !== pageId) pageHistory.push(pageId);
 
     // إخفاء كل الصفحات
     document.querySelectorAll('.page').forEach(p => {
@@ -1814,7 +1942,7 @@ function renderAttReport() {
     if (search) serviceMs = serviceMs.filter(m => (m.name||'').toLowerCase().includes(search));
 
     if (serviceMs.length === 0) {
-        grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-users-slash"></i><p>لا يوجد مخدومين</p></div>';
+        grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-users-slash"></i><p>لا يوجد مخدومون</p></div>';
         return;
     }
 
@@ -1901,7 +2029,7 @@ function getMemberImgSrc(m) {
 }
 
 // ================================================================
-//  المخدومين
+//  المخدومون
 // ================================================================
 function getServiceMembers() {
     return members.filter(m => m.grade === activeSub);
@@ -1953,7 +2081,7 @@ function renderMembers() {
     if (list.length === 0) {
         grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
             <i class="fas fa-users-slash"></i>
-            <p>لا يوجد مخدومين في هذه الخدمة بعد</p>
+            <p>لا يوجد مخدومون في هذه الخدمة بعد</p>
             <button class="btn btn-primary" onclick="openMemberModal()"><i class="fas fa-plus"></i> إضافة أول مخدوم</button>
         </div>`;
         return;
@@ -2333,7 +2461,7 @@ function loadAttendanceList() {
     const serviceMembers = getServiceMembers();
     if (serviceMembers.length === 0) {
         list.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
-            <i class="fas fa-user-slash"></i><p>لا يوجد مخدومين في هذه الخدمة</p></div>`;
+            <i class="fas fa-user-slash"></i><p>لا يوجد مخدومون في هذه الخدمة</p></div>`;
         return;
     }
 
@@ -2448,7 +2576,7 @@ function openTripModal(targetType = 'members') {
     document.getElementById('tripParticipantsTitle').innerHTML =
         targetType === 'servants'
         ? '<i class="fas fa-user-shield"></i> الخدام المشتركون'
-        : '<i class="fas fa-users"></i> المخدومين المشتركون';
+        : '<i class="fas fa-users"></i> المخدومون المشتركون';
     buildTripMembersCheck([], targetType, {});
     document.getElementById('tripModal').style.display = 'block';
 }
@@ -2847,6 +2975,7 @@ function showRegisterModal(fromLogin = false) {
     document.getElementById('rName').value    = '';
     document.getElementById('rEmail').value   = '';
     document.getElementById('rPass').value    = '';
+    if (document.getElementById('rPassConfirm')) document.getElementById('rPassConfirm').value = '';
     document.getElementById('rImg').value     = '';
     document.getElementById('rImgData').value = '';
     document.getElementById('rImgPreview').src = 'https://ui-avatars.com/api/?name=خادم&background=1a237e&color=fff&size=200';
@@ -2892,6 +3021,10 @@ async function registerServant() {
     var fromLogin = document.getElementById('registerModal').dataset.fromLogin === '1';
 
     if (!name || !email || !pass) { showToast("يرجى ملء الحقول المطلوبة", "error"); return; }
+
+    // التحقق من تطابق كلمة السر
+    var passConfirm = (document.getElementById('rPassConfirm') || {}).value || pass;
+    if (pass !== passConfirm) { showToast("كلمة المرور غير متطابقة", "error"); return; }
     if (role === 'Admin') { showToast("لا يمكن إضافة أدمن ثاني", "error"); return; }
     if (!fromLogin && currentUser && currentUser.role === 'Servant') { showToast("ليس لديك صلاحية", "error"); return; }
     if (!fromLogin && currentUser && currentUser.role === 'ServiceLeader' && role !== 'Servant') { showToast("أمين الخدمة يضيف خدام فقط", "error"); return; }
