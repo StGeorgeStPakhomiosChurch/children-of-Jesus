@@ -2290,21 +2290,24 @@ function renderMembers() {
         return;
     }
 
-    list.forEach(m => {
-        const imgSrc = getMemberImgSrc(m);
-        // رحلات المخدوم في الخدمة الحالية
-        var memberTrips = trips.filter(function(t){ return t.service === activeSub && t.targetType !== 'servants' && (t.members||[]).includes(m.id); });
-        var tripsSection = '';
+    list.forEach(function(m) {
+        var imgSrc = getMemberImgSrc(m);
+
+        // بناء قسم الرحلات بدون nested backticks
+        var memberTrips = trips.filter(function(t){
+            return t.service === activeSub && t.targetType !== 'servants' && (t.members||[]).includes(m.id);
+        });
+        var tripsHtml = '';
         if (memberTrips.length > 0) {
-            tripsSection += '<div style="margin-top:12px;border-top:2px solid #e8eaf6;padding-top:12px;">';
-            tripsSection += '<p style="font-size:0.82em;font-weight:800;color:#1a237e;margin:0 0 8px;"><i class="fas fa-bus" style="color:#d4af37;"></i> الرحلات المشترك فيها</p>';
+            tripsHtml += '<div style="margin-top:12px;border-top:2px solid #e8eaf6;padding-top:10px;">';
+            tripsHtml += '<p style="font-size:0.82em;font-weight:800;color:#1a237e;margin:0 0 8px;"><i class="fas fa-bus" style="color:#d4af37;"></i> الرحلات</p>';
             memberTrips.forEach(function(t){
                 var cost = parseFloat(t.cost)||0;
                 var paid = parseFloat((t.payments||{})[m.id]||0);
                 var rem  = cost - paid;
-                var full = cost>0 && rem<=0;
-                var bg = full ? '#e8f5e9' : '#fff8f0';
-                var bd = full ? '#a5d6a7' : '#ffcc80';
+                var full = cost > 0 && rem <= 0;
+                var bg   = full ? '#e8f5e9' : '#fff8f0';
+                var bd   = full ? '#a5d6a7' : '#ffcc80';
                 var badge = '';
                 if (full) {
                     badge = '<span style="background:#e8f5e9;color:#388e3c;font-size:0.78em;font-weight:700;padding:2px 8px;border-radius:20px;"><i class="fas fa-check-circle"></i> مدفوع</span>';
@@ -2315,52 +2318,45 @@ function renderMembers() {
                 }
                 var payRow = '';
                 if (cost > 0) {
-                    payRow  = '<div style="font-size:0.78em;color:#666;margin:5px 0;display:flex;gap:10px;flex-wrap:wrap;">';
+                    payRow += '<div style="font-size:0.78em;color:#666;margin:5px 0;display:flex;gap:10px;flex-wrap:wrap;">';
                     payRow += '<span><i class="fas fa-tag" style="color:#1a237e;"></i> ' + cost + ' ج</span>';
                     payRow += '<span style="color:#388e3c;"><i class="fas fa-coins"></i> دفع: ' + paid + ' ج</span>';
                     if (!full) { payRow += '<span style="color:#e65100;">متبقي: ' + rem + ' ج</span>'; }
                     payRow += '</div>';
                 }
-                var mid = m.id;
-                var tid = t.id;
-                var tname = t.name;
-                var row  = '<div style="background:' + bg + ';border:1px solid ' + bd + ';border-radius:10px;padding:8px 12px;margin-bottom:6px;">';
-                    row += '<div style="display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;">';
-                    row += '<span style="font-size:0.85em;font-weight:700;color:#1a237e;"><i class="fas fa-bus"></i> ' + tname + '</span>';
-                    row += badge + '</div>';
-                    row += payRow;
-                    row += '<button class="btn btn-accent btn-sm" style="margin-top:6px;font-size:0.78em;padding:4px 10px;width:100%;"';
-                    row += ' onclick="openTripPayFromMember(' + JSON.stringify(mid) + ',' + JSON.stringify(tid) + ')">';
-                    row += '<i class="fas fa-coins"></i> تسجيل دفع</button></div>';
-                tripsSection += row;
+                tripsHtml += '<div style="background:' + bg + ';border:1px solid ' + bd + ';border-radius:10px;padding:8px 12px;margin-bottom:6px;">';
+                tripsHtml += '<div style="display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;">';
+                tripsHtml += '<span style="font-size:0.85em;font-weight:700;color:#1a237e;"><i class="fas fa-bus"></i> ' + t.name + '</span>';
+                tripsHtml += badge + '</div>';
+                tripsHtml += payRow;
+                tripsHtml += '<button class="btn btn-accent btn-sm" style="margin-top:6px;font-size:0.78em;padding:4px 10px;width:100%;"';
+                tripsHtml += ' onclick="openTripPayFromMember(' + JSON.stringify(m.id) + ',' + JSON.stringify(t.id) + ')">';
+                tripsHtml += '<i class="fas fa-coins"></i> تسجيل دفع</button></div>';
             });
-            tripsSection += '</div>';
+            tripsHtml += '</div>';
         } else {
-            tripsSection  = '<div style="margin-top:10px;border-top:1px solid #f0f0f0;padding-top:8px;text-align:center;">';
-            tripsSection += '<p style="font-size:0.8em;color:#ccc;margin:4px 0;"><i class="fas fa-bus"></i> غير مشترك في رحلات</p></div>';
+            tripsHtml = '<div style="margin-top:10px;border-top:1px solid #f0f0f0;padding-top:8px;text-align:center;">';
+            tripsHtml += '<p style="font-size:0.8em;color:#ccc;margin:4px 0;"><i class="fas fa-bus"></i> غير مشترك في رحلات</p></div>';
         }
-        var tripBadgeHtml = '';
 
-        const card = document.createElement('div');
-        card.className = "m-card";
-        card.innerHTML = `
-            <img src="${imgSrc}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(m.name)}&background=1a237e&color=fff&size=300'"
-                 onclick="zoomImg('${imgSrc}')" alt="${m.name}">
-            <div class="m-card-body">
-                <h3>${m.name}</h3>
-                <p style="margin:4px 0; font-size:0.85em; color:#666;"><i class="fas fa-graduation-cap" style="color:var(--primary);"></i> ${m.grade}</p>
-                <p style="margin:4px 0; font-size:0.85em; color:#666;"><i class="fas fa-hand-holding-heart" style="color:var(--accent);"></i> ${m.conf || 'أب الاعتراف غير محدد'}</p>
-                ${tripsSection}
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; padding-top:10px; border-top:1px solid #f0f0f0;">
-                    <button class="btn btn-light btn-sm" onclick="viewMemberDetail('${m.id}')"><i class="fas fa-eye"></i> التفاصيل</button>
-                    <div style="display:flex; gap:6px;">
-                        <button class="btn btn-light btn-sm" onclick="editMember('${m.id}')"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteMember('${m.id}')"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>
-            </div>`;
+        var card = document.createElement('div');
+        card.className = 'm-card';
+        card.innerHTML = '<img src="' + imgSrc + '" onerror="this.src='https://ui-avatars.com/api/?name='+encodeURIComponent(m.name)+'&background=1a237e&color=fff&size=300'"'
+            + ' onclick="zoomImg(' + JSON.stringify(imgSrc) + ')" alt="' + m.name + '">'
+            + '<div class="m-card-body">'
+            + '<h3>' + m.name + '</h3>'
+            + '<p style="margin:4px 0;font-size:0.85em;color:#666;"><i class="fas fa-graduation-cap" style="color:var(--primary);"></i> ' + m.grade + '</p>'
+            + '<p style="margin:4px 0;font-size:0.85em;color:#666;"><i class="fas fa-hand-holding-heart" style="color:var(--accent);"></i> ' + (m.conf||'أب الاعتراف غير محدد') + '</p>'
+            + tripsHtml
+            + '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid #f0f0f0;">'
+            + '<button class="btn btn-light btn-sm" onclick="viewMemberDetail(' + JSON.stringify(m.id) + ')"><i class="fas fa-eye"></i> التفاصيل</button>'
+            + '<div style="display:flex;gap:6px;">'
+            + '<button class="btn btn-light btn-sm" onclick="editMember(' + JSON.stringify(m.id) + ')"><i class="fas fa-edit"></i></button>'
+            + '<button class="btn btn-danger btn-sm" onclick="deleteMember(' + JSON.stringify(m.id) + ')"><i class="fas fa-trash"></i></button>'
+            + '</div></div></div>';
         grid.appendChild(card);
     });
+});
 }
 
 function getFacebookUrl(fb) {
