@@ -709,6 +709,16 @@
                         border-radius:10px; color:#a5d6a7; padding:8px 12px; cursor:pointer; font-size:0.82em;">
                     <i class="fas fa-sync-alt"></i>
                 </button>
+                <button onclick="toggleDarkMode()" id="homeDarkBtn" title="وضع ليلي"
+                        style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);
+                        border-radius:10px; color:rgba(255,255,255,0.8); padding:8px 12px; cursor:pointer; font-size:0.82em; transition:0.2s;">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button onclick="openDateTimeSettings()" title="إعدادات الوقت والتاريخ"
+                        style="background:rgba(212,175,55,0.15); border:1px solid rgba(212,175,55,0.35);
+                        border-radius:10px; color:var(--accent); padding:8px 12px; cursor:pointer; font-size:0.82em; transition:0.2s;">
+                    <i class="fas fa-cog"></i>
+                </button>
                 <button onclick="handleLogout()" style="background:rgba(255,80,80,0.15); border:1px solid rgba(255,80,80,0.3);
                         border-radius:10px; color:#ff8a80; padding:8px 12px; cursor:pointer; font-size:0.82em;">
                     <i class="fas fa-sign-out-alt"></i>
@@ -3635,6 +3645,9 @@ document.getElementById('loginPass').addEventListener('keydown', e => {
           <label style="display:flex;align-items:center;gap:6px;font-weight:normal;cursor:pointer;font-size:0.9em;">
             <input type="radio" name="timeFormat" value="24" style="width:auto;"> 24 ساعة
           </label>
+          <label style="display:flex;align-items:center;gap:6px;font-weight:normal;cursor:pointer;font-size:0.9em;">
+            <input type="radio" name="timeFormat" value="arabic" style="width:auto;"> 🕌 عربي (٣:٢٥ م)
+          </label>
         </div>
       </div>
       <div class="form-row" style="margin-top:10px;">
@@ -3722,6 +3735,8 @@ function applyDarkMode(enabled) {
         document.getElementById('darkModeLabel').textContent = 'الوضع النهاري';
         const btn = document.getElementById('darkModeNavBtn');
         if (btn) { btn.innerHTML = '<i class="fas fa-sun"></i>'; btn.title = 'وضع نهاري'; }
+        const homeBtn = document.getElementById('homeDarkBtn');
+        if (homeBtn) { homeBtn.innerHTML = '<i class="fas fa-sun"></i>'; homeBtn.title = 'وضع نهاري'; homeBtn.style.color = '#ffd43b'; }
         const drawerItem = document.getElementById('darkModeDrawerItem');
         if (drawerItem) drawerItem.style.color = '#ffd43b';
     } else {
@@ -3729,6 +3744,8 @@ function applyDarkMode(enabled) {
         document.getElementById('darkModeLabel').textContent = 'الوضع الليلي';
         const btn = document.getElementById('darkModeNavBtn');
         if (btn) { btn.innerHTML = '<i class="fas fa-moon"></i>'; btn.title = 'وضع ليلي'; }
+        const homeBtn = document.getElementById('homeDarkBtn');
+        if (homeBtn) { homeBtn.innerHTML = '<i class="fas fa-moon"></i>'; homeBtn.title = 'وضع ليلي'; homeBtn.style.color = 'rgba(255,255,255,0.8)'; }
         const drawerItem = document.getElementById('darkModeDrawerItem');
         if (drawerItem) drawerItem.style.color = '#a5d8ff';
     }
@@ -3863,7 +3880,7 @@ function updatePreview() {
     // وقت
     const { timeStr, ampmStr } = buildTimeStr(now, tf, ss);
     document.getElementById('previewClock').textContent = timeStr;
-    document.getElementById('previewAmpm').textContent  = tf === '12' ? ampmStr : '';
+    document.getElementById('previewAmpm').textContent  = (tf === '12' || tf === 'arabic') ? ampmStr : '';
 
     // ميلادي
     const pmEl = document.getElementById('previewMiladi');
@@ -3890,6 +3907,19 @@ function buildTimeStr(date, format, seconds) {
     const min = String(date.getMinutes()).padStart(2,'0');
     const sec = String(date.getSeconds()).padStart(2,'0');
     let ampmStr = '';
+
+    if (format === 'arabic') {
+        // تحويل الأرقام للعربية
+        const toAr = n => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+        ampmStr = h >= 12 ? 'م' : 'ص';
+        h = h % 12 || 12;
+        const hAr   = toAr(String(h).padStart(2,'0'));
+        const minAr = toAr(min);
+        const secAr = toAr(sec);
+        const timeStr = seconds === 'yes' ? `${hAr}:${minAr}:${secAr}` : `${hAr}:${minAr}`;
+        return { timeStr, ampmStr };
+    }
+
     if (format === '12') {
         ampmStr = h >= 12 ? 'م' : 'ص';
         h = h % 12 || 12;
@@ -3982,7 +4012,7 @@ function applyDTSettings() {
         const miladiSpan = document.querySelector('#miladiDate span');
         const copticSpan = document.querySelector('#copticDate span');
         if (clockEl)    clockEl.textContent = timeStr;
-        if (ampmEl)     ampmEl.textContent  = s.timeFormat === '12' ? ampmStr : '';
+        if (ampmEl)     ampmEl.textContent  = (s.timeFormat === '12' || s.timeFormat === 'arabic') ? ampmStr : '';
         if (miladiSpan) miladiSpan.textContent = s.showMiladi ? miladiTxt : '';
         if (copticSpan) copticSpan.textContent  = s.showCoptic ? copticTxt : '';
 
@@ -3992,7 +4022,7 @@ function applyDTSettings() {
         const imt  = document.getElementById('innerMiladiTxt');
         const ict  = document.getElementById('innerCopticTxt');
         if (ic)   ic.textContent   = timeStr;
-        if (iamp) iamp.textContent = s.timeFormat === '12' ? ampmStr : '';
+        if (iamp) iamp.textContent = (s.timeFormat === '12' || s.timeFormat === 'arabic') ? ampmStr : '';
         if (imt)  imt.textContent  = s.showMiladi ? miladiTxt : '';
         if (ict)  ict.textContent  = s.showCoptic ? copticTxt : '';
 
