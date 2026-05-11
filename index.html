@@ -346,21 +346,138 @@
         }
         .page-header h2 { margin: 0; color: var(--primary); font-size: 1.6em; }
 
-        /* ===== الكروت ===== */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 22px; }
+        /* ===== الكروت - شبكة ===== */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 22px; }
+
+        /* ===== الكارت التعريفي الجديد ===== */
         .m-card {
             background: var(--white);
-            border-radius: 16px;
+            border-radius: 22px;
             overflow: hidden;
-            box-shadow: 0 3px 15px rgba(0,0,0,0.07);
-            border-top: 4px solid var(--accent);
+            box-shadow: 0 6px 28px rgba(0,0,0,0.10), 0 0 0 1px rgba(212,175,55,0.15);
             transition: 0.3s;
         }
-        .m-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
-        .m-card img { width: 100%; height: 200px; object-fit: cover; cursor: pointer; }
-        .m-card-body { padding: 18px; }
-        .m-card-body h3 { margin: 0 0 5px; color: #1a1a1a; font-size: 1.1em; }
-        .m-card-body p { margin: 4px 0; font-size: 0.85em; color: #666; }
+        .m-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(0,0,0,0.16), 0 0 0 1px rgba(212,175,55,0.3); }
+
+        /* رأس الكارت */
+        .mc-header {
+            background: linear-gradient(135deg, #071444 0%, #0d1660 55%, #1a237e 100%);
+            padding: 22px 18px 16px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .mc-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--accent), #f0d060, var(--accent), transparent);
+        }
+        .mc-service-badge {
+            position: absolute;
+            top: 10px; left: 12px;
+            background: rgba(212,175,55,0.18);
+            border: 1px solid rgba(212,175,55,0.4);
+            color: var(--accent);
+            font-size: 0.68em; font-weight: 700;
+            padding: 2px 9px; border-radius: 20px;
+        }
+        .mc-avatar {
+            flex-shrink: 0;
+            width: 74px; height: 74px;
+            border-radius: 50%;
+            border: 3px solid var(--accent);
+            box-shadow: 0 0 0 3px rgba(212,175,55,0.2);
+            overflow: hidden;
+            background: #1a237e;
+            margin-top: 16px;
+            cursor: pointer;
+        }
+        .mc-avatar img { width:100%; height:100%; object-fit:cover; display:block; }
+        .mc-head-info { flex:1; padding-top: 18px; }
+        .mc-name { color:white; font-size:1.05em; font-weight:900; line-height:1.3; margin-bottom:5px; }
+        .mc-grade-pill {
+            display:inline-flex; align-items:center; gap:4px;
+            background:rgba(212,175,55,0.2); border:1px solid rgba(212,175,55,0.45);
+            color:var(--accent); font-size:0.74em; font-weight:700;
+            padding:2px 10px; border-radius:20px;
+        }
+        .mc-gender { color:rgba(255,255,255,0.55); font-size:0.76em; margin-top:5px; display:flex; align-items:center; gap:4px; }
+
+        /* جسم الكارت */
+        .mc-body { padding: 14px 16px 8px; }
+        .mc-info-row {
+            display:flex; align-items:flex-start; gap:9px;
+            padding: 8px 10px; border-radius:9px; transition:background 0.15s;
+        }
+        .mc-info-row:hover { background:#f8f9ff; }
+        .mc-icon {
+            width:28px; height:28px; border-radius:7px;
+            display:flex; align-items:center; justify-content:center;
+            font-size:0.8em; flex-shrink:0; margin-top:1px;
+        }
+        .mc-lbl { font-size:0.68em; color:#888; font-weight:600; margin-bottom:1px; }
+        .mc-val { font-size:0.87em; font-weight:700; color:#1a1a2e; }
+        .mc-val.empty { color:#ccc; font-weight:400; font-size:0.8em; }
+
+        /* فاصل قسم */
+        .mc-divider {
+            display:flex; align-items:center; gap:8px;
+            padding:10px 10px 4px;
+            font-size:0.72em; font-weight:800; color:var(--primary); letter-spacing:0.4px;
+        }
+        .mc-divider::before, .mc-divider::after {
+            content:''; flex:1; height:1px;
+        }
+        .mc-divider::before { background: linear-gradient(90deg, #e8eaf6, transparent); }
+        .mc-divider::after  { background: linear-gradient(90deg, transparent, #e8eaf6); }
+
+        /* قسم الأسرة */
+        .mc-parents { background:#fafbff; border-top:1px solid #eef0fb; padding:10px 16px 8px; }
+        .mc-parent-row {
+            display:flex; align-items:center; gap:9px;
+            padding: 7px 0;
+        }
+        .mc-parent-row + .mc-parent-row { border-top:1px solid #eef0fb; }
+        .mc-parent-icon { width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:0.85em; flex-shrink:0; }
+        .mc-parent-meta { flex:1; min-width:0; }
+        .mc-parent-name { font-size:0.84em; font-weight:700; color:#1a1a2e; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .mc-parent-job  { font-size:0.7em; color:#888; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .mc-parent-phone { font-size:0.74em; color:var(--primary); font-weight:700; text-decoration:none; white-space:nowrap; display:flex; align-items:center; gap:3px; }
+
+        /* أزرار سريعة */
+        .mc-actions { display:flex; gap:6px; padding:10px 16px 12px; background:white; }
+        .mc-action-btn {
+            flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
+            padding:8px 4px; border-radius:10px; border:none; cursor:pointer;
+            font-family:inherit; font-size:0.68em; font-weight:700; text-decoration:none;
+            transition:all 0.2s;
+        }
+        .mc-action-btn i { font-size:1.2em; }
+        .mc-action-btn:hover { transform:translateY(-2px); filter:brightness(1.08); }
+        .mc-action-btn.call      { background:#e8f5e9; color:#2e7d32; }
+        .mc-action-btn.whatsapp  { background:#e8faf0; color:#128c7e; }
+        .mc-action-btn.telegram  { background:#e6f3ff; color:#0088cc; }
+        .mc-action-btn.facebook  { background:#e8f0fe; color:#1877f2; }
+        .mc-action-btn.map       { background:#fff3e0; color:#e65100; }
+        .mc-action-btn.edit-btn  { background:#f3f4f6; color:#374151; }
+        .mc-action-btn.del-btn   { background:#ffebee; color:#c62828; }
+        .mc-action-btn.detail-btn{ background:#eef0fb; color:#1a237e; }
+
+        /* تذييل الكارت */
+        .mc-footer {
+            background:linear-gradient(135deg,#071444,#0d1660);
+            padding:10px 16px;
+            display:flex; align-items:center; justify-content:space-between;
+        }
+        .mc-footer-logo { color:var(--accent); font-size:0.8em; font-weight:700; display:flex; align-items:center; gap:5px; opacity:0.9; }
+        .mc-footer-id   { font-size:0.65em; color:rgba(255,255,255,0.3); font-weight:600; letter-spacing:1px; font-family:monospace; }
+
+        /* ملاحظة */
+        .mc-note { padding:6px 10px; margin:4px 10px 8px; background:#fffbeb; border-radius:8px; border-right:3px solid var(--accent); font-size:0.76em; color:#7a5c00; }
 
         /* ===== الأزرار ===== */
         .btn {
@@ -2378,24 +2495,122 @@ function renderMembers() {
         }
         const tripBadgeHtml = ''; // لم يعد مستخدماً
 
+        // ===== بناء الكارت التعريفي الجديد =====
+        const genderColor  = m.gender === 'أنثى' ? '#c2185b' : '#1a237e';
+        const genderBg     = m.gender === 'أنثى' ? '#fce4ec' : '#e8eaf6';
+        const genderIcon   = m.gender === 'أنثى' ? 'fa-female' : 'fa-male';
+
+        // أزرار التواصل السريع
+        let qaButtons = '';
+        if (m.phone)    qaButtons += `<a href="tel:${m.phone}" class="mc-action-btn call"><i class="fas fa-phone"></i>اتصال</a>`;
+        if (m.whatsapp) qaButtons += `<a href="https://wa.me/${normalizePhone(m.whatsapp)}" target="_blank" class="mc-action-btn whatsapp"><i class="fab fa-whatsapp"></i>واتساب</a>`;
+        if (m.telegram) qaButtons += `<a href="https://t.me/${(m.telegram||'').replace('@','')}" target="_blank" class="mc-action-btn telegram"><i class="fab fa-telegram"></i>تليجرام</a>`;
+        if (m.loc || m.address) qaButtons += `<button class="mc-action-btn map" onclick="openAddressMapFor('${m.loc||''}','${encodeURIComponent(m.address||'')}')"><i class="fas fa-map-marked-alt"></i>الموقع</button>`;
+        qaButtons += `<button class="mc-action-btn detail-btn" onclick="viewMemberDetail('${m.id}')"><i class="fas fa-eye"></i>التفاصيل</button>`;
+        qaButtons += `<button class="mc-action-btn edit-btn" onclick="editMember('${m.id}')"><i class="fas fa-edit"></i>تعديل</button>`;
+        qaButtons += `<button class="mc-action-btn del-btn" onclick="deleteMember('${m.id}')"><i class="fas fa-trash"></i>حذف</button>`;
+
+        // قسم الأب
+        let fatherHtml = '';
+        if (m.fName || m.fPhone) {
+            fatherHtml = `<div class="mc-parent-row">
+                <div class="mc-parent-icon" style="background:#e8eaf6; color:#1a237e;"><i class="fas fa-male"></i></div>
+                <div class="mc-parent-meta">
+                    <div class="mc-parent-name">${m.fName || '—'}</div>
+                    <div class="mc-parent-job">${[m.fJob, m.fConf ? ('أب اعتراف: ' + m.fConf) : ''].filter(Boolean).join(' · ') || 'الأب'}</div>
+                </div>
+                ${m.fPhone ? `<a href="tel:${m.fPhone}" class="mc-parent-phone"><i class="fas fa-phone-alt"></i>${m.fPhone}</a>` : ''}
+            </div>`;
+        }
+        // قسم الأم
+        let motherHtml = '';
+        if (m.moName || m.moPhone) {
+            motherHtml = `<div class="mc-parent-row">
+                <div class="mc-parent-icon" style="background:#fce4ec; color:#c2185b;"><i class="fas fa-female"></i></div>
+                <div class="mc-parent-meta">
+                    <div class="mc-parent-name">${m.moName || '—'}</div>
+                    <div class="mc-parent-job">${[m.moJob, m.moConf ? ('أب اعتراف: ' + m.moConf) : ''].filter(Boolean).join(' · ') || 'الأم'}</div>
+                </div>
+                ${m.moPhone ? `<a href="tel:${m.moPhone}" class="mc-parent-phone"><i class="fas fa-phone-alt"></i>${m.moPhone}</a>` : ''}
+            </div>`;
+        }
+
         const card = document.createElement('div');
         card.className = "m-card";
         card.innerHTML = `
-            <img src="${imgSrc}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(m.name)}&background=1a237e&color=fff&size=300'"
-                 onclick="zoomImg('${imgSrc}')" alt="${m.name}">
-            <div class="m-card-body">
-                <h3>${m.name}</h3>
-                <p style="margin:4px 0; font-size:0.85em; color:#666;"><i class="fas fa-graduation-cap" style="color:var(--primary);"></i> ${m.grade}</p>
-                <p style="margin:4px 0; font-size:0.85em; color:#666;"><i class="fas fa-hand-holding-heart" style="color:var(--accent);"></i> ${m.conf || 'أب الاعتراف غير محدد'}</p>
-                ${tripsSection}
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; padding-top:10px; border-top:1px solid #f0f0f0;">
-                    <button class="btn btn-light btn-sm" onclick="viewMemberDetail('${m.id}')"><i class="fas fa-eye"></i> التفاصيل</button>
-                    <div style="display:flex; gap:6px;">
-                        <button class="btn btn-light btn-sm" onclick="editMember('${m.id}')"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteMember('${m.id}')"><i class="fas fa-trash"></i></button>
+            <!-- رأس الكارت -->
+            <div class="mc-header">
+                <span class="mc-service-badge"><i class="fas fa-layer-group" style="font-size:0.85em;"></i> ${activeMain} · ${m.grade}</span>
+                <div class="mc-avatar" onclick="zoomImg('${imgSrc}')">
+                    <img src="${imgSrc}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(m.name)}&background=1a237e&color=fff&size=200'" alt="${m.name}">
+                </div>
+                <div class="mc-head-info">
+                    <div class="mc-name">${m.name}</div>
+                    <div class="mc-grade-pill"><i class="fas fa-graduation-cap" style="font-size:0.85em;"></i> ${m.grade}</div>
+                    <div class="mc-gender">
+                        <i class="fas ${genderIcon}"></i> ${m.gender || ''}
+                        ${m.age ? `&nbsp;·&nbsp; <i class="fas fa-birthday-cake" style="color:#f0d060;"></i> ${m.age} سنة` : ''}
                     </div>
                 </div>
-            </div>`;
+            </div>
+
+            <!-- جسم الكارت -->
+            <div class="mc-body">
+                <!-- أب الاعتراف -->
+                <div class="mc-info-row">
+                    <div class="mc-icon" style="background:#eef0fb; color:#1a237e;"><i class="fas fa-hand-holding-heart"></i></div>
+                    <div>
+                        <div class="mc-lbl">أب الاعتراف</div>
+                        <div class="mc-val ${m.conf ? '' : 'empty'}">${m.conf || 'غير محدد'}</div>
+                    </div>
+                </div>
+                <!-- تاريخ الميلاد -->
+                ${m.dob ? `<div class="mc-info-row">
+                    <div class="mc-icon" style="background:#fff3e0; color:#e65100;"><i class="fas fa-birthday-cake"></i></div>
+                    <div>
+                        <div class="mc-lbl">تاريخ الميلاد</div>
+                        <div class="mc-val">${formatDateDMY(m.dob)}</div>
+                    </div>
+                </div>` : ''}
+                <!-- العنوان -->
+                ${m.address ? `<div class="mc-info-row" style="cursor:pointer;" onclick="openAddressMapFor('${m.loc||''}','${encodeURIComponent(m.address||'')}')">
+                    <div class="mc-icon" style="background:#e8f5e9; color:#2e7d32;"><i class="fas fa-map-marker-alt"></i></div>
+                    <div>
+                        <div class="mc-lbl">العنوان</div>
+                        <div class="mc-val">${m.address}</div>
+                    </div>
+                </div>` : ''}
+                <!-- الموبايل -->
+                ${m.phone ? `<div class="mc-divider"><i class="fas fa-phone"></i> التواصل</div>
+                <a href="tel:${m.phone}" class="mc-info-row" style="text-decoration:none; color:inherit;">
+                    <div class="mc-icon" style="background:#e8f5e9; color:#2e7d32;"><i class="fas fa-phone"></i></div>
+                    <div>
+                        <div class="mc-lbl">الموبايل</div>
+                        <div class="mc-val">${m.phone}</div>
+                    </div>
+                </a>` : ''}
+                <!-- ملاحظات -->
+                ${m.notes ? `<div class="mc-note"><i class="fas fa-sticky-note"></i> ${m.notes}</div>` : ''}
+                <!-- الرحلات -->
+                ${tripsSection}
+            </div>
+
+            <!-- الأسرة -->
+            ${(fatherHtml || motherHtml) ? `
+            <div class="mc-parents">
+                <div class="mc-divider" style="padding-top:0;"><i class="fas fa-users"></i> الأسرة</div>
+                ${fatherHtml}${motherHtml}
+            </div>` : ''}
+
+            <!-- أزرار سريعة -->
+            <div class="mc-actions">${qaButtons}</div>
+
+            <!-- تذييل -->
+            <div class="mc-footer">
+                <div class="mc-footer-logo"><i class="fas fa-cross" style="font-size:0.8em;"></i> أبناء يسوع</div>
+                <div class="mc-footer-id">#MB-${m.id ? m.id.toString().slice(-6).toUpperCase() : '------'}</div>
+            </div>
+        `;
         grid.appendChild(card);
     });
 }
