@@ -23,13 +23,6 @@
             --success: #388e3c;
             --warning: #f57c00;
             --sidebar-width: 270px;
-            /* Dark mode vars */
-            --dm-bg: #0f1117;
-            --dm-surface: #1a1d2e;
-            --dm-surface2: #242740;
-            --dm-border: rgba(255,255,255,0.08);
-            --dm-text: #e8eaf0;
-            --dm-text2: #9aa0b8;
             --card-bg: var(--white);
             --text-main: #222;
             --text-sub: #555;
@@ -37,55 +30,6 @@
             --input-bg: #fff;
             --section-bg: #fafafa;
         }
-
-        /* ===== الوضع الليلي ===== */
-        body.dark-mode {
-            --bg: var(--dm-bg);
-            --white: var(--dm-surface);
-            --card-bg: var(--dm-surface);
-            --text-main: var(--dm-text);
-            --text-sub: var(--dm-text2);
-            --border-color: var(--dm-border);
-            --input-bg: var(--dm-surface2);
-            --section-bg: var(--dm-surface2);
-        }
-        body.dark-mode { background: var(--dm-bg); color: var(--dm-text); }
-        body.dark-mode .login-box { background: var(--dm-surface); color: var(--dm-text); box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
-        body.dark-mode .login-box h2 { color: var(--accent); }
-        body.dark-mode .login-box p { color: var(--dm-text2); }
-        body.dark-mode .login-box input { background: var(--dm-surface2); border-color: var(--dm-border); color: var(--dm-text); }
-        body.dark-mode .modal-content { background: var(--dm-surface); color: var(--dm-text); }
-        body.dark-mode .modal-header { border-color: var(--dm-border); }
-        body.dark-mode .modal-footer { border-color: var(--dm-border); }
-        body.dark-mode .form-section { background: var(--dm-surface2); border-color: var(--dm-border); }
-        body.dark-mode input[type="text"], body.dark-mode input[type="email"],
-        body.dark-mode input[type="password"], body.dark-mode input[type="tel"],
-        body.dark-mode input[type="date"], body.dark-mode select, body.dark-mode textarea {
-            background: var(--dm-surface2); border-color: var(--dm-border); color: var(--dm-text);
-        }
-        body.dark-mode .card { background: var(--dm-surface); border-color: var(--dm-border); }
-        body.dark-mode .stat-card { background: var(--dm-surface); }
-        body.dark-mode .attendance-card { background: var(--dm-surface); }
-        body.dark-mode .trip-card { background: var(--dm-surface); }
-        body.dark-mode .page-header { background: var(--dm-surface); border-color: var(--dm-border); }
-        body.dark-mode .search-bar input { background: var(--dm-surface2); border-color: var(--dm-border); color: var(--dm-text); }
-        body.dark-mode .tab-pill { background: var(--dm-surface2); color: var(--dm-text2); }
-        body.dark-mode .att-btn { background: var(--dm-surface2); border-color: var(--dm-border); color: var(--dm-text); }
-        body.dark-mode .att-session-tab { background: var(--dm-surface2); border-color: var(--dm-border); color: var(--dm-text2); }
-        body.dark-mode .btn-light { background: var(--dm-surface2); color: var(--dm-text); }
-        body.dark-mode .form-row label { color: var(--dm-text2); }
-        body.dark-mode .main-content { background: var(--dm-bg); }
-        body.dark-mode #main-app { background: var(--dm-bg); }
-        body.dark-mode .sidebar { background: linear-gradient(180deg, #050d2e 0%, #0d1660 100%); }
-
-        /* Dark mode toggle button */
-        .dark-toggle-btn {
-            background: none; border: none; cursor: pointer;
-            color: rgba(255,255,255,0.7); font-size: 1em;
-            padding: 4px 8px; border-radius: 8px; transition: 0.2s;
-            display: flex; align-items: center; gap: 5px;
-        }
-        .dark-toggle-btn:hover { background: rgba(255,255,255,0.1); color: white; }
 
         /* ================================================================
            نظام الثيمات
@@ -883,11 +827,6 @@
                         border-radius:10px; color:#a5d6a7; padding:8px 12px; cursor:pointer; font-size:0.82em;">
                     <i class="fas fa-sync-alt"></i>
                 </button>
-                <button onclick="toggleDarkMode()" id="homeDarkBtn" title="وضع ليلي"
-                        style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);
-                        border-radius:10px; color:rgba(255,255,255,0.8); padding:8px 12px; cursor:pointer; font-size:0.82em; transition:0.2s;">
-                    <i class="fas fa-moon"></i>
-                </button>
                 <button onclick="openThemeModal()" title="تغيير الثيم"
                         style="background:rgba(255,215,100,0.15); border:1px solid rgba(255,215,100,0.35);
                         border-radius:10px; color:#ffd54f; padding:8px 12px; cursor:pointer; font-size:0.82em; transition:0.2s;">
@@ -1009,10 +948,6 @@
                 <div style="color:var(--accent); font-size:0.78em; font-weight:600; flex-shrink:0;" id="innerServiceLabel"></div>
                 <!-- اسم الصفحة -->
                 <div style="flex:1; color:white; font-weight:700; font-size:1em; text-align:center;" id="innerPageTitle"></div>
-                <!-- زر الوضع الليلي -->
-                <button onclick="toggleDarkMode()" id="darkModeNavBtn" title="وضع ليلي" class="dark-toggle-btn" style="flex-shrink:0;">
-                    <i class="fas fa-moon"></i>
-                </button>
                 <!-- زر رجوع — يسار -->
                 <button onclick="navigateBack()" title="رجوع" style="background:rgba(255,255,255,0.12); border:none;
                         border-radius:10px; color:white; padding:9px 13px; cursor:pointer; font-size:0.9em;
@@ -1046,10 +981,6 @@
                 <div class="drawer-item" onclick="closeDrawerAndGo('memberAttReport')"><i class="fas fa-user-check"></i> تقرير حضور فردي</div>
                 <div class="drawer-item admin-only" onclick="closeDrawerAndGo('servants')"><i class="fas fa-user-shield"></i> إدارة الخدام</div>
                 <div style="border-top:1px solid rgba(255,255,255,0.1); margin:8px 16px;"></div>
-                <!-- وضع ليلي -->
-                <div class="drawer-item" onclick="toggleDarkMode()" id="darkModeDrawerItem" style="color:#a5d8ff;">
-                    <i class="fas fa-moon"></i> <span id="darkModeLabel">الوضع الليلي</span>
-                </div>
                 <!-- تصدير واستيراد -->
                 <div class="drawer-item" onclick="exportData(); toggleDrawer();" style="color:#b2f2bb;">
                     <i class="fas fa-file-export"></i> تصدير البيانات
@@ -4038,44 +3969,6 @@ function openThemeModal() {
 (function initTheme() {
     const saved = localStorage.getItem('cm_theme') || 'church';
     applyTheme(saved);
-})();
-
-// ================================================================
-//  الوضع الليلي
-// ================================================================
-function applyDarkMode(enabled) {
-    if (enabled) {
-        document.body.classList.add('dark-mode');
-        document.getElementById('darkModeLabel').textContent = 'الوضع النهاري';
-        const btn = document.getElementById('darkModeNavBtn');
-        if (btn) { btn.innerHTML = '<i class="fas fa-sun"></i>'; btn.title = 'وضع نهاري'; }
-        const homeBtn = document.getElementById('homeDarkBtn');
-        if (homeBtn) { homeBtn.innerHTML = '<i class="fas fa-sun"></i>'; homeBtn.title = 'وضع نهاري'; homeBtn.style.color = '#ffd43b'; }
-        const drawerItem = document.getElementById('darkModeDrawerItem');
-        if (drawerItem) drawerItem.style.color = '#ffd43b';
-    } else {
-        document.body.classList.remove('dark-mode');
-        document.getElementById('darkModeLabel').textContent = 'الوضع الليلي';
-        const btn = document.getElementById('darkModeNavBtn');
-        if (btn) { btn.innerHTML = '<i class="fas fa-moon"></i>'; btn.title = 'وضع ليلي'; }
-        const homeBtn = document.getElementById('homeDarkBtn');
-        if (homeBtn) { homeBtn.innerHTML = '<i class="fas fa-moon"></i>'; homeBtn.title = 'وضع ليلي'; homeBtn.style.color = 'rgba(255,255,255,0.8)'; }
-        const drawerItem = document.getElementById('darkModeDrawerItem');
-        if (drawerItem) drawerItem.style.color = '#a5d8ff';
-    }
-}
-
-function toggleDarkMode() {
-    const isNowDark = !document.body.classList.contains('dark-mode');
-    localStorage.setItem('cm_dark_mode', isNowDark ? '1' : '0');
-    applyDarkMode(isNowDark);
-    showToast(isNowDark ? '🌙 تم تفعيل الوضع الليلي' : '☀️ تم تفعيل الوضع النهاري');
-}
-
-// تطبيق الوضع المحفوظ عند التحميل
-(function initDarkMode() {
-    const saved = localStorage.getItem('cm_dark_mode');
-    if (saved === '1') applyDarkMode(true);
 })();
 
 // ================================================================
