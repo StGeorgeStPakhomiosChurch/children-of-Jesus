@@ -790,6 +790,8 @@
                 <div class="drawer-item" onclick="closeDrawerAndGo('memberAttReport')"><i class="fas fa-user-check"></i> تقرير حضور فردي</div>
                 <div class="drawer-item admin-only" onclick="closeDrawerAndGo('servants')"><i class="fas fa-user-shield"></i> إدارة الخدام</div>
                 <div style="border-top:1px solid rgba(255,255,255,0.1); margin:8px 16px;"></div>
+                <div class="drawer-item" onclick="openDateTimeSettings(); toggleDrawer();" style="color:#a5d8ff;"><i class="fas fa-cog"></i> إعدادات العرض</div>
+                <div style="border-top:1px solid rgba(255,255,255,0.1); margin:8px 16px;"></div>
                 <div class="drawer-item" style="color:#ff8a80;" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</div>
             </nav>
         </div>
@@ -3531,6 +3533,300 @@ window.addEventListener('click', e => {
 document.getElementById('loginPass').addEventListener('keydown', e => {
     if (e.key === 'Enter') handleLogin();
 });
+</script>
+
+<!-- ===== مودال إعدادات الوقت والتاريخ ===== -->
+<div id="modalDateTimeSettings" class="modal" style="z-index:2000;">
+  <div class="modal-content" style="max-width:520px;">
+    <div class="modal-header">
+      <h3><i class="fas fa-cog" style="margin-left:8px; color:var(--accent);"></i> إعدادات عرض الوقت والتاريخ</h3>
+      <button class="modal-close" onclick="closeModal('modalDateTimeSettings')"><i class="fas fa-times"></i></button>
+    </div>
+
+    <!-- الوقت -->
+    <div class="form-section">
+      <h4><i class="fas fa-clock"></i> إعدادات الوقت</h4>
+      <div class="form-row">
+        <label>تنسيق الوقت</label>
+        <div style="display:flex; gap:18px; margin-top:8px; flex-wrap:wrap;">
+          <label style="display:flex;align-items:center;gap:6px;font-weight:normal;cursor:pointer;font-size:0.9em;">
+            <input type="radio" name="timeFormat" value="12" style="width:auto;"> 12 ساعة (ص/م)
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-weight:normal;cursor:pointer;font-size:0.9em;">
+            <input type="radio" name="timeFormat" value="24" style="width:auto;"> 24 ساعة
+          </label>
+        </div>
+      </div>
+      <div class="form-row" style="margin-top:10px;">
+        <label>إظهار الثواني</label>
+        <div style="display:flex; gap:18px; margin-top:8px; flex-wrap:wrap;">
+          <label style="display:flex;align-items:center;gap:6px;font-weight:normal;cursor:pointer;font-size:0.9em;">
+            <input type="radio" name="showSeconds" value="yes" style="width:auto;"> إظهار
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-weight:normal;cursor:pointer;font-size:0.9em;">
+            <input type="radio" name="showSeconds" value="no" style="width:auto;"> إخفاء
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- التاريخ الميلادي -->
+    <div class="form-section">
+      <h4><i class="fas fa-calendar-alt"></i> التاريخ الميلادي</h4>
+      <div class="form-row">
+        <label>تنسيق العرض</label>
+        <select id="miladiFormat" style="margin-top:6px;">
+          <option value="full">الجمعة، 9 مايو 2025 (كامل)</option>
+          <option value="noday">9 مايو 2025 (بدون اسم اليوم)</option>
+          <option value="numeric">09 / 05 / 2025 (أرقام)</option>
+          <option value="short">9/5/2025 (مختصر)</option>
+        </select>
+      </div>
+      <div class="form-row" style="margin-top:10px;">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:normal;">
+          <input type="checkbox" id="showMiladi" style="width:auto;"> إظهار التاريخ الميلادي في الشريط
+        </label>
+      </div>
+    </div>
+
+    <!-- التاريخ القبطي -->
+    <div class="form-section">
+      <h4><i class="fas fa-cross"></i> التاريخ القبطي</h4>
+      <div class="form-row">
+        <label>تنسيق العرض</label>
+        <select id="copticFormat" style="margin-top:6px;">
+          <option value="full">3 هاتور 1741 ق (كامل مع السنة)</option>
+          <option value="noYear">3 هاتور (بدون سنة)</option>
+          <option value="numeric">03 / 03 / 1741 (أرقام)</option>
+        </select>
+      </div>
+      <div class="form-row" style="margin-top:10px;">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:normal;">
+          <input type="checkbox" id="showCoptic" style="width:auto;"> إظهار التاريخ القبطي في الشريط
+        </label>
+      </div>
+    </div>
+
+    <!-- معاينة مباشرة -->
+    <div style="background:linear-gradient(135deg,#071444,#1a237e); border-radius:12px; padding:12px 18px; margin-bottom:16px;">
+      <p style="color:rgba(255,255,255,0.5); font-size:0.72em; text-align:center; margin:0 0 8px;">📺 معاينة مباشرة</p>
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <span id="previewMiladi" style="color:rgba(255,255,255,0.9); font-size:0.8em; font-weight:600; display:flex; align-items:center; gap:5px;">
+          <i class="fas fa-calendar" style="color:var(--accent); font-size:0.8em;"></i> <span></span>
+        </span>
+        <span style="display:flex; align-items:center; gap:5px;">
+          <span id="previewClock" style="color:white; font-size:1em; font-weight:800; letter-spacing:2px;"></span>
+          <span id="previewAmpm" style="color:var(--accent); font-size:0.72em; font-weight:700;"></span>
+        </span>
+        <span id="previewCoptic" style="color:var(--accent); font-size:0.8em; font-weight:700; display:flex; align-items:center; gap:5px;">
+          <i class="fas fa-cross" style="font-size:0.75em;"></i> <span></span>
+        </span>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="saveDateTimeSettings()"><i class="fas fa-save"></i> حفظ الإعدادات</button>
+      <button class="btn btn-light" onclick="resetDateTimeSettings()"><i class="fas fa-undo"></i> إعادة تعيين</button>
+      <button class="btn btn-light" onclick="closeModal('modalDateTimeSettings')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ================================================================
+//  إعدادات الوقت والتاريخ
+// ================================================================
+
+// القيم الافتراضية
+const defaultDTSettings = {
+    timeFormat: '12',
+    showSeconds: 'yes',
+    miladiFormat: 'full',
+    showMiladi: true,
+    copticFormat: 'full',
+    showCoptic: true
+};
+
+// تحميل الإعدادات
+function loadDTSettings() {
+    try {
+        const saved = localStorage.getItem('cm_dt_settings');
+        return saved ? Object.assign({}, defaultDTSettings, JSON.parse(saved)) : {...defaultDTSettings};
+    } catch(e) { return {...defaultDTSettings}; }
+}
+
+// فتح مودال الإعدادات وتعبئة القيم الحالية
+function openDateTimeSettings() {
+    const s = loadDTSettings();
+    // الوقت
+    document.querySelectorAll('input[name="timeFormat"]').forEach(r => r.checked = (r.value === s.timeFormat));
+    document.querySelectorAll('input[name="showSeconds"]').forEach(r => r.checked = (r.value === s.showSeconds));
+    // الميلادي
+    document.getElementById('miladiFormat').value = s.miladiFormat;
+    document.getElementById('showMiladi').checked = s.showMiladi;
+    // القبطي
+    document.getElementById('copticFormat').value = s.copticFormat;
+    document.getElementById('showCoptic').checked = s.showCoptic;
+    // تحديث المعاينة
+    updatePreview();
+    document.getElementById('modalDateTimeSettings').style.display = 'block';
+    // ربط أحداث التغيير للمعاينة الفورية
+    document.querySelectorAll('#modalDateTimeSettings input, #modalDateTimeSettings select').forEach(el => {
+        el.addEventListener('change', updatePreview);
+    });
+}
+
+// معاينة مباشرة
+function updatePreview() {
+    const now = new Date();
+    const tf  = document.querySelector('input[name="timeFormat"]:checked')?.value || '12';
+    const ss  = document.querySelector('input[name="showSeconds"]:checked')?.value || 'yes';
+    const mf  = document.getElementById('miladiFormat')?.value || 'full';
+    const sm  = document.getElementById('showMiladi')?.checked;
+    const cf  = document.getElementById('copticFormat')?.value || 'full';
+    const sc  = document.getElementById('showCoptic')?.checked;
+
+    // وقت
+    const { timeStr, ampmStr } = buildTimeStr(now, tf, ss);
+    document.getElementById('previewClock').textContent = timeStr;
+    document.getElementById('previewAmpm').textContent  = tf === '12' ? ampmStr : '';
+
+    // ميلادي
+    const pmEl = document.getElementById('previewMiladi');
+    if (sm) {
+        pmEl.style.visibility = 'visible';
+        pmEl.querySelector('span').textContent = buildMiladiStr(now, mf);
+    } else {
+        pmEl.style.visibility = 'hidden';
+    }
+
+    // قبطي
+    const pcEl = document.getElementById('previewCoptic');
+    if (sc) {
+        pcEl.style.visibility = 'visible';
+        pcEl.querySelector('span').textContent = buildCopticStr(now, cf);
+    } else {
+        pcEl.style.visibility = 'hidden';
+    }
+}
+
+// بناء نص الوقت
+function buildTimeStr(date, format, seconds) {
+    let h   = date.getHours();
+    const min = String(date.getMinutes()).padStart(2,'0');
+    const sec = String(date.getSeconds()).padStart(2,'0');
+    let ampmStr = '';
+    if (format === '12') {
+        ampmStr = h >= 12 ? 'م' : 'ص';
+        h = h % 12 || 12;
+    }
+    const hStr = String(h).padStart(2,'0');
+    const timeStr = seconds === 'yes' ? `${hStr}:${min}:${sec}` : `${hStr}:${min}`;
+    return { timeStr, ampmStr };
+}
+
+// بناء نص الميلادي
+function buildMiladiStr(date, format) {
+    const dayName = arDays[date.getDay()];
+    const d = date.getDate();
+    const mName = arMonths[date.getMonth()];
+    const dStr  = String(d).padStart(2,'0');
+    const mNum  = String(date.getMonth()+1).padStart(2,'0');
+    const y     = date.getFullYear();
+    if (format === 'full')    return `${dayName}، ${d} ${mName} ${y}`;
+    if (format === 'noday')   return `${d} ${mName} ${y}`;
+    if (format === 'numeric') return `${dStr} / ${mNum} / ${y}`;
+    if (format === 'short')   return `${d}/${date.getMonth()+1}/${y}`;
+    return `${dayName}، ${d} ${mName} ${y}`;
+}
+
+// بناء نص القبطي
+function buildCopticStr(date, format) {
+    const { year, month, day } = gregorianToCoptic(
+        date.getFullYear(), date.getMonth()+1, date.getDate()
+    );
+    const mName = copticMonths[Math.min(month-1,12)] || 'نسيء';
+    const dStr  = String(day).padStart(2,'0');
+    const mNum  = String(month).padStart(2,'0');
+    if (format === 'full')    return `${day} ${mName} ${year} ق`;
+    if (format === 'noYear')  return `${day} ${mName}`;
+    if (format === 'numeric') return `${dStr} / ${mNum} / ${year}`;
+    return `${day} ${mName} ${year} ق`;
+}
+
+// حفظ الإعدادات وتطبيقها
+function saveDateTimeSettings() {
+    const s = {
+        timeFormat:   document.querySelector('input[name="timeFormat"]:checked')?.value || '12',
+        showSeconds:  document.querySelector('input[name="showSeconds"]:checked')?.value || 'yes',
+        miladiFormat: document.getElementById('miladiFormat').value,
+        showMiladi:   document.getElementById('showMiladi').checked,
+        copticFormat: document.getElementById('copticFormat').value,
+        showCoptic:   document.getElementById('showCoptic').checked
+    };
+    localStorage.setItem('cm_dt_settings', JSON.stringify(s));
+    applyDTSettings();
+    closeModal('modalDateTimeSettings');
+    showToast('✅ تم حفظ الإعدادات');
+}
+
+// إعادة تعيين للافتراضي
+function resetDateTimeSettings() {
+    localStorage.removeItem('cm_dt_settings');
+    const s = defaultDTSettings;
+    document.querySelectorAll('input[name="timeFormat"]').forEach(r => r.checked = (r.value === s.timeFormat));
+    document.querySelectorAll('input[name="showSeconds"]').forEach(r => r.checked = (r.value === s.showSeconds));
+    document.getElementById('miladiFormat').value = s.miladiFormat;
+    document.getElementById('showMiladi').checked = s.showMiladi;
+    document.getElementById('copticFormat').value = s.copticFormat;
+    document.getElementById('showCoptic').checked = s.showCoptic;
+    updatePreview();
+    showToast('🔄 تمت إعادة التعيين');
+}
+
+// تطبيق الإعدادات على الساعات الفعلية (تعديل updateClocks)
+function applyDTSettings() {
+    // تُعيد استدعاء updateClocks — التعديل يتم داخلها
+    updateClocks();
+}
+
+// ----------------------------------------------------------------
+// استبدال دالة updateClocks لتدعم الإعدادات
+// ----------------------------------------------------------------
+(function() {
+    // نحتفظ بالدالة الأصلية ثم نعيد تعريفها
+    window.updateClocks = function() {
+        const now = new Date();
+        const s   = loadDTSettings();
+        const { timeStr, ampmStr } = buildTimeStr(now, s.timeFormat, s.showSeconds);
+        const miladiTxt = buildMiladiStr(now, s.miladiFormat);
+        const copticTxt = buildCopticStr(now, s.copticFormat);
+
+        // الهوم — ساعة وسط
+        const clockEl    = document.getElementById('clockDisplay');
+        const ampmEl     = document.getElementById('ampmDisplay');
+        const miladiSpan = document.querySelector('#miladiDate span');
+        const copticSpan = document.querySelector('#copticDate span');
+        if (clockEl)    clockEl.textContent = timeStr;
+        if (ampmEl)     ampmEl.textContent  = s.timeFormat === '12' ? ampmStr : '';
+        if (miladiSpan) miladiSpan.textContent = s.showMiladi ? miladiTxt : '';
+        if (copticSpan) copticSpan.textContent  = s.showCoptic ? copticTxt : '';
+
+        // الصفحات الداخلية
+        const ic   = document.getElementById('innerClock');
+        const iamp = document.getElementById('innerAmpm');
+        const imt  = document.getElementById('innerMiladiTxt');
+        const ict  = document.getElementById('innerCopticTxt');
+        if (ic)   ic.textContent   = timeStr;
+        if (iamp) iamp.textContent = s.timeFormat === '12' ? ampmStr : '';
+        if (imt)  imt.textContent  = s.showMiladi ? miladiTxt : '';
+        if (ict)  ict.textContent  = s.showCoptic ? copticTxt : '';
+
+        // تحديث المعاينة إن كان المودال مفتوحاً
+        const modal = document.getElementById('modalDateTimeSettings');
+        if (modal && modal.style.display === 'block') updatePreview();
+    };
+})();
 </script>
 
 <script>
