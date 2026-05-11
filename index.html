@@ -1642,9 +1642,14 @@ async function handleLogin() {
     const user = servants.find(u => u.email === email && u.pass === pass);
 
     if (user) {
+        // تحقق إن الحساب لم يعد معلقاً
+        if (user.pending) {
+            showToast("حسابك لا يزال قيد المراجعة — انتظر موافقة الأدمن", "error");
+            return;
+        }
         currentUser = user;
-        // حفظ الجلسة في localStorage
-        localStorage.setItem('cm_session', JSON.stringify({ email: user.email, pass: user.pass }));
+        // حفظ الجلسة في localStorage (بدون كلمة السر في النص الواضح)
+        localStorage.setItem('cm_session', JSON.stringify({ email: user.email, token: btoa(user.email + ':' + user.pass) }));
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('main-app').style.display = 'flex';
         document.getElementById('userName').innerText  = user.name;
@@ -1661,7 +1666,10 @@ async function handleLogin() {
 
         // إظهار زر إدارة الخدام في الهوم (للكاهن وأمين الخدمة فقط — الخادم لا يراه)
         if (canAdmin || isLeader) {
-            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'flex');
+            document.querySelectorAll('.admin-only').forEach(el => {
+                // احترم نوع العنصر: block أو inline-flex أو grid
+                el.style.display = el.tagName === 'BUTTON' || el.tagName === 'A' ? 'inline-flex' : '';
+            });
         }
         if (canAdmin || isLeader) {
             const btn = document.getElementById('btnTripServants');
@@ -2019,8 +2027,8 @@ function closeDrawerAndGo(page) {
 
 function navigateBack() {
     if (pageHistory.length >= 2) {
-        pageHistory.pop(); // الصفحة الحالية
-        const prev = pageHistory.pop(); // الصفحة السابقة
+        pageHistory.pop(); // إزالة الصفحة الحالية
+        const prev = pageHistory[pageHistory.length - 1]; // إطلالة على السابقة بدون حذف
         if (prev === 'home') goHome();
         else showPage(prev);
     } else {
@@ -2046,7 +2054,10 @@ function updateHomeStats() {
     if (elt) elt.textContent = trips.filter(t => t.service === activeSub).length + ' رحلة';
 
     // حضور اليوم
-    const todayKey = new Date().toISOString().split('T')[0] + '_' + activeSub;
+    const todayDateStr = new Date().toISOString().split('T')[0];
+    const sessionSuffix = (typeof activeSessionType !== 'undefined' && activeSessionType !== 'friday')
+        ? `__session_${activeSessionType}` : '';
+    const todayKey = `${todayDateStr}_${activeSub}${sessionSuffix}`;
     const todayRec = attendance[todayKey] || {};
     const present  = Object.values(todayRec).filter(v => v && v.status === 'present').length;
     const elA = document.getElementById('hstat-att');
@@ -2059,7 +2070,12 @@ function updateHomeStats() {
     // birthday banner
     const curMonth = new Date().getMonth() + 1;
     const monthNames = ['','يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
-    const bdays = sm.filter(m => m.dob && new Date(m.dob).getMonth()+1 === curMonth);
+    const bdays = sm.filter(m => {
+        if (!m.dob) return false;
+        const parts = m.dob.split('-');
+        const month = parts.length >= 2 ? parseInt(parts[1]) : new Date(m.dob).getMonth() + 1;
+        return month === curMonth;
+    });
     const hbb = document.getElementById('homeBirthdayBanner');
     if (hbb) {
         if (bdays.length > 0) {
@@ -2131,13 +2147,15 @@ function renderAttReport() {
 
     // جمع كل مفاتيح الحضور لهذا الشهر والخدمة الفرعية
     const dayKeys = Object.keys(attendance).filter(k => {
-        // key format: YYYY-MM-DD_serviceName
-        const [datePart, svc] = k.split('_').reduce((acc, part, i, arr) => {
-            if (i === 0) return [part, arr.slice(1).join('_')];
-            return acc;
-        }, ['', '']);
+        // key format: YYYY-MM-DD_serviceName  OR  YYYY-MM-DD_serviceName__session_X
+        const dateMatch = k.match(/^(\d{4}-\d{2}-\d{2})_(.+)$/);
+        if (!dateMatch) return false;
+        const datePart = dateMatch[1];
+        const restPart = dateMatch[2];
+        // الخدمة الفرعية هي الجزء قبل __session_ (إن وُجد)
+        const svcPart = restPart.split('__session_')[0];
         const d = new Date(datePart);
-        return svc === activeSub && d.getFullYear() === year && d.getMonth()+1 === month;
+        return svcPart === activeSub && d.getFullYear() === year && d.getMonth()+1 === month;
     });
 
     // كل مخدومي الخدمة
@@ -2157,7 +2175,8 @@ function renderAttReport() {
 
         dayKeys.forEach(k => {
             const rec = attendance[k][m.id];
-            const datePart = k.split('_')[0];
+            const dateMatch = k.match(/^(\d{4}-\d{2}-\d{2})/);
+            const datePart = dateMatch ? dateMatch[1] : k.split('_')[0];
             const dateLabel = formatDateDMY(datePart);
             const status = rec ? rec.status : 'absent';
             if (status === 'present') { presentCount++; sessionDetails.push({date:dateLabel, status:'present'}); }
@@ -2256,12 +2275,14 @@ function renderMembers() {
     if (monthFilter) {
         list = list.filter(m => {
             if (!m.dob) return false;
-            return new Date(m.dob).getMonth() + 1 === parseInt(monthFilter);
+            const parts = m.dob.split('-');
+            const month = parts.length >= 2 ? parseInt(parts[1]) : new Date(m.dob).getMonth() + 1;
+            return month === parseInt(monthFilter);
         });
         // ترتيب حسب يوم الميلاد داخل الشهر
         list.sort((a, b) => {
-            const dayA = new Date(a.dob).getDate();
-            const dayB = new Date(b.dob).getDate();
+            const dayA = parseInt((a.dob || '').split('-')[2] || 0);
+            const dayB = parseInt((b.dob || '').split('-')[2] || 0);
             return dayA - dayB;
         });
     }
@@ -2271,11 +2292,21 @@ function renderMembers() {
     if (banner) {
         const curMonth = new Date().getMonth() + 1;
         const monthNames = ['','يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
-        const bdays = getServiceMembers().filter(m => m.dob && new Date(m.dob).getMonth()+1 === curMonth);
+        const bdays = getServiceMembers().filter(m => {
+            if (!m.dob) return false;
+            const parts = m.dob.split('-');
+            const month = parts.length >= 2 ? parseInt(parts[1]) : new Date(m.dob).getMonth() + 1;
+            const day   = parts.length >= 3 ? parseInt(parts[2]) : new Date(m.dob).getDate();
+            return month === curMonth;
+        });
         if (bdays.length > 0 && !monthFilter) {
             banner.style.display = 'flex';
             banner.innerHTML = `<i class="fas fa-birthday-cake" style="font-size:1.4em; color:#d4af37;"></i>
-                <span><strong>🎉 مواليد ${monthNames[curMonth]}:</strong> ${bdays.map(m=>`<strong>${m.name}</strong> (${m.dob ? new Date(m.dob).getDate() : '?'})`).join(' — ')}</span>`;
+                <span><strong>🎉 مواليد ${monthNames[curMonth]}:</strong> ${bdays.map(m=>{
+                    const parts = (m.dob||'').split('-');
+                    const day = parts.length >= 3 ? parseInt(parts[2]) : '?';
+                    return `<strong>${m.name}</strong> (${day})`;
+                }).join(' — ')}</span>`;
         } else {
             banner.style.display = 'none';
         }
@@ -2294,61 +2325,58 @@ function renderMembers() {
         const imgSrc = getMemberImgSrc(m);
         // رحلات المخدوم في الخدمة الحالية
         const memberTrips = trips.filter(t => t.service === activeSub && t.targetType !== 'servants' && (t.members || []).includes(m.id));
-        let tripBadgeHtml = '';
-        if (memberTrips.length > 0) {
-            tripBadgeHtml = `<div style="margin:8px 0 0; display:flex; flex-wrap:wrap; gap:5px;">`;
-            memberTrips.forEach(t => {
-                const cost = parseFloat(t.cost) || 0;
-                const paid = parseFloat((t.payments || {})[m.id] || 0);
-                const remaining = cost - paid;
-                const isFullyPaid = cost > 0 && remaining <= 0;
-                tripBadgeHtml += `<span style="display:inline-flex; align-items:center; gap:4px; background:${isFullyPaid?'#e8f5e9':'#fff3e0'}; border:1px solid ${isFullyPaid?'#a5d6a7':'#ffcc80'}; border-radius:12px; padding:3px 8px; font-size:0.75em; cursor:pointer;" onclick="openTripPayFromMember('${m.id}','${t.id}')">
-                    <i class="fas fa-bus" style="color:${isFullyPaid?'#388e3c':'#e65100'};"></i>
-                    ${t.name}
-                    ${cost > 0 ? (isFullyPaid
-                        ? `<span style="color:#388e3c; font-weight:700;"><i class="fas fa-check-circle"></i> مدفوع كامل</span>`
-                        : `<span style="color:#e65100;">دفع: ${paid} / متبقي: <strong>${remaining}</strong></span>`
-                    ) : ''}
-                </span>`;
-            });
-            tripBadgeHtml += `</div>`;
-        }
-        // رحلات المخدوم — قسم واضح
+
+        // قسم الرحلات في الكارت — بدون nested backticks
         let tripsSection = '';
         if (memberTrips.length > 0) {
-            tripsSection = `<div style="margin-top:10px; border-top:1px solid #f0f0f0; padding-top:10px;">
-                <p style="font-size:0.78em; font-weight:700; color:#888; margin:0 0 6px;"><i class="fas fa-bus"></i> الرحلات</p>`;
-            memberTrips.forEach(t => {
-                const cost = parseFloat(t.cost) || 0;
-                const paid = parseFloat((t.payments || {})[m.id] || 0);
-                const remaining = cost - paid;
-                const isFullyPaid = cost > 0 && remaining <= 0;
-                tripsSection += `
-                <div style="background:${isFullyPaid?'#e8f5e9':'#fff8f0'}; border:1px solid ${isFullyPaid?'#a5d6a7':'#ffcc80'}; border-radius:10px; padding:8px 12px; margin-bottom:6px;">
-                    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">
-                        <span style="font-size:0.85em; font-weight:700; color:#1a237e;"><i class="fas fa-bus"></i> ${t.name}</span>
-                        ${isFullyPaid
-                            ? `<span style="color:#388e3c; font-size:0.8em; font-weight:700;"><i class="fas fa-check-circle"></i> مدفوع كامل</span>`
-                            : cost > 0
-                                ? `<span style="color:#e65100; font-size:0.8em; font-weight:700;">متبقي: <strong>${remaining}</strong> جنيه</span>`
-                                : `<span style="color:#888; font-size:0.8em;">مشترك</span>`
-                        }
-                    </div>
-                    ${cost > 0 ? `<div style="display:flex; gap:10px; margin-top:4px; font-size:0.78em; color:#555;">
-                        <span>التكلفة: ${cost} جنيه</span>
-                        <span style="color:#388e3c;">دفع: ${paid} جنيه</span>
-                    </div>` : ''}
-                    <button class="btn btn-accent btn-sm" style="margin-top:6px; font-size:0.78em; padding:4px 10px;" onclick="openTripPayFromMember('${m.id}','${t.id}')">
-                        <i class="fas fa-coins"></i> تسجيل دفع
-                    </button>
-                </div>`;
+            tripsSection = '<div style="margin-top:12px; border-top:2px solid #e8eaf6; padding-top:12px;">'
+                + '<p style="font-size:0.82em; font-weight:800; color:#1a237e; margin:0 0 8px;">'
+                + '<i class="fas fa-bus" style="color:#d4af37;"></i> الرحلات المشترك فيها</p>';
+            memberTrips.forEach(function(t) {
+                var cost = parseFloat(t.cost) || 0;
+                var paid = parseFloat((t.payments || {})[m.id] || 0);
+                var remaining = cost - paid;
+                var isFullyPaid = cost > 0 && remaining <= 0;
+                var bgColor = isFullyPaid ? '#e8f5e9' : '#fff8f0';
+                var bdColor = isFullyPaid ? '#a5d6a7' : '#ffcc80';
+
+                var statusBadge = '';
+                if (isFullyPaid) {
+                    statusBadge = '<span style="background:#e8f5e9;color:#388e3c;font-size:0.8em;font-weight:700;padding:2px 10px;border-radius:20px;border:1px solid #a5d6a7;"><i class="fas fa-check-circle"></i> مدفوع كامل</span>';
+                } else if (cost > 0) {
+                    statusBadge = '<span style="background:#fff3e0;color:#e65100;font-size:0.8em;font-weight:700;padding:2px 10px;border-radius:20px;border:1px solid #ffcc80;"><i class="fas fa-exclamation-circle"></i> متبقي: ' + remaining + ' جنيه</span>';
+                } else {
+                    statusBadge = '<span style="background:#e8eaf6;color:#1a237e;font-size:0.8em;padding:2px 10px;border-radius:20px;">مشترك</span>';
+                }
+
+                var dateHtml = t.date ? ('<span style="font-weight:400;font-size:0.78em;color:#999;margin-right:6px;">' + t.date + '</span>') : '';
+
+                var payDetails = '';
+                if (cost > 0) {
+                    var remainingRow = !isFullyPaid ? ('<span style="color:#e65100;"><i class="fas fa-clock"></i> متبقي: <strong>' + remaining + '</strong> جنيه</span>') : '';
+                    payDetails = '<div style="display:flex;gap:12px;font-size:0.8em;color:#666;margin-bottom:8px;flex-wrap:wrap;">'
+                        + '<span><i class="fas fa-tag" style="color:#1a237e;"></i> التكلفة: <strong>' + cost + '</strong> جنيه</span>'
+                        + '<span style="color:#388e3c;"><i class="fas fa-coins"></i> دفع: <strong>' + paid + '</strong> جنيه</span>'
+                        + remainingRow
+                        + '</div>';
+                }
+
+                tripsSection += '<div style="background:' + bgColor + ';border:2px solid ' + bdColor + ';border-radius:12px;padding:10px 14px;margin-bottom:8px;">'
+                    + '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:6px;">'
+                    + '<span style="font-size:0.9em;font-weight:700;color:#1a237e;"><i class="fas fa-bus"></i> ' + t.name + ' ' + dateHtml + '</span>'
+                    + statusBadge
+                    + '</div>'
+                    + payDetails
+                    + '<button class="btn btn-accent btn-sm" style="font-size:0.8em;padding:5px 14px;width:100%;" onclick="openTripPayFromMember(\'' + m.id + '\',\'' + t.id + '\')">'
+                    + '<i class="fas fa-coins"></i> تسجيل / تحديث الدفع</button>'
+                    + '</div>';
             });
-            tripsSection += `</div>`;
+            tripsSection += '</div>';
         } else {
-            tripsSection = `<div style="margin-top:10px; border-top:1px solid #f0f0f0; padding-top:10px;">
-                <p style="font-size:0.8em; color:#bbb; text-align:center;"><i class="fas fa-bus"></i> غير مشترك في رحلات</p>
-            </div>`;
+            tripsSection = '<div style="margin-top:12px;border-top:2px solid #f0f0f0;padding-top:10px;text-align:center;">'
+                + '<p style="font-size:0.82em;color:#ccc;margin:4px 0;"><i class="fas fa-bus"></i> غير مشترك في رحلات</p></div>';
         }
+        const tripBadgeHtml = ''; // لم يعد مستخدماً
 
         const card = document.createElement('div');
         card.className = "m-card";
@@ -2394,6 +2422,9 @@ function openMemberModal() {
     document.getElementById('editId').value = "";
     document.getElementById('mImgData').value = "";
     document.getElementById('mImgPreview').src = `https://ui-avatars.com/api/?name=صورة&background=1a237e&color=fff&size=200`;
+    // إعادة ضبط مدخل الملف
+    const fileInput = document.getElementById('mImgFile');
+    if (fileInput) fileInput.value = '';
     document.getElementById('memberModalTitle').innerHTML = '<i class="fas fa-user-plus"></i> إضافة مخدوم جديد';
     document.getElementById('mMainGrade').value = activeMain;
     populateSubGradeInModal();
@@ -2486,7 +2517,7 @@ function viewMemberDetail(id) {
                 <h4><i class="fas fa-phone"></i> التواصل</h4>
                 ${m.phone    ? `<p style="margin:6px 0;"><strong style="color:#555; font-size:0.9em;">الموبايل:</strong> <a href="tel:${m.phone}" class="contact-link">${m.phone}</a></p>` : ''}
                 ${m.landline ? `<p style="margin:6px 0;"><strong style="color:#555; font-size:0.9em;">أرضي:</strong> <a href="tel:${m.landline}" class="contact-link">${m.landline}</a></p>` : ''}
-                ${m.whatsapp ? `<p style="margin:6px 0;"><strong style="color:#555; font-size:0.9em;">واتساب:</strong> <a href="https://wa.me/2${m.whatsapp}" target="_blank" class="contact-link" style="color:#25d366;"><i class="fab fa-whatsapp"></i> ${m.whatsapp}</a></p>` : ''}
+                ${m.whatsapp ? `<p style="margin:6px 0;"><strong style="color:#555; font-size:0.9em;">واتساب:</strong> <a href="https://wa.me/${normalizePhone(m.whatsapp)}" target="_blank" class="contact-link" style="color:#25d366;"><i class="fab fa-whatsapp"></i> ${m.whatsapp}</a></p>` : ''}
                 ${m.telegram ? `<p style="margin:6px 0;"><strong style="color:#555; font-size:0.9em;">تليجرام:</strong> <a href="https://t.me/${m.telegram.replace('@','')}" target="_blank" class="contact-link" style="color:#0088cc;"><i class="fab fa-telegram"></i> ${m.telegram}</a></p>` : ''}
                 ${m.facebook ? `<p style="margin:6px 0;"><strong style="color:#555; font-size:0.9em;">فيسبوك:</strong> <a href="${getFacebookUrl(m.facebook)}" target="_blank" class="contact-link" style="color:#1877f2;"><i class="fab fa-facebook"></i> فيسبوك</a></p>` : ''}
             </div>
@@ -2509,7 +2540,7 @@ function viewMemberDetail(id) {
         </div>
         <div class="modal-footer">
             <button class="btn btn-primary" onclick="editMember('${m.id}'); closeModal('memberDetailModal')"><i class="fas fa-edit"></i> تعديل</button>
-            ${m.whatsapp ? `<a href="https://wa.me/2${m.whatsapp}" target="_blank" class="btn btn-whatsapp"><i class="fab fa-whatsapp"></i> واتساب</a>` : ''}
+            ${m.whatsapp ? `<a href="https://wa.me/${normalizePhone(m.whatsapp)}" target="_blank" class="btn btn-whatsapp"><i class="fab fa-whatsapp"></i> واتساب</a>` : ''}
             ${m.telegram ? `<a href="https://t.me/${m.telegram.replace('@','')}" target="_blank" class="btn btn-telegram"><i class="fab fa-telegram"></i> تليجرام</a>` : ''}
             ${m.facebook ? `<a href="${getFacebookUrl(m.facebook)}" target="_blank" class="btn btn-facebook"><i class="fab fa-facebook"></i> فيسبوك</a>` : ''}
             ${(m.loc||m.address) ? `<button class="btn btn-accent" onclick="openAddressMapFor('${m.loc||''}','${encodeURIComponent(m.address||'')}')"><i class="fas fa-map-marked-alt"></i> الموقع</button>` : ''}
@@ -2555,6 +2586,12 @@ function row(label, val) {
 // تنسيق التاريخ: يوم / شهر / سنة
 function formatDateDMY(dateStr) {
     if (!dateStr) return '';
+    // تجنب مشكلة الـ timezone: نقرأ الأجزاء مباشرة
+    const parts = dateStr.split('-');
+    if (parts.length === 3) {
+        const year = parts[0], month = parts[1], day = parts[2].substring(0, 2);
+        return `${day}/${month}/${year}`;
+    }
     const d = new Date(dateStr);
     if (isNaN(d)) return dateStr;
     const day   = String(d.getDate()).padStart(2, '0');
@@ -2566,6 +2603,9 @@ function formatDateDMY(dateStr) {
 document.getElementById('memberForm').onsubmit = function(e) {
     e.preventDefault();
     const id = document.getElementById('editId').value || Date.now().toString();
+    // حساب العمر تلقائياً لو dob موجود
+    const dobVal = document.getElementById('mDob').value;
+    if (dobVal) calculateAge(dobVal);
     const newMember = {
         id,
         name:      document.getElementById('mName').value.trim(),
@@ -2662,7 +2702,7 @@ function deleteCustomAttDay(day) {
     localStorage.setItem('cm_customAttDays', JSON.stringify(customAttDays));
     // حذف بيانات الحضور المرتبطة بهذا اليوم
     Object.keys(attendance).forEach(k => {
-        if (k.includes(`__session_${day}_`)) delete attendance[k];
+        if (k.includes(`__session_${day}`)) delete attendance[k];
     });
     saveData();
     if (activeSessionType === day) activeSessionType = 'friday';
@@ -2734,7 +2774,36 @@ function setAttendance(memberId, date, service, status) {
     const dayKey = getAttDayKey(date, service);
     if (!attendance[dayKey]) attendance[dayKey] = {};
     attendance[dayKey][memberId] = { status, reason: '' };
-    loadAttendanceList();
+
+    // تحديث بصري للكارت بدون إعادة رسم كاملة (لتجنب فقدان التمرير)
+    const card = document.getElementById(`attcard_${memberId}`);
+    if (card) {
+        card.querySelectorAll('.att-btn').forEach(btn => {
+            btn.classList.remove('present-active','absent-active','excused-active');
+        });
+        const btns = card.querySelectorAll('.att-btn');
+        if (status === 'present' && btns[0]) btns[0].classList.add('present-active');
+        if (status === 'absent'  && btns[1]) btns[1].classList.add('absent-active');
+        if (status === 'excused' && btns[2]) btns[2].classList.add('excused-active');
+        // إزالة سبب الاعتذار القديم لو غيّر الحالة
+        const reasonDiv = card.querySelector('.att-reason-div');
+        if (reasonDiv) reasonDiv.remove();
+    }
+
+    // تحديث الإحصائيات فقط
+    const statsEl = document.getElementById('attStats');
+    const serviceMembers = getServiceMembers();
+    const rec = attendance[dayKey] || {};
+    const presentCount = Object.values(rec).filter(v => v && v.status === 'present').length;
+    const excusedCount = Object.values(rec).filter(v => v && v.status === 'excused').length;
+    const absentCount  = serviceMembers.length - presentCount - excusedCount;
+    const sessionLabel = activeSessionType === 'friday' ? 'يوم الجمعة' : activeSessionType;
+    if (statsEl) statsEl.innerHTML = `
+        <span style="color:#888; font-weight:700; font-size:0.82em;"><i class="fas fa-calendar-day"></i> ${sessionLabel}</span>
+        <span style="color:var(--success);"><i class="fas fa-check-circle"></i> حاضر: <strong>${presentCount}</strong></span>
+        <span style="color:var(--danger);"><i class="fas fa-times-circle"></i> غائب: <strong>${absentCount}</strong></span>
+        <span style="color:var(--warning);"><i class="fas fa-clock"></i> معتذر: <strong>${excusedCount}</strong></span>
+        <span><i class="fas fa-users"></i> الإجمالي: <strong>${serviceMembers.length}</strong></span>`;
 }
 
 // مودال سبب الاعتذار
@@ -2751,12 +2820,43 @@ function openExcuseModal(memberId, date, service) {
 function confirmExcuse() {
     const dayKey = getAttDayKey(pendingExcuseDate, pendingExcuseService);
     if (!attendance[dayKey]) attendance[dayKey] = {};
-    attendance[dayKey][pendingExcuseMemberId] = {
-        status: 'excused',
-        reason: document.getElementById('excuseReason').value.trim()
-    };
+    const reason = document.getElementById('excuseReason').value.trim();
+    attendance[dayKey][pendingExcuseMemberId] = { status: 'excused', reason };
     closeModal('excuseModal');
-    loadAttendanceList();
+
+    // تحديث بصري للكارت
+    const card = document.getElementById(`attcard_${pendingExcuseMemberId}`);
+    if (card) {
+        card.querySelectorAll('.att-btn').forEach(btn => btn.classList.remove('present-active','absent-active','excused-active'));
+        const btns = card.querySelectorAll('.att-btn');
+        if (btns[2]) btns[2].classList.add('excused-active');
+        // تحديث/إضافة سبب الاعتذار
+        let reasonDiv = card.querySelector('.att-reason-div');
+        if (!reasonDiv) {
+            reasonDiv = document.createElement('div');
+            reasonDiv.className = 'att-reason-div';
+            reasonDiv.style.cssText = 'width:100%; font-size:0.82em; color:var(--warning); padding-top:6px;';
+            card.appendChild(reasonDiv);
+        }
+        reasonDiv.innerHTML = reason ? `<i class="fas fa-comment-alt"></i> سبب الاعتذار: ${reason}` : '';
+    }
+
+    // تحديث الإحصائيات
+    setAttendance.__updateStats && setAttendance.__updateStats();
+    // إعادة حساب الإحصائيات
+    const statsEl = document.getElementById('attStats');
+    const serviceMembers = getServiceMembers();
+    const rec = attendance[dayKey] || {};
+    const presentCount = Object.values(rec).filter(v => v && v.status === 'present').length;
+    const excusedCount = Object.values(rec).filter(v => v && v.status === 'excused').length;
+    const absentCount  = serviceMembers.length - presentCount - excusedCount;
+    const sessionLabel = activeSessionType === 'friday' ? 'يوم الجمعة' : activeSessionType;
+    if (statsEl) statsEl.innerHTML = `
+        <span style="color:#888; font-weight:700; font-size:0.82em;"><i class="fas fa-calendar-day"></i> ${sessionLabel}</span>
+        <span style="color:var(--success);"><i class="fas fa-check-circle"></i> حاضر: <strong>${presentCount}</strong></span>
+        <span style="color:var(--danger);"><i class="fas fa-times-circle"></i> غائب: <strong>${absentCount}</strong></span>
+        <span style="color:var(--warning);"><i class="fas fa-clock"></i> معتذر: <strong>${excusedCount}</strong></span>
+        <span><i class="fas fa-users"></i> الإجمالي: <strong>${serviceMembers.length}</strong></span>`;
 }
 
 function saveAttendance() {
@@ -2785,7 +2885,12 @@ function sendAbsenceMessages(absents, date) {
         const msg = encodeURIComponent(
             `السلام عليكم،\nنُعلمكم بأن ابنكم / ابنتكم (${m.name}) لم يحضر اجتماع خدمة ${activeSub} بتاريخ ${formattedDate}.\nنرجو التكرم بإبلاغنا بسبب الغياب.\nشكراً جزيلاً 🙏`
         );
-        const phone = parentPhone.startsWith('0') ? `2${parentPhone}` : parentPhone;
+        // تطبيع رقم الهاتف: إزالة أي مسافات، ثم إضافة كود الدولة 20 إن لزم
+        let phone = parentPhone.replace(/\s+/g, '');
+        if (phone.startsWith('00')) phone = phone.slice(2);        // 0020... → 20...
+        else if (phone.startsWith('0'))  phone = '2' + phone;       // 01... → 201...
+        // لو بيبدأ بـ 2 أو + فتركه كما هو
+        phone = phone.replace(/^\+/, '');                           // +20... → 20...
         window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
     });
     showToast(`تم فتح رسائل واتساب لـ ${absents.length} ولي أمر`);
@@ -3073,7 +3178,8 @@ function updateTripPayStatus() {
 function confirmTripPay() {
     const t = trips.find(x => x.id === pendingPayTripId);
     if (!t) return;
-    const newPaid = parseFloat(document.getElementById('tripPayAmount').value) || 0;
+    let newPaid = parseFloat(document.getElementById('tripPayAmount').value) || 0;
+    if (newPaid < 0) newPaid = 0; // لا يسمح بقيم سالبة
     if (!t.payments) t.payments = {};
     t.payments[pendingPayMemberId] = newPaid;
     saveData();
@@ -3105,12 +3211,26 @@ function initCharts() {
         <div class="stat-card"><div class="stat-icon">👨‍💼</div><div class="stat-num">${servants.length}</div><div class="stat-label">خدام</div></div>`;
 
     destroyChart('chartAttendance');
-    const weeks = ['الأسبوع 1','الأسبوع 2','الأسبوع 3','الأسبوع 4'];
-    const attData = weeks.map(() => Math.floor(Math.random() * 30 + 60));
+    // بناء بيانات الحضور الحقيقية: آخر 4 جمع
+    const today = new Date();
+    const attLabels = [];
+    const attDataReal = [];
+    for (let i = 3; i >= 0; i--) {
+        const d = new Date(today);
+        // إيجاد آخر 4 جمع (أو أقرب تواريخ)
+        d.setDate(d.getDate() - i * 7);
+        const dateStr = d.toISOString().split('T')[0];
+        const key = `${dateStr}_${activeSub}`;
+        const rec = attendance[key] || {};
+        const presentCnt = Object.values(rec).filter(v => v && v.status === 'present').length;
+        const total = serviceMembers.length || 1;
+        attLabels.push(formatDateDMY(dateStr));
+        attDataReal.push(Math.round(presentCnt / total * 100));
+    }
     chartInstances['chartAttendance'] = new Chart(document.getElementById('chartAttendance'), {
         type: 'bar',
-        data: { labels: weeks, datasets: [{ label: 'نسبة الحضور %', data: attData, backgroundColor: '#1a237e', borderRadius: 8 }] },
-        options: { plugins: { legend: { display: false }, title: { display: true, text: 'نسبة الحضور الشهرية', font: { size: 14 } } } }
+        data: { labels: attLabels, datasets: [{ label: 'نسبة الحضور %', data: attDataReal, backgroundColor: '#1a237e', borderRadius: 8 }] },
+        options: { plugins: { legend: { display: false }, title: { display: true, text: 'نسبة الحضور (آخر 4 أسابيع)', font: { size: 14 } } }, scales: { y: { min: 0, max: 100 } } }
     });
 
     destroyChart('chartGender');
@@ -3124,7 +3244,7 @@ function initCharts() {
 
     destroyChart('chartGrades');
     const gradeCount = {};
-    members.forEach(m => { gradeCount[m.grade] = (gradeCount[m.grade] || 0) + 1; });
+    serviceMembers.forEach(m => { gradeCount[m.grade] = (gradeCount[m.grade] || 0) + 1; });
     const gradeLabels = Object.keys(gradeCount);
     const gradeVals   = gradeLabels.map(g => gradeCount[g]);
     const colors      = gradeLabels.map((_, i) => `hsl(${220 + i*25}, 60%, ${40 + i*5}%)`);
@@ -3487,10 +3607,24 @@ function deleteServant(id) {
 // ================================================================
 //  أدوات مساعدة
 // ================================================================
+function normalizePhone(phone) {
+    if (!phone) return '';
+    let p = phone.replace(/\s+/g, '');
+    if (p.startsWith('00')) p = p.slice(2);
+    else if (p.startsWith('0')) p = '2' + p;
+    p = p.replace(/^\+/, '');
+    return p;
+}
+
 function calculateAge(dob) {
     if (!dob) return;
     const today = new Date();
-    const birth = new Date(dob);
+    // تجنب مشكلة الـ timezone: نقرأ الأجزاء مباشرة
+    const parts = dob.split('-');
+    const birth = parts.length === 3
+        ? new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]))
+        : new Date(dob);
+    if (isNaN(birth)) return;
     let age = today.getFullYear() - birth.getFullYear();
     if (today < new Date(today.getFullYear(), birth.getMonth(), birth.getDate())) age--;
     document.getElementById('mAge').value = age + " سنة";
@@ -3687,11 +3821,14 @@ function gregorianToJDN(y, m, d) {
 function jdnToCoptic(jdn) {
     const jdnCopticEpoch = 1825030; // JDN of 1 Tout 1 AM
     let n = jdn - jdnCopticEpoch;
-    const year  = Math.floor(n / 365.25 - 0.25) + 1;
-    n = n - Math.floor((year - 1) * 365.25 + 0.75);
-    const month = Math.floor(n / 30) + 1;
-    const day   = n - (month - 1) * 30 + 1;
-    return { year, month: Math.min(month, 13), day: Math.max(1, day) };
+    if (n < 0) n = 0; // تجنب التواريخ قبل البداية
+    const year  = Math.floor(n / 365) + 1;
+    // احسب بداية السنة بدقة
+    const yearStart = (year - 1) * 365 + Math.floor((year - 1) / 4);
+    const dayOfYear = n - yearStart;
+    const month = Math.min(Math.floor(dayOfYear / 30) + 1, 13);
+    const day   = dayOfYear - (month - 1) * 30 + 1;
+    return { year, month: Math.min(month, 13), day: Math.max(1, Math.min(day, 30)) };
 }
 
 function formatCopticDate(date) {
@@ -4244,14 +4381,20 @@ setTimeout(function() {
         const savedSession = localStorage.getItem('cm_session');
         if (savedSession) {
             try {
-                const { email, pass } = JSON.parse(savedSession);
-                // reload servants from storage first
+                const session = JSON.parse(savedSession);
+                // دعم الصيغة القديمة (email+pass) والجديدة (email+token)
                 const srv = JSON.parse(localStorage.getItem('cm_servants') || '[]');
-                const user = srv.find(u => u.email === email && u.pass === pass);
+                let user = null;
+                if (session.token) {
+                    user = srv.find(u => session.token === btoa(u.email + ':' + u.pass) && u.email === session.email);
+                } else if (session.pass) {
+                    // صيغة قديمة — ترقية تلقائية
+                    user = srv.find(u => u.email === session.email && u.pass === session.pass);
+                }
                 if (user) {
                     // auto-login
-                    document.getElementById('loginEmail').value = email;
-                    document.getElementById('loginPass').value = pass;
+                    document.getElementById('loginEmail').value = user.email;
+                    document.getElementById('loginPass').value = user.pass;
                     handleLogin();
                     return;
                 }
