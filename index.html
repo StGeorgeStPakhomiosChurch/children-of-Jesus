@@ -2313,6 +2313,43 @@ function renderMembers() {
             });
             tripBadgeHtml += `</div>`;
         }
+        // رحلات المخدوم — قسم واضح
+        let tripsSection = '';
+        if (memberTrips.length > 0) {
+            tripsSection = `<div style="margin-top:10px; border-top:1px solid #f0f0f0; padding-top:10px;">
+                <p style="font-size:0.78em; font-weight:700; color:#888; margin:0 0 6px;"><i class="fas fa-bus"></i> الرحلات</p>`;
+            memberTrips.forEach(t => {
+                const cost = parseFloat(t.cost) || 0;
+                const paid = parseFloat((t.payments || {})[m.id] || 0);
+                const remaining = cost - paid;
+                const isFullyPaid = cost > 0 && remaining <= 0;
+                tripsSection += `
+                <div style="background:${isFullyPaid?'#e8f5e9':'#fff8f0'}; border:1px solid ${isFullyPaid?'#a5d6a7':'#ffcc80'}; border-radius:10px; padding:8px 12px; margin-bottom:6px;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">
+                        <span style="font-size:0.85em; font-weight:700; color:#1a237e;"><i class="fas fa-bus"></i> ${t.name}</span>
+                        ${isFullyPaid
+                            ? `<span style="color:#388e3c; font-size:0.8em; font-weight:700;"><i class="fas fa-check-circle"></i> مدفوع كامل</span>`
+                            : cost > 0
+                                ? `<span style="color:#e65100; font-size:0.8em; font-weight:700;">متبقي: <strong>${remaining}</strong> جنيه</span>`
+                                : `<span style="color:#888; font-size:0.8em;">مشترك</span>`
+                        }
+                    </div>
+                    ${cost > 0 ? `<div style="display:flex; gap:10px; margin-top:4px; font-size:0.78em; color:#555;">
+                        <span>التكلفة: ${cost} جنيه</span>
+                        <span style="color:#388e3c;">دفع: ${paid} جنيه</span>
+                    </div>` : ''}
+                    <button class="btn btn-accent btn-sm" style="margin-top:6px; font-size:0.78em; padding:4px 10px;" onclick="openTripPayFromMember('${m.id}','${t.id}')">
+                        <i class="fas fa-coins"></i> تسجيل دفع
+                    </button>
+                </div>`;
+            });
+            tripsSection += `</div>`;
+        } else {
+            tripsSection = `<div style="margin-top:10px; border-top:1px solid #f0f0f0; padding-top:10px;">
+                <p style="font-size:0.8em; color:#bbb; text-align:center;"><i class="fas fa-bus"></i> غير مشترك في رحلات</p>
+            </div>`;
+        }
+
         const card = document.createElement('div');
         card.className = "m-card";
         card.innerHTML = `
@@ -2320,26 +2357,15 @@ function renderMembers() {
                  onclick="zoomImg('${imgSrc}')" alt="${m.name}">
             <div class="m-card-body">
                 <h3>${m.name}</h3>
-                <p><i class="fas fa-hand-holding-heart" style="color:var(--accent);"></i> ${m.conf || 'أب الاعتراف غير محدد'}</p>
-                <p><i class="fas fa-graduation-cap" style="color:var(--primary);"></i> ${m.grade}</p>
-                ${m.address ? `<p onclick="openAddressMapFor('${m.loc || ''}','${encodeURIComponent(m.address)}')" style="cursor:pointer; color:var(--primary);">
-                    <i class="fas fa-map-marker-alt" style="color:${m.loc ? 'var(--accent)' : '#d32f2f'};"></i> ${m.address}
-                    ${!m.loc ? `<span style="font-size:0.75em; color:#d32f2f; background:#fff3f3; border-radius:8px; padding:1px 7px; margin-right:4px; font-weight:600;"><i class="fas fa-exclamation-triangle"></i> برجاء إضافة لوكيشن</span>` : ''}
-                </p>` : ''}
-                ${m.phone ? `<p><a href="tel:${m.phone}" class="contact-link"><i class="fas fa-phone" style="color:var(--success);"></i> ${m.phone}</a></p>` : ''}
-                ${tripBadgeHtml}
-                <div style="display:flex; flex-wrap:wrap; gap:7px; margin-top:12px;">
-                    ${m.phone    ? `<a href="tel:${m.phone}" class="btn btn-primary btn-sm"><i class="fas fa-phone"></i></a>` : ''}
-                    ${m.landline ? `<a href="tel:${m.landline}" class="btn btn-primary btn-sm"><i class="fas fa-phone-alt"></i></a>` : ''}
-                    ${m.whatsapp ? `<a href="https://wa.me/2${m.whatsapp}" target="_blank" class="btn btn-whatsapp btn-sm"><i class="fab fa-whatsapp"></i></a>` : ''}
-                    ${m.telegram ? `<a href="https://t.me/${m.telegram.replace('@','')}" target="_blank" class="btn btn-telegram btn-sm"><i class="fab fa-telegram"></i></a>` : ''}
-                    ${m.facebook ? `<a href="${getFacebookUrl(m.facebook)}" target="_blank" class="btn btn-facebook btn-sm"><i class="fab fa-facebook"></i></a>` : ''}
-                    ${(m.loc || m.address) ? `<button class="btn btn-accent btn-sm" onclick="openAddressMapFor('${m.loc||''}','${encodeURIComponent(m.address||'')}')"><i class="fas fa-map-marked-alt"></i></button>` : ''}
-                    <button class="btn btn-light btn-sm" onclick="viewMemberDetail('${m.id}')"><i class="fas fa-eye"></i></button>
-                </div>
-                <div style="display:flex; justify-content:space-between; margin-top:14px; padding-top:12px; border-top:1px solid #f0f0f0;">
-                    <button class="btn btn-light btn-sm" onclick="editMember('${m.id}')"><i class="fas fa-edit"></i> تعديل</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteMember('${m.id}')"><i class="fas fa-trash"></i> حذف</button>
+                <p style="margin:4px 0; font-size:0.85em; color:#666;"><i class="fas fa-graduation-cap" style="color:var(--primary);"></i> ${m.grade}</p>
+                <p style="margin:4px 0; font-size:0.85em; color:#666;"><i class="fas fa-hand-holding-heart" style="color:var(--accent);"></i> ${m.conf || 'أب الاعتراف غير محدد'}</p>
+                ${tripsSection}
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; padding-top:10px; border-top:1px solid #f0f0f0;">
+                    <button class="btn btn-light btn-sm" onclick="viewMemberDetail('${m.id}')"><i class="fas fa-eye"></i> التفاصيل</button>
+                    ${(currentUser && currentUser.role !== 'Servant') ? `<div style="display:flex; gap:6px;">
+                        <button class="btn btn-light btn-sm" onclick="editMember('${m.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteMember('${m.id}')"><i class="fas fa-trash"></i></button>
+                    </div>` : ''}
                 </div>
             </div>`;
         grid.appendChild(card);
@@ -2449,13 +2475,14 @@ function viewMemberDetail(id) {
                 ${row("تاريخ الميلاد", formatDateDMY(m.dob))}
                 ${row("العمر", m.age)}
                 ${row("أب الاعتراف", m.conf)}
-                ${m.address ? `<p style="margin:6px 0; font-size:0.9em;"><strong style="color:#555;">العنوان:</strong>
+                ${(currentUser && currentUser.role !== 'Servant') && m.address ? `<p style="margin:6px 0; font-size:0.9em;"><strong style="color:#555;">العنوان:</strong>
                     <span onclick="openAddressMapFor('${m.loc||''}','${encodeURIComponent(m.address)}')" style="cursor:pointer; color:var(--primary); text-decoration:underline;">
                     <i class="fas fa-map-marker-alt" style="color:${m.loc ? 'var(--accent)' : '#d32f2f'};"></i> ${m.address}</span>
                     ${!m.loc ? `<span style="display:block; margin-top:4px; font-size:0.82em; color:#d32f2f; background:#fff3f3; border-radius:8px; padding:3px 10px; font-weight:600;"><i class="fas fa-exclamation-triangle"></i> برجاء إضافة لوكيشن GPS للمخدوم</span>` : ''}
                     </p>` : ''}
                 ${m.notes ? `<p style="margin:6px 0; font-size:0.9em;"><strong style="color:#555;">ملاحظات:</strong> ${m.notes}</p>` : ''}
             </div>
+            ${(currentUser && currentUser.role !== 'Servant') ? `
             <div class="form-section">
                 <h4><i class="fas fa-phone"></i> التواصل</h4>
                 ${m.phone    ? `<p style="margin:6px 0;"><strong style="color:#555; font-size:0.9em;">الموبايل:</strong> <a href="tel:${m.phone}" class="contact-link">${m.phone}</a></p>` : ''}
@@ -2479,42 +2506,51 @@ function viewMemberDetail(id) {
                 ${m.moPhone    ? `<p style="margin:6px 0; font-size:0.9em;"><strong style="color:#555;">الموبايل:</strong> <a href="tel:${m.moPhone}" class="contact-link">${m.moPhone}</a></p>` : ''}
                 ${m.moLandline ? `<p style="margin:6px 0; font-size:0.9em;"><strong style="color:#555;">أرضي:</strong> <a href="tel:${m.moLandline}" class="contact-link">${m.moLandline}</a></p>` : ''}
                 ${row("أب الاعتراف", m.moConf)}
-            </div>
+            </div>` : `
+            <div class="form-section" style="background:#f9f9f9; border-radius:12px; padding:16px; text-align:center; color:#aaa; font-size:0.88em;">
+                <i class="fas fa-lock" style="font-size:1.5em; margin-bottom:8px; display:block; color:#ccc;"></i>
+                بيانات التواصل والأسرة<br>متاحة لأمين الخدمة والكاهن فقط
+            </div>`}
         </div>
         <div class="modal-footer">
-            <button class="btn btn-primary" onclick="editMember('${m.id}'); closeModal('memberDetailModal')"><i class="fas fa-edit"></i> تعديل</button>
-            ${m.whatsapp ? `<a href="https://wa.me/2${m.whatsapp}" target="_blank" class="btn btn-whatsapp"><i class="fab fa-whatsapp"></i> واتساب</a>` : ''}
-            ${m.telegram ? `<a href="https://t.me/${m.telegram.replace('@','')}" target="_blank" class="btn btn-telegram"><i class="fab fa-telegram"></i> تليجرام</a>` : ''}
-            ${m.facebook ? `<a href="${getFacebookUrl(m.facebook)}" target="_blank" class="btn btn-facebook"><i class="fab fa-facebook"></i> فيسبوك</a>` : ''}
-            ${(m.loc||m.address) ? `<button class="btn btn-accent" onclick="openAddressMapFor('${m.loc||''}','${encodeURIComponent(m.address||'')}')"><i class="fas fa-map-marked-alt"></i> الموقع</button>` : ''}
+            ${(currentUser && currentUser.role !== 'Servant') ? `<button class="btn btn-primary" onclick="editMember('${m.id}'); closeModal('memberDetailModal')"><i class="fas fa-edit"></i> تعديل</button>` : ''}
+            ${(currentUser && currentUser.role !== 'Servant') && m.whatsapp ? `<a href="https://wa.me/2${m.whatsapp}" target="_blank" class="btn btn-whatsapp"><i class="fab fa-whatsapp"></i> واتساب</a>` : ''}
+            ${(currentUser && currentUser.role !== 'Servant') && m.telegram ? `<a href="https://t.me/${m.telegram.replace('@','')}" target="_blank" class="btn btn-telegram"><i class="fab fa-telegram"></i> تليجرام</a>` : ''}
+            ${(currentUser && currentUser.role !== 'Servant') && m.facebook ? `<a href="${getFacebookUrl(m.facebook)}" target="_blank" class="btn btn-facebook"><i class="fab fa-facebook"></i> فيسبوك</a>` : ''}
+            ${(currentUser && currentUser.role !== 'Servant') && (m.loc||m.address) ? `<button class="btn btn-accent" onclick="openAddressMapFor('${m.loc||''}','${encodeURIComponent(m.address||'')}')"><i class="fas fa-map-marked-alt"></i> الموقع</button>` : ''}
         </div>
         <!-- رحلات المخدوم -->
         ${(function(){
             const memberTrips = trips.filter(t => t.targetType !== 'servants' && (t.members||[]).includes(m.id));
-            if (memberTrips.length === 0) return '';
-            let html = `<div class="form-section" style="margin-top:10px;">
-                <h4><i class="fas fa-bus" style="color:var(--primary);"></i> الرحلات المشترك فيها</h4>`;
-            memberTrips.forEach(t => {
-                const cost = parseFloat(t.cost) || 0;
-                const paid = parseFloat((t.payments||{})[m.id] || 0);
-                const remaining = cost - paid;
-                const isFullyPaid = cost > 0 && remaining <= 0;
-                html += `<div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; padding:10px; margin:6px 0; background:${isFullyPaid?'#e8f5e9':'#fff8f0'}; border-radius:10px; border:1px solid ${isFullyPaid?'#a5d6a7':'#ffcc80'};">
-                    <div>
-                        <strong style="color:#1a237e;"><i class="fas fa-bus"></i> ${t.name}</strong>
-                        ${t.date ? `<span style="font-size:0.8em; color:#888; margin-right:8px;"><i class="fas fa-calendar"></i> ${formatDateDMY(t.date)}</span>` : ''}
-                    </div>
-                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                        ${cost > 0 ? `<span style="font-size:0.82em; color:#555;">تكلفة: ${cost} جنيه</span>
-                        <span style="font-size:0.82em; color:#388e3c;">دفع: ${paid} جنيه</span>
-                        ${isFullyPaid
-                            ? `<span style="color:#388e3c; font-weight:700; font-size:0.85em;"><i class="fas fa-check-circle"></i> مدفوع كامل</span>`
-                            : `<span style="color:#e65100; font-size:0.82em; font-weight:700;">متبقي: ${remaining} جنيه</span>`
-                        }` : ''}
-                        <button class="btn btn-accent btn-sm" onclick="openTripPayFromMember('${m.id}','${t.id}')"><i class="fas fa-coins"></i> تحديث الدفع</button>
-                    </div>
-                </div>`;
-            });
+            const isServant = currentUser && currentUser.role === 'Servant';
+            let html = `<div class="form-section" style="margin-top:10px; border:2px solid #e8eaf6; border-radius:14px; padding:16px;">
+                <h4 style="margin-top:0;"><i class="fas fa-bus" style="color:var(--primary);"></i> الرحلات</h4>`;
+            if (memberTrips.length === 0) {
+                html += `<p style="color:#bbb; text-align:center; margin:10px 0; font-size:0.88em;"><i class="fas fa-bus"></i> غير مشترك في أي رحلة</p>`;
+            } else {
+                memberTrips.forEach(t => {
+                    const cost = parseFloat(t.cost) || 0;
+                    const paid = parseFloat((t.payments||{})[m.id] || 0);
+                    const remaining = cost - paid;
+                    const isFullyPaid = cost > 0 && remaining <= 0;
+                    html += `<div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; padding:10px; margin:6px 0; background:${isFullyPaid?'#e8f5e9':'#fff8f0'}; border-radius:10px; border:1px solid ${isFullyPaid?'#a5d6a7':'#ffcc80'};">
+                        <div>
+                            <strong style="color:#1a237e;"><i class="fas fa-bus"></i> ${t.name}</strong>
+                            ${t.date ? `<span style="font-size:0.8em; color:#888; margin-right:8px;"><i class="fas fa-calendar"></i> ${formatDateDMY(t.date)}</span>` : ''}
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                            <span style="background:#e8eaf6; color:#1a237e; padding:2px 10px; border-radius:10px; font-size:0.8em; font-weight:700;"><i class="fas fa-check"></i> مشترك</span>
+                            ${cost > 0 ? `<span style="font-size:0.82em; color:#555;">تكلفة: <strong>${cost}</strong> جنيه</span>
+                            <span style="font-size:0.82em; color:#388e3c;">دفع: <strong>${paid}</strong> جنيه</span>
+                            ${isFullyPaid
+                                ? `<span style="color:#388e3c; font-weight:700; font-size:0.85em;"><i class="fas fa-check-circle"></i> مدفوع كامل</span>`
+                                : `<span style="color:#e65100; font-size:0.82em; font-weight:700; background:#fff3e0; padding:2px 8px; border-radius:8px;">متبقي: ${remaining} جنيه</span>`
+                            }` : `<span style="color:#888; font-size:0.8em;">بدون تكلفة</span>`}
+                            ${!isServant ? `<button class="btn btn-accent btn-sm" onclick="openTripPayFromMember('${m.id}','${t.id}')"><i class="fas fa-coins"></i> تحديث الدفع</button>` : ''}
+                        </div>
+                    </div>`;
+                });
+            }
             html += '</div>';
             return html;
         })()}`;
