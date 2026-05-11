@@ -811,10 +811,11 @@
         <div style="background:linear-gradient(135deg,#071444,#1a237e); position:sticky; top:0; z-index:99;
                     box-shadow:0 2px 15px rgba(0,0,0,0.3);">
             <div style="display:flex; align-items:center; gap:10px; padding:11px 16px;">
-                <!-- زر القائمة الجانبية — يسار -->
-                <button onclick="toggleDrawer()" title="القائمة" style="background:rgba(255,255,255,0.12); border:none;
-                        border-radius:10px; color:white; padding:9px 13px; cursor:pointer; font-size:0.9em; flex-shrink:0;">
-                    <i class="fas fa-bars"></i>
+                <!-- زر رجوع — يسار -->
+                <button onclick="navigateBack()" title="رجوع" style="background:rgba(255,255,255,0.12); border:none;
+                        border-radius:10px; color:white; padding:9px 13px; cursor:pointer; font-size:0.9em;
+                        display:flex; align-items:center; gap:5px; flex-shrink:0;">
+                    <i class="fas fa-arrow-right"></i> رجوع
                 </button>
                 <!-- اسم الصفحة -->
                 <div style="flex:1; color:white; font-weight:700; font-size:1em; text-align:center;" id="innerPageTitle"></div>
@@ -824,11 +825,10 @@
                 <button onclick="toggleDarkMode()" id="darkModeNavBtn" title="وضع ليلي" class="dark-toggle-btn" style="flex-shrink:0;">
                     <i class="fas fa-moon"></i>
                 </button>
-                <!-- زر رجوع — يمين -->
-                <button onclick="navigateBack()" title="رجوع" style="background:rgba(255,255,255,0.12); border:none;
-                        border-radius:10px; color:white; padding:9px 13px; cursor:pointer; font-size:0.9em;
-                        display:flex; align-items:center; gap:5px; flex-shrink:0;">
-                    رجوع <i class="fas fa-arrow-left"></i>
+                <!-- زر القائمة الجانبية — يمين -->
+                <button onclick="toggleDrawer()" title="القائمة" style="background:rgba(255,255,255,0.12); border:none;
+                        border-radius:10px; color:white; padding:9px 13px; cursor:pointer; font-size:0.9em; flex-shrink:0;">
+                    <i class="fas fa-bars"></i>
                 </button>
             </div>
         </div>
