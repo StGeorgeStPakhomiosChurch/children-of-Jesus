@@ -1000,33 +1000,33 @@
         <div style="background:linear-gradient(135deg,#071444,#1a237e); position:sticky; top:0; z-index:99;
                     box-shadow:0 2px 15px rgba(0,0,0,0.3);">
             <div style="display:flex; align-items:center; gap:10px; padding:11px 16px;">
-                <!-- زر رجوع — يسار -->
-                <button onclick="navigateBack()" title="رجوع" style="background:rgba(255,255,255,0.12); border:none;
-                        border-radius:10px; color:white; padding:9px 13px; cursor:pointer; font-size:0.9em;
-                        display:flex; align-items:center; gap:5px; flex-shrink:0;">
-                    <i class="fas fa-arrow-right"></i> رجوع
-                </button>
-                <!-- اسم الصفحة -->
-                <div style="flex:1; color:white; font-weight:700; font-size:1em; text-align:center;" id="innerPageTitle"></div>
-                <!-- اسم الخدمة -->
-                <div style="color:var(--accent); font-size:0.78em; font-weight:600; flex-shrink:0;" id="innerServiceLabel"></div>
-                <!-- زر الوضع الليلي -->
-                <button onclick="toggleDarkMode()" id="darkModeNavBtn" title="وضع ليلي" class="dark-toggle-btn" style="flex-shrink:0;">
-                    <i class="fas fa-moon"></i>
-                </button>
                 <!-- زر القائمة الجانبية — يمين -->
                 <button onclick="toggleDrawer()" title="القائمة" style="background:rgba(255,255,255,0.12); border:none;
                         border-radius:10px; color:white; padding:9px 13px; cursor:pointer; font-size:0.9em; flex-shrink:0;">
                     <i class="fas fa-bars"></i>
+                </button>
+                <!-- اسم الخدمة -->
+                <div style="color:var(--accent); font-size:0.78em; font-weight:600; flex-shrink:0;" id="innerServiceLabel"></div>
+                <!-- اسم الصفحة -->
+                <div style="flex:1; color:white; font-weight:700; font-size:1em; text-align:center;" id="innerPageTitle"></div>
+                <!-- زر الوضع الليلي -->
+                <button onclick="toggleDarkMode()" id="darkModeNavBtn" title="وضع ليلي" class="dark-toggle-btn" style="flex-shrink:0;">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <!-- زر رجوع — يسار -->
+                <button onclick="navigateBack()" title="رجوع" style="background:rgba(255,255,255,0.12); border:none;
+                        border-radius:10px; color:white; padding:9px 13px; cursor:pointer; font-size:0.9em;
+                        display:flex; align-items:center; gap:5px; flex-shrink:0;">
+                    <i class="fas fa-arrow-left"></i> رجوع
                 </button>
             </div>
         </div>
 
         <!-- ③ Drawer — القائمة الجانبية المنسدلة -->
         <div id="drawerOverlay" onclick="toggleDrawer()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:200;"></div>
-        <div id="sideDrawer" style="position:fixed; top:0; left:-280px; width:270px; height:100vh; z-index:201;
-             background:linear-gradient(180deg,#071444 0%,#1a237e 100%); box-shadow:4px 0 20px rgba(0,0,0,0.4);
-             transition:left 0.3s ease; display:flex; flex-direction:column; overflow-y:auto;">
+        <div id="sideDrawer" style="position:fixed; top:0; right:-280px; width:270px; height:100vh; z-index:201;
+             background:linear-gradient(180deg,#071444 0%,#1a237e 100%); box-shadow:-4px 0 20px rgba(0,0,0,0.4);
+             transition:right 0.3s ease; display:flex; flex-direction:column; overflow-y:auto;">
             <!-- رأس الـ Drawer -->
             <div style="padding:24px 20px 16px; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; align-items:center; gap:12px;">
                 <img id="drawerAvatar" src="https://i.pravatar.cc/150?u=default" style="width:46px;height:46px;border-radius:50%;border:2px solid var(--accent);object-fit:cover;">
@@ -2059,8 +2059,8 @@ let pageHistory = [];  // سجل الصفحات للرجوع
 function toggleDrawer() {
     const drawer  = document.getElementById('sideDrawer');
     const overlay = document.getElementById('drawerOverlay');
-    const isOpen  = drawer.style.left === '0px';
-    drawer.style.left   = isOpen ? '-280px' : '0px';
+    const isOpen  = drawer.style.right === '0px';
+    drawer.style.right   = isOpen ? '-280px' : '0px';
     overlay.style.display = isOpen ? 'none' : 'block';
 
     // تحديث بيانات المستخدم في الـ drawer
@@ -2080,7 +2080,7 @@ function toggleDrawer() {
 function closeDrawerAndGo(page) {
     const drawer  = document.getElementById('sideDrawer');
     const overlay = document.getElementById('drawerOverlay');
-    drawer.style.left   = '-280px';
+    drawer.style.right   = '-280px';
     overlay.style.display = 'none';
     if (page === 'home') goHome();
     else showPage(page);
@@ -3763,30 +3763,48 @@ function formatTime(date) {
 }
 
 function updateClocks() {
-    const now    = new Date();
-    const { time, ampm } = formatTime(now);
-    const miladi = formatMiladiDate(now);
-    const coptic = formatCopticDate(now);
+    const now = new Date();
+    // الدوال المساعدة قد تكون في script block لاحق — نتعامل بأمان
+    if (typeof loadDTSettings === 'undefined' || typeof buildTimeStr === 'undefined') {
+        // fallback بسيط حتى تكتمل الصفحة
+        const h = now.getHours(), m = now.getMinutes(), s2 = now.getSeconds();
+        const ampm = h >= 12 ? 'م' : 'ص';
+        const hh = String(h % 12 || 12).padStart(2,'0');
+        const mm = String(m).padStart(2,'0');
+        const ss = String(s2).padStart(2,'0');
+        const t = `${hh}:${mm}:${ss}`;
+        ['clockDisplay','innerClock'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=t; });
+        ['ampmDisplay','innerAmpm'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=ampm; });
+        return;
+    }
+    const s   = loadDTSettings();
+    const { timeStr, ampmStr } = buildTimeStr(now, s.timeFormat, s.showSeconds);
+    const miladiTxt = buildMiladiStr(now, s.miladiFormat);
+    const copticTxt = buildCopticStr(now, s.copticFormat);
 
-    // الهوم — ميلادي يمين | ساعة وسط | قبطي شمال
+    // الهوم
     const clockEl    = document.getElementById('clockDisplay');
     const ampmEl     = document.getElementById('ampmDisplay');
     const miladiSpan = document.querySelector('#miladiDate span');
     const copticSpan = document.querySelector('#copticDate span');
-    if (clockEl)    clockEl.textContent    = time;
-    if (ampmEl)     ampmEl.textContent     = ampm;
-    if (miladiSpan) miladiSpan.textContent = miladi;
-    if (copticSpan) copticSpan.textContent = coptic + ' ق';
+    if (clockEl)    clockEl.textContent = timeStr;
+    if (ampmEl)     ampmEl.textContent  = (s.timeFormat === '12' || s.timeFormat === 'arabic') ? ampmStr : '';
+    if (miladiSpan) miladiSpan.textContent = s.showMiladi ? miladiTxt : '';
+    if (copticSpan) copticSpan.textContent  = s.showCoptic ? copticTxt : '';
 
-    // الصفحات الداخلية — نفس التنسيق
+    // الصفحات الداخلية
     const ic   = document.getElementById('innerClock');
     const iamp = document.getElementById('innerAmpm');
     const imt  = document.getElementById('innerMiladiTxt');
     const ict  = document.getElementById('innerCopticTxt');
-    if (ic)   ic.textContent   = time;
-    if (iamp) iamp.textContent = ampm;
-    if (imt)  imt.textContent  = miladi;
-    if (ict)  ict.textContent  = coptic + ' ق';
+    if (ic)   ic.textContent   = timeStr;
+    if (iamp) iamp.textContent = (s.timeFormat === '12' || s.timeFormat === 'arabic') ? ampmStr : '';
+    if (imt)  imt.textContent  = s.showMiladi ? miladiTxt : '';
+    if (ict)  ict.textContent  = s.showCoptic ? copticTxt : '';
+
+    // تحديث المعاينة إن كان المودال مفتوحاً
+    const modal = document.getElementById('modalDateTimeSettings');
+    if (modal && modal.style.display === 'block') updatePreview();
 }
 
 // تشغيل الساعة
@@ -4157,8 +4175,9 @@ function openDateTimeSettings() {
     // تحديث المعاينة
     updatePreview();
     document.getElementById('modalDateTimeSettings').style.display = 'block';
-    // ربط أحداث التغيير للمعاينة الفورية
+    // ربط أحداث التغيير للمعاينة الفورية (مرة واحدة فقط)
     document.querySelectorAll('#modalDateTimeSettings input, #modalDateTimeSettings select').forEach(el => {
+        el.removeEventListener('change', updatePreview);
         el.addEventListener('change', updatePreview);
     });
 }
@@ -4284,49 +4303,10 @@ function resetDateTimeSettings() {
     showToast('🔄 تمت إعادة التعيين');
 }
 
-// تطبيق الإعدادات على الساعات الفعلية (تعديل updateClocks)
+// تطبيق الإعدادات على الساعات الفعلية
 function applyDTSettings() {
-    // تُعيد استدعاء updateClocks — التعديل يتم داخلها
     updateClocks();
 }
-
-// ----------------------------------------------------------------
-// استبدال دالة updateClocks لتدعم الإعدادات
-// ----------------------------------------------------------------
-(function() {
-    // نحتفظ بالدالة الأصلية ثم نعيد تعريفها
-    window.updateClocks = function() {
-        const now = new Date();
-        const s   = loadDTSettings();
-        const { timeStr, ampmStr } = buildTimeStr(now, s.timeFormat, s.showSeconds);
-        const miladiTxt = buildMiladiStr(now, s.miladiFormat);
-        const copticTxt = buildCopticStr(now, s.copticFormat);
-
-        // الهوم — ساعة وسط
-        const clockEl    = document.getElementById('clockDisplay');
-        const ampmEl     = document.getElementById('ampmDisplay');
-        const miladiSpan = document.querySelector('#miladiDate span');
-        const copticSpan = document.querySelector('#copticDate span');
-        if (clockEl)    clockEl.textContent = timeStr;
-        if (ampmEl)     ampmEl.textContent  = (s.timeFormat === '12' || s.timeFormat === 'arabic') ? ampmStr : '';
-        if (miladiSpan) miladiSpan.textContent = s.showMiladi ? miladiTxt : '';
-        if (copticSpan) copticSpan.textContent  = s.showCoptic ? copticTxt : '';
-
-        // الصفحات الداخلية
-        const ic   = document.getElementById('innerClock');
-        const iamp = document.getElementById('innerAmpm');
-        const imt  = document.getElementById('innerMiladiTxt');
-        const ict  = document.getElementById('innerCopticTxt');
-        if (ic)   ic.textContent   = timeStr;
-        if (iamp) iamp.textContent = (s.timeFormat === '12' || s.timeFormat === 'arabic') ? ampmStr : '';
-        if (imt)  imt.textContent  = s.showMiladi ? miladiTxt : '';
-        if (ict)  ict.textContent  = s.showCoptic ? copticTxt : '';
-
-        // تحديث المعاينة إن كان المودال مفتوحاً
-        const modal = document.getElementById('modalDateTimeSettings');
-        if (modal && modal.style.display === 'block') updatePreview();
-    };
-})();
 </script>
 
 <script>
