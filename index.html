@@ -2641,7 +2641,7 @@ function renderMembers() {
 
         // أزرار التواصل السريع
         var qaButtons = '';
-        if (m.phone)    qaButtons += '<a href="tel:' + m.phone + '" class="mc-action-btn call"><i class="fas fa-phone"></i>اتصال</a>';
+        if (m.phone)    qaButtons += '<a href="tel:+' + normalizePhone(m.phone) + '" class="mc-action-btn call"><i class="fas fa-phone"></i>اتصال</a>';
         if (m.whatsapp) qaButtons += '<a href="https://wa.me/' + normalizePhone(m.whatsapp) + '" target="_blank" class="mc-action-btn whatsapp"><i class="fab fa-whatsapp"></i>واتساب</a>';
         if (m.telegram) qaButtons += '<a href="https://t.me/' + (m.telegram||'').replace('@','') + '" target="_blank" class="mc-action-btn telegram"><i class="fab fa-telegram"></i>تليجرام</a>';
         if (m.loc || m.address) qaButtons += '<button class="mc-action-btn map" onclick="openAddressMapFor(\'' + (m.loc||'') + '\',\'' + encodeURIComponent(m.address||'') + '\')"><i class="fas fa-map-marked-alt"></i>الموقع</button>';
@@ -2673,10 +2673,10 @@ function renderMembers() {
         var phoneHtml = '';
         if (m.phone) {
             phoneHtml = '<div class="mc-divider"><i class="fas fa-phone"></i> التواصل</div>'
-                + '<a href="tel:' + m.phone + '" class="mc-info-row" style="text-decoration:none; color:inherit;">'
+                + '<a href="tel:+' + normalizePhone(m.phone) + '" class="mc-info-row" style="text-decoration:none; color:inherit;">'
                 + '<div class="mc-icon" style="background:#e8f5e9; color:#2e7d32;"><i class="fas fa-phone"></i></div>'
                 + '<div><div class="mc-lbl">الموبايل</div>'
-                + '<div class="mc-val">' + m.phone + '</div></div>'
+                + '<div class="mc-val">' + formatPhoneDisplay(m.phone) + '</div></div>'
                 + '</a>';
         }
 
@@ -2699,7 +2699,7 @@ function renderMembers() {
             if (m.fJob) fJobArr.push(m.fJob);
             if (m.fConf) fJobArr.push('أب اعتراف: ' + m.fConf);
             var fJobStr = fJobArr.length ? fJobArr.join(' · ') : 'الأب';
-            var fPhoneLink = m.fPhone ? '<a href="tel:' + m.fPhone + '" class="mc-parent-phone"><i class="fas fa-phone-alt"></i>' + m.fPhone + '</a>' : '';
+            var fPhoneLink = m.fPhone ? '<a href="tel:+' + normalizePhone(m.fPhone) + '" class="mc-parent-phone"><i class="fas fa-phone-alt"></i>' + formatPhoneDisplay(m.fPhone) + '</a>' : '';
             fatherHtml = '<div class="mc-parent-row">'
                 + '<div class="mc-parent-icon" style="background:#e8eaf6; color:#1a237e;"><i class="fas fa-male"></i></div>'
                 + '<div class="mc-parent-meta">'
@@ -2715,7 +2715,7 @@ function renderMembers() {
             if (m.moJob) moJobArr.push(m.moJob);
             if (m.moConf) moJobArr.push('أب اعتراف: ' + m.moConf);
             var moJobStr = moJobArr.length ? moJobArr.join(' · ') : 'الأم';
-            var moPhoneLink = m.moPhone ? '<a href="tel:' + m.moPhone + '" class="mc-parent-phone"><i class="fas fa-phone-alt"></i>' + m.moPhone + '</a>' : '';
+            var moPhoneLink = m.moPhone ? '<a href="tel:+' + normalizePhone(m.moPhone) + '" class="mc-parent-phone"><i class="fas fa-phone-alt"></i>' + formatPhoneDisplay(m.moPhone) + '</a>' : '';
             motherHtml = '<div class="mc-parent-row">'
                 + '<div class="mc-parent-icon" style="background:#fce4ec; color:#c2185b;"><i class="fas fa-female"></i></div>'
                 + '<div class="mc-parent-meta">'
@@ -2809,7 +2809,7 @@ function openMemberModal() {
 }
 
 function editMember(id) {
-    const m = members.find(x => x.id === id);
+    const m = members.find(x => String(x.id) === String(id));
     if (!m) return;
 
     document.getElementById('editId').value     = m.id;
@@ -2821,11 +2821,11 @@ function editMember(id) {
     document.getElementById('mAge').value       = m.age      || '';
     document.getElementById('mGender').value    = m.gender   || 'ذكر';
     document.getElementById('mConf').value      = m.conf     || '';
-    document.getElementById('mPhone').value     = m.phone    || '';
-    document.getElementById('mLandline').value  = m.landline || '';
+    document.getElementById('mPhone').value     = formatPhoneDisplay(m.phone)    || '';
+    document.getElementById('mLandline').value  = formatPhoneDisplay(m.landline) || '';
     document.getElementById('mAddress').value   = m.address  || '';
     document.getElementById('mLoc').value       = m.loc      || '';
-    document.getElementById('mWhatsApp').value  = m.whatsapp || '';
+    document.getElementById('mWhatsApp').value  = formatPhoneDisplay(m.whatsapp) || '';
     document.getElementById('mTelegram').value  = m.telegram || '';
     document.getElementById('mFacebook').value  = m.facebook || '';
     document.getElementById('mNotes').value     = m.notes    || '';
@@ -2855,14 +2855,14 @@ function editMember(id) {
 
 function deleteMember(id) {
     if (!confirm("هل أنت متأكد من حذف هذا المخدوم؟")) return;
-    members = members.filter(m => m.id !== id);
+    members = members.filter(m => String(m.id) !== String(id));
     saveData();
     renderMembers();
     showToast("تم حذف المخدوم");
 }
 
 function viewMemberDetail(id) {
-    const m = members.find(x => x.id === id);
+    const m = members.find(x => String(x.id) === String(id));
     if (!m) return;
     const imgSrc = getMemberImgSrc(m);
 
@@ -2901,9 +2901,9 @@ function viewMemberDetail(id) {
     // — التواصل
     html += '<div class="form-section">';
     html += '<h4><i class="fas fa-phone"></i> التواصل</h4>';
-    if (m.phone)    html += '<p style="margin:6px 0;"><strong style="color:#555; font-size:0.9em;">الموبايل:</strong> <a href="tel:' + m.phone + '" class="contact-link">' + m.phone + '</a></p>';
-    if (m.landline) html += '<p style="margin:6px 0;"><strong style="color:#555; font-size:0.9em;">أرضي:</strong> <a href="tel:' + m.landline + '" class="contact-link">' + m.landline + '</a></p>';
-    if (m.whatsapp) html += '<p style="margin:6px 0;"><strong style="color:#555; font-size:0.9em;">واتساب:</strong> <a href="https://wa.me/' + normalizePhone(m.whatsapp) + '" target="_blank" class="contact-link" style="color:#25d366;"><i class="fab fa-whatsapp"></i> ' + m.whatsapp + '</a></p>';
+    if (m.phone)    html += '<p style="margin:6px 0;"><strong style="color:#555; font-size:0.9em;">الموبايل:</strong> <a href="tel:+' + normalizePhone(m.phone) + '" class="contact-link">' + formatPhoneDisplay(m.phone) + '</a></p>';
+    if (m.landline) html += '<p style="margin:6px 0;"><strong style="color:#555; font-size:0.9em;">أرضي:</strong> <a href="tel:+' + normalizePhone(m.landline) + '" class="contact-link">' + formatPhoneDisplay(m.landline) + '</a></p>';
+    if (m.whatsapp) html += '<p style="margin:6px 0;"><strong style="color:#555; font-size:0.9em;">واتساب:</strong> <a href="https://wa.me/' + normalizePhone(m.whatsapp) + '" target="_blank" class="contact-link" style="color:#25d366;"><i class="fab fa-whatsapp"></i> ' + formatPhoneDisplay(m.whatsapp) + '</a></p>';
     if (m.telegram) html += '<p style="margin:6px 0;"><strong style="color:#555; font-size:0.9em;">تليجرام:</strong> <a href="https://t.me/' + m.telegram.replace('@','') + '" target="_blank" class="contact-link" style="color:#0088cc;"><i class="fab fa-telegram"></i> ' + m.telegram + '</a></p>';
     if (m.facebook) html += '<p style="margin:6px 0;"><strong style="color:#555; font-size:0.9em;">فيسبوك:</strong> <a href="' + getFacebookUrl(m.facebook) + '" target="_blank" class="contact-link" style="color:#1877f2;"><i class="fab fa-facebook"></i> فيسبوك</a></p>';
     html += '</div>';
@@ -2913,8 +2913,8 @@ function viewMemberDetail(id) {
     html += '<h4><i class="fas fa-male"></i> الأب</h4>';
     html += row('الاسم', m.fName);
     html += row('الوظيفة', m.fJob);
-    if (m.fPhone)    html += '<p style="margin:6px 0; font-size:0.9em;"><strong style="color:#555;">الموبايل:</strong> <a href="tel:' + m.fPhone + '" class="contact-link">' + m.fPhone + '</a></p>';
-    if (m.fLandline) html += '<p style="margin:6px 0; font-size:0.9em;"><strong style="color:#555;">أرضي:</strong> <a href="tel:' + m.fLandline + '" class="contact-link">' + m.fLandline + '</a></p>';
+    if (m.fPhone)    html += '<p style="margin:6px 0; font-size:0.9em;"><strong style="color:#555;">الموبايل:</strong> <a href="tel:+' + normalizePhone(m.fPhone) + '" class="contact-link">' + formatPhoneDisplay(m.fPhone) + '</a></p>';
+    if (m.fLandline) html += '<p style="margin:6px 0; font-size:0.9em;"><strong style="color:#555;">أرضي:</strong> <a href="tel:+' + normalizePhone(m.fLandline) + '" class="contact-link">' + formatPhoneDisplay(m.fLandline) + '</a></p>';
     html += row('أب الاعتراف', m.fConf);
     html += '</div>';
 
@@ -2923,8 +2923,8 @@ function viewMemberDetail(id) {
     html += '<h4><i class="fas fa-female"></i> الأم</h4>';
     html += row('الاسم', m.moName);
     html += row('الوظيفة', m.moJob);
-    if (m.moPhone)    html += '<p style="margin:6px 0; font-size:0.9em;"><strong style="color:#555;">الموبايل:</strong> <a href="tel:' + m.moPhone + '" class="contact-link">' + m.moPhone + '</a></p>';
-    if (m.moLandline) html += '<p style="margin:6px 0; font-size:0.9em;"><strong style="color:#555;">أرضي:</strong> <a href="tel:' + m.moLandline + '" class="contact-link">' + m.moLandline + '</a></p>';
+    if (m.moPhone)    html += '<p style="margin:6px 0; font-size:0.9em;"><strong style="color:#555;">الموبايل:</strong> <a href="tel:+' + normalizePhone(m.moPhone) + '" class="contact-link">' + formatPhoneDisplay(m.moPhone) + '</a></p>';
+    if (m.moLandline) html += '<p style="margin:6px 0; font-size:0.9em;"><strong style="color:#555;">أرضي:</strong> <a href="tel:+' + normalizePhone(m.moLandline) + '" class="contact-link">' + formatPhoneDisplay(m.moLandline) + '</a></p>';
     html += row('أب الاعتراف', m.moConf);
     html += '</div>';
 
@@ -3005,13 +3005,25 @@ document.getElementById('memberForm').onsubmit = function(e) {
         showToast("يرجى إدخال اسم المخدوم", "error");
         return;
     }
-    const phone = document.getElementById('mPhone').value.trim();
-    if (phone && !/^\d{10,11}$/.test(phone.replace(/\s/g, ''))) {
+    const rawPhone = document.getElementById('mPhone').value.trim();
+    const normalizedPhone = normalizePhone(rawPhone);
+    if (rawPhone && !/^[0-9]{11,12}$/.test(normalizedPhone)) {
         showToast("رقم الهاتف غير صحيح", "error");
         return;
     }
-    // Continue with existing code
-    e.preventDefault();
+    const rawLandline = document.getElementById('mLandline').value.trim();
+    const normalizedLandline = normalizePhone(rawLandline);
+    const rawWhatsApp = document.getElementById('mWhatsApp').value.trim();
+    const normalizedWhatsApp = normalizePhone(rawWhatsApp);
+    const rawFPhone = document.getElementById('fPhone').value.trim();
+    const normalizedFPhone = normalizePhone(rawFPhone);
+    const rawFLandline = document.getElementById('fLandline').value.trim();
+    const normalizedFLandline = normalizePhone(rawFLandline);
+    const rawMoPhone = document.getElementById('moPhone').value.trim();
+    const normalizedMoPhone = normalizePhone(rawMoPhone);
+    const rawMoLandline = document.getElementById('moLandline').value.trim();
+    const normalizedMoLandline = normalizePhone(rawMoLandline);
+
     const id = document.getElementById('editId').value || Date.now().toString();
     // حساب العمر تلقائياً لو dob موجود
     const dobVal = document.getElementById('mDob').value;
@@ -3026,26 +3038,26 @@ document.getElementById('memberForm').onsubmit = function(e) {
         gender:    document.getElementById('mGender').value,
         grade:     document.getElementById('mGrade').value,
         conf:      document.getElementById('mConf').value.trim(),
-        phone:     document.getElementById('mPhone').value.trim(),
-        landline:  document.getElementById('mLandline').value.trim(),
+        phone:     normalizedPhone,
+        landline:  normalizedLandline,
         address:   document.getElementById('mAddress').value.trim(),
         loc:       document.getElementById('mLoc').value.trim(),
-        whatsapp:  document.getElementById('mWhatsApp').value.trim(),
+        whatsapp:  normalizedWhatsApp,
         telegram:  document.getElementById('mTelegram').value.trim(),
         facebook:  document.getElementById('mFacebook').value.trim(),
         notes:     document.getElementById('mNotes').value.trim(),
         fName:     document.getElementById('fName').value.trim(),
         fJob:      document.getElementById('fJob').value.trim(),
-        fPhone:    document.getElementById('fPhone').value.trim(),
-        fLandline: document.getElementById('fLandline').value.trim(),
+        fPhone:    normalizedFPhone,
+        fLandline: normalizedFLandline,
         fConf:     document.getElementById('fConf').value.trim(),
         moName:    document.getElementById('moName').value.trim(),
         moJob:     document.getElementById('moJob').value.trim(),
-        moPhone:   document.getElementById('moPhone').value.trim(),
-        moLandline:document.getElementById('moLandline').value.trim(),
+        moPhone:   normalizedMoPhone,
+        moLandline:normalizedMoLandline,
         moConf:    document.getElementById('moConf').value.trim(),
     };
-    const idx = members.findIndex(m => m.id === id);
+    const idx = members.findIndex(m => String(m.id) === String(id));
     if (idx > -1) members[idx] = newMember;
     else members.push(newMember);
     saveData();
@@ -4019,11 +4031,18 @@ function deleteServant(id) {
 // ================================================================
 function normalizePhone(phone) {
     if (!phone) return '';
-    let p = phone.replace(/\s+/g, '');
+    let p = String(phone).trim();
+    p = p.replace(/[\s\-()]/g, '');
+    if (p.startsWith('+')) p = p.slice(1);
     if (p.startsWith('00')) p = p.slice(2);
-    else if (p.startsWith('0')) p = '2' + p;
-    p = p.replace(/^\+/, '');
+    if (p.startsWith('0')) p = '20' + p.slice(1);
+    if (!p.startsWith('20')) p = '20' + p;
     return p;
+}
+
+function formatPhoneDisplay(phone) {
+    const normalized = normalizePhone(phone);
+    return normalized ? '+' + normalized : '';
 }
 
 function calculateAge(dob) {
