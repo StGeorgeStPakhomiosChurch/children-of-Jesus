@@ -2516,20 +2516,20 @@ function getServiceMembers() {
 }
 
 function renderMembers() {
-    const grid   = document.getElementById('membersGrid');
-    const search = document.getElementById('searchMember').value.trim().toLowerCase();
+    const grid = document.getElementById('membersGrid');
+    const search = (document.getElementById('searchMember').value || '').trim().toLowerCase();
     const monthFilter = document.getElementById('filterBirthMonth') ? document.getElementById('filterBirthMonth').value : '';
-    grid.innerHTML = "";
+    grid.innerHTML = '';
 
     let list = getServiceMembers();
     if (search) {
         list = list.filter(m =>
-            (m.name  || "").toLowerCase().includes(search) ||
-            (m.conf  || "").toLowerCase().includes(search) ||
-            (m.phone || "").includes(search)
+            (m.name || '').toLowerCase().includes(search) ||
+            (m.conf || '').toLowerCase().includes(search) ||
+            (m.phone || '').includes(search)
         );
     }
-    // فلتر شهر الميلاد
+
     if (monthFilter) {
         list = list.filter(m => {
             if (!m.dob) return false;
@@ -2537,7 +2537,6 @@ function renderMembers() {
             const month = parts.length >= 2 ? parseInt(parts[1]) : new Date(m.dob).getMonth() + 1;
             return month === parseInt(monthFilter);
         });
-        // ترتيب حسب يوم الميلاد داخل الشهر
         list.sort((a, b) => {
             const dayA = parseInt((a.dob || '').split('-')[2] || 0);
             const dayB = parseInt((b.dob || '').split('-')[2] || 0);
@@ -2545,23 +2544,22 @@ function renderMembers() {
         });
     }
 
-    // بانر مواليد الشهر الحالي
     const banner = document.getElementById('birthdayBanner');
     if (banner) {
         const curMonth = new Date().getMonth() + 1;
-        const monthNames = ['','يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+        const monthNames = ['', 'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
         const bdays = getServiceMembers().filter(m => {
             if (!m.dob) return false;
             const parts = m.dob.split('-');
             const month = parts.length >= 2 ? parseInt(parts[1]) : new Date(m.dob).getMonth() + 1;
-            const day   = parts.length >= 3 ? parseInt(parts[2]) : new Date(m.dob).getDate();
+            const day = parts.length >= 3 ? parseInt(parts[2]) : new Date(m.dob).getDate();
             return month === curMonth;
         });
         if (bdays.length > 0 && !monthFilter) {
             banner.style.display = 'flex';
             banner.innerHTML = `<i class="fas fa-birthday-cake" style="font-size:1.4em; color:#d4af37;"></i>
-                <span><strong>🎉 مواليد ${monthNames[curMonth]}:</strong> ${bdays.map(m=>{
-                    const parts = (m.dob||'').split('-');
+                <span><strong>🎉 مواليد ${monthNames[curMonth]}:</strong> ${bdays.map(m => {
+                    const parts = (m.dob || '').split('-');
                     const day = parts.length >= 3 ? parseInt(parts[2]) : '?';
                     return `<strong>${m.name}</strong> (${day})`;
                 }).join(' — ')}</span>`;
@@ -2579,10 +2577,11 @@ function renderMembers() {
         return;
     }
 
+    const serviceTrips = trips.filter(t => t.service === activeSub && t.targetType !== 'servants');
+
     list.forEach(m => {
         const imgSrc = getMemberImgSrc(m);
-        const serviceTrips = trips.filter(t => t.service === activeSub && t.targetType !== 'servants');
-        const memberTrips = serviceTrips.filter(t => normalizeTripMembers(t.members).includes(String(m.id)));
+        const memberIdString = String(m.id || '');
 
         let tripsSection = '';
         if (serviceTrips.length > 0) {
@@ -2590,11 +2589,11 @@ function renderMembers() {
                 + '<p style="font-size:0.82em; font-weight:800; color:#1a237e; margin:0 0 8px;">'
                 + '<i class="fas fa-bus" style="color:#d4af37;"></i> الرحلات</p>';
 
-            serviceTrips.forEach(function(t) {
+            serviceTrips.forEach(t => {
                 const memberIds = normalizeTripMembers(t.members);
-                const joined = memberIds.includes(String(m.id));
+                const joined = memberIds.includes(memberIdString);
                 const cost = parseFloat(t.cost) || 0;
-                const paid = parseFloat((t.payments || {})[m.id]) || 0;
+                const paid = parseFloat((t.payments || {})[memberIdString] || 0);
                 const remaining = cost - paid;
                 const isFullyPaid = cost > 0 && remaining <= 0;
                 const bgColor = joined ? (isFullyPaid ? '#e8f5e9' : '#fff8f0') : '#fafafa';
@@ -2630,11 +2629,11 @@ function renderMembers() {
 
                 if (joined) {
                     tripsSection += '<div style="display:flex; gap:8px; flex-wrap:wrap;">'
-                        + '<button class="btn btn-accent btn-sm" style="font-size:0.8em;padding:5px 14px;" onclick="openTripPayFromMember(\'' + m.id + '\',\'' + t.id + '\')"><i class="fas fa-coins"></i> تحديث الدفع</button>'
-                        + '<button class="btn btn-light btn-sm" style="font-size:0.8em;padding:5px 14px;" onclick="cancelTripSubscription(\'' + m.id + '\',\'' + t.id + '\')"><i class="fas fa-times-circle"></i> إلغاء الاشتراك</button>'
+                        + '<button class="btn btn-accent btn-sm" style="font-size:0.8em;padding:5px 14px;" onclick="openTripPayFromMember(\'' + memberIdString + '\',\'' + t.id + '\')"><i class="fas fa-coins"></i> تحديث الدفع</button>'
+                        + '<button class="btn btn-light btn-sm" style="font-size:0.8em;padding:5px 14px;" onclick="cancelTripSubscription(\'' + memberIdString + '\',\'' + t.id + '\')"><i class="fas fa-times-circle"></i> إلغاء الاشتراك</button>'
                         + '</div>';
                 } else {
-                    tripsSection += '<button class="btn btn-primary btn-sm" style="font-size:0.8em;padding:5px 14px;width:100%;" onclick="openTripPayFromMember(\'' + m.id + '\',\'' + t.id + '\', true)"><i class="fas fa-user-plus"></i> اشترك في الرحلة</button>';
+                    tripsSection += '<button class="btn btn-primary btn-sm" style="font-size:0.8em;padding:5px 14px;width:100%;" onclick="openTripPayFromMember(\'' + memberIdString + '\',\'' + t.id + '\', true)"><i class="fas fa-user-plus"></i> اشترك في الرحلة</button>';
                 }
 
                 tripsSection += '</div>';
@@ -2644,20 +2643,17 @@ function renderMembers() {
             tripsSection = '<div style="margin-top:12px;border-top:2px solid #f0f0f0;padding-top:10px;text-align:center;">'
                 + '<p style="font-size:0.82em;color:#ccc;margin:4px 0;"><i class="fas fa-bus"></i> لا توجد رحلات لهذه الخدمة</p></div>';
         }
-        // ===== بناء الكارت التعريفي الجديد =====
+
         var genderIcon = m.gender === 'أنثى' ? 'fa-female' : 'fa-male';
-
-        // أزرار التواصل السريع
         var qaButtons = '';
-        if (m.phone)    qaButtons += '<a href="tel:+' + normalizePhone(m.phone) + '" class="mc-action-btn call"><i class="fas fa-phone"></i>اتصال</a>';
+        if (m.phone) qaButtons += '<a href="tel:+' + normalizePhone(m.phone) + '" class="mc-action-btn call"><i class="fas fa-phone"></i>اتصال</a>';
         if (m.whatsapp) qaButtons += '<a href="https://wa.me/' + normalizePhone(m.whatsapp) + '" target="_blank" class="mc-action-btn whatsapp"><i class="fab fa-whatsapp"></i>واتساب</a>';
-        if (m.telegram) qaButtons += '<a href="https://t.me/' + (m.telegram||'').replace('@','') + '" target="_blank" class="mc-action-btn telegram"><i class="fab fa-telegram"></i>تليجرام</a>';
+        if (m.telegram) qaButtons += '<a href="https://t.me/' + (m.telegram || '').replace('@','') + '" target="_blank" class="mc-action-btn telegram"><i class="fab fa-telegram"></i>تليجرام</a>';
         if (m.loc || m.address) qaButtons += '<button class="mc-action-btn map" onclick="openAddressMapFor(\'' + (m.loc||'') + '\',\'' + encodeURIComponent(m.address||'') + '\')"><i class="fas fa-map-marked-alt"></i>الموقع</button>';
-        qaButtons += '<button class="mc-action-btn detail-btn" onclick="viewMemberDetail(\'' + m.id + '\')"><i class="fas fa-eye"></i>التفاصيل</button>';
-        qaButtons += '<button class="mc-action-btn edit-btn" onclick="editMember(\'' + m.id + '\')"><i class="fas fa-edit"></i>تعديل</button>';
-        qaButtons += '<button class="mc-action-btn del-btn" onclick="deleteMember(\'' + m.id + '\')"><i class="fas fa-trash"></i>حذف</button>';
+        qaButtons += '<button class="mc-action-btn detail-btn" onclick="viewMemberDetail(\'' + memberIdString + '\')"><i class="fas fa-eye"></i>التفاصيل</button>';
+        qaButtons += '<button class="mc-action-btn edit-btn" onclick="editMember(\'' + memberIdString + '\')"><i class="fas fa-edit"></i>تعديل</button>';
+        qaButtons += '<button class="mc-action-btn del-btn" onclick="deleteMember(\'' + memberIdString + '\')"><i class="fas fa-trash"></i>حذف</button>';
 
-        // تاريخ الميلاد
         var dobHtml = '';
         if (m.dob) {
             dobHtml = '<div class="mc-info-row">'
@@ -2667,7 +2663,6 @@ function renderMembers() {
                 + '</div>';
         }
 
-        // العنوان
         var addressHtml = '';
         if (m.address) {
             addressHtml = '<div class="mc-info-row" style="cursor:pointer;" onclick="openAddressMapFor(\'' + (m.loc||'') + '\',\'' + encodeURIComponent(m.address||'') + '\')">'
@@ -2677,7 +2672,6 @@ function renderMembers() {
                 + '</div>';
         }
 
-        // الموبايل
         var phoneHtml = '';
         if (m.phone) {
             phoneHtml = '<div class="mc-divider"><i class="fas fa-phone"></i> التواصل</div>'
@@ -2688,19 +2682,16 @@ function renderMembers() {
                 + '</a>';
         }
 
-        // الملاحظات
         var notesHtml = '';
         if (m.notes) {
             notesHtml = '<div class="mc-note"><i class="fas fa-sticky-note"></i> ' + m.notes + '</div>';
         }
 
-        // العمر
         var ageHtml = '';
         if (m.age) {
             ageHtml = ' &middot; <i class="fas fa-birthday-cake" style="color:#f0d060;"></i> ' + m.age + ' سنة';
         }
 
-        // قسم الأب
         var fatherHtml = '';
         if (m.fName || m.fPhone) {
             var fJobArr = [];
@@ -2716,7 +2707,6 @@ function renderMembers() {
                 + '</div>' + fPhoneLink + '</div>';
         }
 
-        // قسم الأم
         var motherHtml = '';
         if (m.moName || m.moPhone) {
             var moJobArr = [];
@@ -2732,7 +2722,6 @@ function renderMembers() {
                 + '</div>' + moPhoneLink + '</div>';
         }
 
-        // قسم الأسرة
         var parentsHtml = '';
         if (fatherHtml || motherHtml) {
             parentsHtml = '<div class="mc-parents">'
@@ -2741,10 +2730,8 @@ function renderMembers() {
                 + '</div>';
         }
 
-        // رقم ID
         var memberId = m.id ? m.id.toString().slice(-6).toUpperCase() : '------';
 
-        // تجميع الكارت كامل بدون nested backticks
         var cardHtml = ''
             + '<div class="mc-header">'
             +   '<span class="mc-service-badge"><i class="fas fa-layer-group" style="font-size:0.85em;"></i> ' + activeMain + ' &middot; ' + m.grade + '</span>'
@@ -2754,7 +2741,7 @@ function renderMembers() {
             +   '<div class="mc-head-info">'
             +     '<div class="mc-name">' + m.name + '</div>'
             +     '<div class="mc-grade-pill"><i class="fas fa-graduation-cap" style="font-size:0.85em;"></i> ' + m.grade + '</div>'
-            +     '<div class="mc-gender"><i class="fas ' + genderIcon + '"></i> ' + (m.gender||'') + ageHtml + '</div>'
+            +     '<div class="mc-gender"><i class="fas ' + genderIcon + '"></i> ' + (m.gender || '') + ageHtml + '</div>'
             +   '</div>'
             + '</div>'
             + '<div class="mc-body">'
