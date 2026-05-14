@@ -1786,6 +1786,23 @@ async function saveDataToStorage(key, value) {
     }
 }
 
+function normalizeTripMembers(membersField) {
+    if (Array.isArray(membersField)) return membersField;
+    if (typeof membersField === 'string') {
+        try {
+            const parsed = JSON.parse(membersField);
+            if (Array.isArray(parsed)) return parsed;
+        } catch (e) {
+            // not JSON, fall through to comma split
+        }
+        return membersField.split(',').map(item => item.trim()).filter(Boolean);
+    }
+    if (membersField && typeof membersField === 'object') {
+        return Object.values(membersField).filter(Boolean);
+    }
+    return [];
+}
+
 // الخدمات التي لها فروع فرعية حقيقية
 const hasSubServices  = ["ملائكة","ابتدائي","إعدادي","ثانوي","شباب"];
 
@@ -2564,7 +2581,10 @@ function renderMembers() {
     list.forEach(m => {
         const imgSrc = getMemberImgSrc(m);
         // رحلات المخدوم في الخدمة الحالية
-        const memberTrips = trips.filter(t => t.service === activeSub && t.targetType !== 'servants' && (t.members || []).includes(m.id));
+        const memberTrips = trips.filter(t => {
+            const memberIds = normalizeTripMembers(t.members);
+            return t.service === activeSub && t.targetType !== 'servants' && memberIds.includes(m.id);
+        });
 
         // قسم الرحلات في الكارت — بدون nested backticks
         let tripsSection = '';
@@ -3436,7 +3456,7 @@ function renderTrips() {
         const payments = t.payments || {};
 
         // حساب إجمالي المبالغ
-        const participantIds = t.members || [];
+        const participantIds = normalizeTripMembers(t.members);
         const totalCollected = participantIds.reduce((sum, id) => sum + (parseFloat(payments[id]) || 0), 0);
         const totalExpected  = cost * participantIds.length;
         const totalRemaining = totalExpected - totalCollected;
@@ -4145,6 +4165,12 @@ async function loadFromSheet() {
         if (json && json.ok === true && data) {
             members    = Array.isArray(data.members)    ? data.members    : members;
             trips      = Array.isArray(data.trips)      ? data.trips      : trips;
+            if (Array.isArray(trips)) {
+                trips = trips.map(t => ({
+                    ...t,
+                    members: normalizeTripMembers(t.members)
+                }));
+            }
             if (data.servants) servants = data.servants;
 
             // الـ attendance بيتحفظ كـ array — نرجعه لـ object
