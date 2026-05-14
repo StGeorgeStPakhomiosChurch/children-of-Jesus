@@ -1756,6 +1756,36 @@ if (!useIndexedDB) {
     console.warn('IndexedDB not supported, falling back to localStorage');
 }
 
+async function loadData(key, defaultValue = []) {
+    try {
+        if (useIndexedDB) {
+            const data = await loadFromDB(key);
+            if (data !== null && data !== undefined) return data;
+        }
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : defaultValue;
+    } catch (e) {
+        console.error('Error loading data:', e);
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : defaultValue;
+    }
+}
+
+async function saveDataToStorage(key, value) {
+    try {
+        if (useIndexedDB) {
+            await saveToDB(key, value);
+        }
+    } catch (e) {
+        console.error('Error saving to storage:', e);
+    }
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+        console.error('Error saving to localStorage backup:', e);
+    }
+}
+
 // الخدمات التي لها فروع فرعية حقيقية
 const hasSubServices  = ["ملائكة","ابتدائي","إعدادي","ثانوي","شباب"];
 
@@ -1819,15 +1849,35 @@ function showToast(msg, type = "success") {
 // ================================================================
 async function handleLogin() {
     try {
-    const email = document.getElementById('loginEmail').value.trim();
-    const pass  = document.getElementById('loginPass').value;
+        const email = document.getElementById('loginEmail').value.trim();
+        const pass  = document.getElementById('loginPass').value;
 
-    try {
         const hashedPass = await hashPassword(pass);
-        // ... rest of the code
-        const user = servants.find(u => u.email === email && u.pass === hashedPass);
 
-    if (user) {
+        if (isSheetEnabled()) {
+            try {
+                const res  = await fetch(SHEET_API_URL + "?action=load", { method: "GET" });
+                const json = await res.json();
+                const data = (json && json.result) ? json.result : json;
+                if (json && json.ok && data && Array.isArray(data.servants) && data.servants.length > 0) {
+                    servants = data.servants;
+                    await saveDataToStorage('cm_servants', servants);
+                }
+            } catch (e) {
+                console.warn("Could not load servants from Sheets on login", e);
+            }
+        }
+
+        let user = servants.find(u => u.email === email && u.pass === hashedPass);
+        if (!user) {
+            user = servants.find(u => u.email === email && u.pass === pass);
+            if (user) {
+                user.pass = hashedPass;
+                await saveData();
+            }
+        }
+
+        if (user) {
         // تحقق إن الحساب لم يعد معلقاً
         if (user.pending) {
             showToast("حسابك لا يزال قيد المراجعة — انتظر موافقة الأدمن", "error");
