@@ -1787,18 +1787,19 @@ async function saveDataToStorage(key, value) {
 }
 
 function normalizeTripMembers(membersField) {
-    if (Array.isArray(membersField)) return membersField;
+    const normalizeArray = arr => arr.map(item => String(item).trim()).filter(Boolean);
+    if (Array.isArray(membersField)) return normalizeArray(membersField);
     if (typeof membersField === 'string') {
         try {
             const parsed = JSON.parse(membersField);
-            if (Array.isArray(parsed)) return parsed;
+            if (Array.isArray(parsed)) return normalizeArray(parsed);
         } catch (e) {
             // not JSON, fall through to comma split
         }
-        return membersField.split(',').map(item => item.trim()).filter(Boolean);
+        return membersField.split(',').map(item => String(item).trim()).filter(Boolean);
     }
     if (membersField && typeof membersField === 'object') {
-        return Object.values(membersField).filter(Boolean);
+        return normalizeArray(Object.values(membersField));
     }
     return [];
 }
@@ -2581,7 +2582,7 @@ function renderMembers() {
     list.forEach(m => {
         const imgSrc = getMemberImgSrc(m);
         const serviceTrips = trips.filter(t => t.service === activeSub && t.targetType !== 'servants');
-        const memberTrips = serviceTrips.filter(t => normalizeTripMembers(t.members).includes(m.id));
+        const memberTrips = serviceTrips.filter(t => normalizeTripMembers(t.members).includes(String(m.id)));
 
         let tripsSection = '';
         if (serviceTrips.length > 0) {
@@ -2591,7 +2592,7 @@ function renderMembers() {
 
             serviceTrips.forEach(function(t) {
                 const memberIds = normalizeTripMembers(t.members);
-                const joined = memberIds.includes(m.id);
+                const joined = memberIds.includes(String(m.id));
                 const cost = parseFloat(t.cost) || 0;
                 const paid = parseFloat((t.payments || {})[m.id]) || 0;
                 const remaining = cost - paid;
@@ -2947,7 +2948,7 @@ function viewMemberDetail(id) {
     html += '</div>';
 
     // ===== الرحلات =====
-    var memberTrips = trips.filter(function(t){ return t.targetType !== 'servants' && (t.members||[]).includes(m.id); });
+    var memberTrips = trips.filter(function(t){ return t.targetType !== 'servants' && normalizeTripMembers(t.members).includes(String(m.id)); });
     if (memberTrips.length > 0) {
         html += '<div class="form-section" style="margin-top:10px;">';
         html += '<h4><i class="fas fa-bus" style="color:var(--primary);"></i> الرحلات المشترك فيها</h4>';
@@ -3571,7 +3572,8 @@ function openTripPayFromMember(memberId, tripId, subscribe = false) {
     if (!t || !m) return;
 
     const memberIds = normalizeTripMembers(t.members);
-    const isSubscribed = memberIds.includes(memberId);
+    const stringMemberId = String(memberId);
+    const isSubscribed = memberIds.includes(stringMemberId);
     pendingPaySubscribe = subscribe && !isSubscribed;
 
     pendingPayMemberId = memberId;
@@ -3623,8 +3625,9 @@ function confirmTripPay() {
     let newPaid = parseFloat(document.getElementById('tripPayAmount').value) || 0;
     if (newPaid < 0) newPaid = 0;
     const memberIds = normalizeTripMembers(t.members);
-    if (!memberIds.includes(pendingPayMemberId)) {
-        memberIds.push(pendingPayMemberId);
+    const stringMemberId = String(pendingPayMemberId);
+    if (!memberIds.includes(stringMemberId)) {
+        memberIds.push(stringMemberId);
         t.members = memberIds;
     }
     if (!t.payments) t.payments = {};
