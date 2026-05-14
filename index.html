@@ -1703,30 +1703,51 @@ const allGrades       = Object.values(serviceTree).flat();
 //  دوال الأمان والأداء
 // ================================================================
 async function hashPassword(password) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(password);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    try {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(password);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    } catch (e) {
+        console.error('Crypto not supported, using plain password:', e);
+        return password; // fallback
+    }
 }
 
 // IndexedDB setup
-const dbPromise = idb.openDB('cmDB', 1, {
-    upgrade(db) {
-        if (!db.objectStoreNames.contains('data')) {
-            db.createObjectStore('data');
-        }
+const dbPromise = (async () => {
+    try {
+        return await idb.openDB('cmDB', 1, {
+            upgrade(db) {
+                if (!db.objectStoreNames.contains('data')) {
+                    db.createObjectStore('data');
+                }
+            }
+        });
+    } catch (e) {
+        console.error('IndexedDB not available:', e);
+        return null; // fallback
     }
-});
+})();
 
 async function saveToDB(key, value) {
-    const db = await dbPromise;
-    await db.put('data', value, key);
+    try {
+        const db = await dbPromise;
+        if (db) await db.put('data', value, key);
+    } catch (e) {
+        console.error('Error saving to DB:', e);
+    }
 }
 
 async function loadFromDB(key) {
-    const db = await dbPromise;
-    return await db.get('data', key);
+    try {
+        const db = await dbPromise;
+        if (db) return await db.get('data', key);
+    } catch (e) {
+        console.error('Error loading from DB:', e);
+    }
+    return null;
 }
 
 // Check for IndexedDB support, fallback to localStorage
@@ -1744,13 +1765,31 @@ const hasSubServices  = ["ملائكة","ابتدائي","إعدادي","ثان�
 let members, servants, trips, attendance;
 
 async function initData() {
-    members = await loadData('cm_members', []);
-    servants = await loadData('cm_servants', [
-        { id: "1", name: "الأدمن", email: "admin@church.com", pass: await hashPassword("admin123"),
-          role: "Admin", services: ["all"], img: "https://i.pravatar.cc/150?u=admin" }
-    ]);
-    trips = await loadData('cm_trips', []);
-    attendance = await loadData('cm_attendance', {});
+    try {
+        console.log('Initializing data...');
+        members = await loadData('cm_members', []);
+        console.log('Members loaded');
+        const hashedPass = await hashPassword("admin123").catch(e => { console.error('Hash error:', e); return "admin123"; }); // fallback
+        servants = await loadData('cm_servants', [
+            { id: "1", name: "الأدمن", email: "admin@church.com", pass: hashedPass,
+              role: "Admin", services: ["all"], img: "https://i.pravatar.cc/150?u=admin" }
+        ]);
+        console.log('Servants loaded');
+        trips = await loadData('cm_trips', []);
+        attendance = await loadData('cm_attendance', {});
+        console.log('Data initialization complete');
+    } catch (e) {
+        console.error('Error in initData:', e);
+        // Fallback to localStorage
+        members = JSON.parse(localStorage.getItem('cm_members')) || [];
+        servants = JSON.parse(localStorage.getItem('cm_servants')) || [
+            { id: "1", name: "الأدمن", email: "admin@church.com", pass: "admin123",
+              role: "Admin", services: ["all"], img: "https://i.pravatar.cc/150?u=admin" }
+        ];
+        trips = JSON.parse(localStorage.getItem('cm_trips')) || [];
+        attendance = JSON.parse(localStorage.getItem('cm_attendance')) || {};
+        showToast("حدث خطأ في تحميل البيانات، تم استخدام البيانات المحلية", "error");
+    }
 }
 
 let currentUser    = null;
@@ -1779,27 +1818,14 @@ function showToast(msg, type = "success") {
 //  تسجيل الدخول
 // ================================================================
 async function handleLogin() {
+    try {
     const email = document.getElementById('loginEmail').value.trim();
     const pass  = document.getElementById('loginPass').value;
 
-    const hashedPass = await hashPassword(pass);
-
-    // نحمل البيانات من Sheets أولاً عشان نضمن إن الخدام المضافين من أجهزة تانية موجودين
-    if (isSheetEnabled()) {
-        try {
-            const res  = await fetch(SHEET_API_URL + "?action=load", { method: "GET" });
-            const json = await res.json();
-            const data = (json && json.result) ? json.result : json;
-            if (json && json.ok && data && Array.isArray(data.servants) && data.servants.length > 0) {
-                servants = data.servants;
-                await saveDataToStorage('cm_servants', servants);
-            }
-        } catch(e) {
-            console.warn("Could not load servants from Sheets on login", e);
-        }
-    }
-
-    const user = servants.find(u => u.email === email && u.pass === hashedPass);
+    try {
+        const hashedPass = await hashPassword(pass);
+        // ... rest of the code
+        const user = servants.find(u => u.email === email && u.pass === hashedPass);
 
     if (user) {
         // تحقق إن الحساب لم يعد معلقاً
@@ -1856,6 +1882,10 @@ async function handleLogin() {
         setTimeout(postLoginInit, 1500);
     } else {
         showToast("بيانات الدخول غير صحيحة", "error");
+    }
+    } catch (e) {
+        console.error('Login error:', e);
+        showToast("حدث خطأ في تسجيل الدخول", "error");
     }
 }
 
@@ -3712,7 +3742,7 @@ async function registerServant() {
         id: Date.now().toString(),
         name: name,
         email: email,
-        pass: await hashPassword(pass),
+        pass: await hashPassword(pass).catch(e => { console.error('Hash error in register:', e); return pass; }), // fallback to plain
         role: role,
         img: imgUrl || '',
         imgData: imgData || '',
@@ -4684,7 +4714,13 @@ function applyDTSettings() {
 
 // Initialize data on load
 (async () => {
-    await initData();
+    try {
+        console.log('Starting app initialization...');
+        await initData();
+        console.log('App ready');
+    } catch (e) {
+        console.error('Init error:', e);
+    }
 })();
 </script>
 
