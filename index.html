@@ -2580,28 +2580,29 @@ function renderMembers() {
 
     list.forEach(m => {
         const imgSrc = getMemberImgSrc(m);
-        // رحلات المخدوم في الخدمة الحالية
-        const memberTrips = trips.filter(t => {
-            const memberIds = normalizeTripMembers(t.members);
-            return t.service === activeSub && t.targetType !== 'servants' && memberIds.includes(m.id);
-        });
+        const serviceTrips = trips.filter(t => t.service === activeSub && t.targetType !== 'servants');
+        const memberTrips = serviceTrips.filter(t => normalizeTripMembers(t.members).includes(m.id));
 
-        // قسم الرحلات في الكارت — بدون nested backticks
         let tripsSection = '';
-        if (memberTrips.length > 0) {
+        if (serviceTrips.length > 0) {
             tripsSection = '<div style="margin-top:12px; border-top:2px solid #e8eaf6; padding-top:12px;">'
                 + '<p style="font-size:0.82em; font-weight:800; color:#1a237e; margin:0 0 8px;">'
-                + '<i class="fas fa-bus" style="color:#d4af37;"></i> الرحلات المشترك فيها</p>';
-            memberTrips.forEach(function(t) {
-                var cost = parseFloat(t.cost) || 0;
-                var paid = parseFloat((t.payments || {})[m.id] || 0);
-                var remaining = cost - paid;
-                var isFullyPaid = cost > 0 && remaining <= 0;
-                var bgColor = isFullyPaid ? '#e8f5e9' : '#fff8f0';
-                var bdColor = isFullyPaid ? '#a5d6a7' : '#ffcc80';
+                + '<i class="fas fa-bus" style="color:#d4af37;"></i> الرحلات</p>';
 
-                var statusBadge = '';
-                if (isFullyPaid) {
+            serviceTrips.forEach(function(t) {
+                const memberIds = normalizeTripMembers(t.members);
+                const joined = memberIds.includes(m.id);
+                const cost = parseFloat(t.cost) || 0;
+                const paid = parseFloat((t.payments || {})[m.id]) || 0;
+                const remaining = cost - paid;
+                const isFullyPaid = cost > 0 && remaining <= 0;
+                const bgColor = joined ? (isFullyPaid ? '#e8f5e9' : '#fff8f0') : '#fafafa';
+                const bdColor = joined ? (isFullyPaid ? '#a5d6a7' : '#ffcc80') : '#ddd';
+
+                let statusBadge = '';
+                if (!joined) {
+                    statusBadge = '<span style="background:#e3f2fd;color:#1565c0;font-size:0.8em;font-weight:700;padding:2px 10px;border-radius:20px;border:1px solid #90caf9;"><i class="fas fa-user-plus"></i> غير مشترك</span>';
+                } else if (isFullyPaid) {
                     statusBadge = '<span style="background:#e8f5e9;color:#388e3c;font-size:0.8em;font-weight:700;padding:2px 10px;border-radius:20px;border:1px solid #a5d6a7;"><i class="fas fa-check-circle"></i> مدفوع كامل</span>';
                 } else if (cost > 0) {
                     statusBadge = '<span style="background:#fff3e0;color:#e65100;font-size:0.8em;font-weight:700;padding:2px 10px;border-radius:20px;border:1px solid #ffcc80;"><i class="fas fa-exclamation-circle"></i> متبقي: ' + remaining + ' جنيه</span>';
@@ -2609,15 +2610,13 @@ function renderMembers() {
                     statusBadge = '<span style="background:#e8eaf6;color:#1a237e;font-size:0.8em;padding:2px 10px;border-radius:20px;">مشترك</span>';
                 }
 
-                var dateHtml = t.date ? ('<span style="font-weight:400;font-size:0.78em;color:#999;margin-right:6px;">' + t.date + '</span>') : '';
-
-                var payDetails = '';
-                if (cost > 0) {
-                    var remainingRow = !isFullyPaid ? ('<span style="color:#e65100;"><i class="fas fa-clock"></i> متبقي: <strong>' + remaining + '</strong> جنيه</span>') : '';
+                const dateHtml = t.date ? ('<span style="font-weight:400;font-size:0.78em;color:#999;margin-right:6px;">' + t.date + '</span>') : '';
+                let payDetails = '';
+                if (joined && cost > 0) {
                     payDetails = '<div style="display:flex;gap:12px;font-size:0.8em;color:#666;margin-bottom:8px;flex-wrap:wrap;">'
                         + '<span><i class="fas fa-tag" style="color:#1a237e;"></i> التكلفة: <strong>' + cost + '</strong> جنيه</span>'
                         + '<span style="color:#388e3c;"><i class="fas fa-coins"></i> دفع: <strong>' + paid + '</strong> جنيه</span>'
-                        + remainingRow
+                        + '<span style="color:#e65100;"><i class="fas fa-clock"></i> متبقي: <strong>' + (remaining > 0 ? remaining : 0) + '</strong> جنيه</span>'
                         + '</div>';
                 }
 
@@ -2626,15 +2625,23 @@ function renderMembers() {
                     + '<span style="font-size:0.9em;font-weight:700;color:#1a237e;"><i class="fas fa-bus"></i> ' + t.name + ' ' + dateHtml + '</span>'
                     + statusBadge
                     + '</div>'
-                    + payDetails
-                    + '<button class="btn btn-accent btn-sm" style="font-size:0.8em;padding:5px 14px;width:100%;" onclick="openTripPayFromMember(\'' + m.id + '\',\'' + t.id + '\')">'
-                    + '<i class="fas fa-coins"></i> تسجيل / تحديث الدفع</button>'
-                    + '</div>';
+                    + payDetails;
+
+                if (joined) {
+                    tripsSection += '<div style="display:flex; gap:8px; flex-wrap:wrap;">'
+                        + '<button class="btn btn-accent btn-sm" style="font-size:0.8em;padding:5px 14px;" onclick="openTripPayFromMember(\'' + m.id + '\',\'' + t.id + '\')"><i class="fas fa-coins"></i> تحديث الدفع</button>'
+                        + '<button class="btn btn-light btn-sm" style="font-size:0.8em;padding:5px 14px;" onclick="cancelTripSubscription(\'' + m.id + '\',\'' + t.id + '\')"><i class="fas fa-times-circle"></i> إلغاء الاشتراك</button>'
+                        + '</div>';
+                } else {
+                    tripsSection += '<button class="btn btn-primary btn-sm" style="font-size:0.8em;padding:5px 14px;width:100%;" onclick="openTripPayFromMember(\'' + m.id + '\',\'' + t.id + '\', true)"><i class="fas fa-user-plus"></i> اشترك في الرحلة</button>';
+                }
+
+                tripsSection += '</div>';
             });
             tripsSection += '</div>';
         } else {
             tripsSection = '<div style="margin-top:12px;border-top:2px solid #f0f0f0;padding-top:10px;text-align:center;">'
-                + '<p style="font-size:0.82em;color:#ccc;margin:4px 0;"><i class="fas fa-bus"></i> غير مشترك في رحلات</p></div>';
+                + '<p style="font-size:0.82em;color:#ccc;margin:4px 0;"><i class="fas fa-bus"></i> لا توجد رحلات لهذه الخدمة</p></div>';
         }
         // ===== بناء الكارت التعريفي الجديد =====
         var genderIcon = m.gender === 'أنثى' ? 'fa-female' : 'fa-male';
@@ -3555,12 +3562,17 @@ function deleteTrip(id) {
 // ================================================================
 let pendingPayMemberId = null;
 let pendingPayTripId   = null;
+let pendingPaySubscribe = false;
 
-function openTripPayFromMember(memberId, tripId) {
+function openTripPayFromMember(memberId, tripId, subscribe = false) {
     const t = trips.find(x => x.id === tripId);
     const pool = t && t.targetType === 'servants' ? servants : members;
     const m = pool && pool.find(x => x.id === memberId);
     if (!t || !m) return;
+
+    const memberIds = normalizeTripMembers(t.members);
+    const isSubscribed = memberIds.includes(memberId);
+    pendingPaySubscribe = subscribe && !isSubscribed;
 
     pendingPayMemberId = memberId;
     pendingPayTripId   = tripId;
@@ -3570,12 +3582,20 @@ function openTripPayFromMember(memberId, tripId) {
     const paid      = parseFloat(payments[memberId]) || 0;
     const remaining = cost - paid;
 
+    let subText = '';
+    if (pendingPaySubscribe) {
+        subText = '<p style="margin:4px 0; color:#1a237e; font-weight:700;"><i class="fas fa-check-circle"></i> سيتم إضافة هذا المخدوم إلى الرحلة</p>';
+    } else if (!isSubscribed) {
+        subText = '<p style="margin:4px 0; color:#e65100; font-weight:700;"><i class="fas fa-exclamation-triangle"></i> هذا المخدوم غير مشترك بالرحلة حالياً</p>';
+    }
+
     document.getElementById('tripPayInfo').innerHTML = `
         <p style="margin:0 0 6px; font-weight:700; font-size:0.95em; color:#1a237e;"><i class="fas fa-bus"></i> ${t.name}</p>
         <p style="margin:2px 0; font-size:0.85em; color:#555;"><i class="fas fa-user"></i> المخدوم: <strong>${m.name}</strong></p>
         <p style="margin:2px 0; font-size:0.85em; color:#555;"><i class="fas fa-tag"></i> التكلفة الكاملة: <strong>${cost} جنيه</strong></p>
         <p style="margin:2px 0; font-size:0.85em; color:#388e3c;"><i class="fas fa-check"></i> تم دفعه: <strong>${paid} جنيه</strong></p>
-        <p style="margin:2px 0; font-size:0.85em; color:#e65100;"><i class="fas fa-clock"></i> المتبقي: <strong>${remaining > 0 ? remaining : 0} جنيه</strong></p>`;
+        <p style="margin:2px 0; font-size:0.85em; color:#e65100;"><i class="fas fa-clock"></i> المتبقي: <strong>${remaining > 0 ? remaining : 0} جنيه</strong></p>
+        ${subText}`;
 
     document.getElementById('tripPayAmount').value = paid;
     updateTripPayStatus();
@@ -3601,7 +3621,12 @@ function confirmTripPay() {
     const t = trips.find(x => x.id === pendingPayTripId);
     if (!t) return;
     let newPaid = parseFloat(document.getElementById('tripPayAmount').value) || 0;
-    if (newPaid < 0) newPaid = 0; // لا يسمح بقيم سالبة
+    if (newPaid < 0) newPaid = 0;
+    const memberIds = normalizeTripMembers(t.members);
+    if (!memberIds.includes(pendingPayMemberId)) {
+        memberIds.push(pendingPayMemberId);
+        t.members = memberIds;
+    }
     if (!t.payments) t.payments = {};
     t.payments[pendingPayMemberId] = newPaid;
     saveData();
@@ -3610,10 +3635,26 @@ function confirmTripPay() {
     renderMembers();
     const cost = parseFloat(t.cost) || 0;
     if (cost > 0 && newPaid >= cost) {
-        showToast("✅ تم تسجيل الدفع كامل!");
+        showToast(pendingPaySubscribe ? "✅ تم الاشتراك في الرحلة وتسجيل الدفع كامل!" : "✅ تم تسجيل الدفع كامل!");
+    } else if (pendingPaySubscribe) {
+        showToast("✅ تم الاشتراك في الرحلة مع تسجيل مبلغ الدفع");
     } else {
         showToast("تم تحديث بيانات الدفع");
     }
+    pendingPaySubscribe = false;
+}
+
+function cancelTripSubscription(memberId, tripId) {
+    const t = trips.find(x => x.id === tripId);
+    if (!t) return;
+    t.members = normalizeTripMembers(t.members).filter(id => String(id) !== String(memberId));
+    if (t.payments) {
+        delete t.payments[memberId];
+    }
+    saveData();
+    renderTrips();
+    renderMembers();
+    showToast("تم إلغاء الاشتراك في الرحلة");
 }
 
 // ================================================================
