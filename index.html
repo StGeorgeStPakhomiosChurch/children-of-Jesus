@@ -2661,11 +2661,11 @@ function renderMembers() {
 
                 if (joined) {
                     tripsSection += '<div style="display:flex; gap:8px; flex-wrap:wrap;">'
-                        + '<button class="btn btn-accent btn-sm" style="font-size:0.8em;padding:5px 14px;" onclick="openTripPayFromMember(\'' + memberIdString + '\',\'' + t.id + '\')"><i class="fas fa-coins"></i> تحديث الدفع</button>'
-                        + '<button class="btn btn-light btn-sm" style="font-size:0.8em;padding:5px 14px;" onclick="cancelTripSubscription(\'' + memberIdString + '\',\'' + t.id + '\')"><i class="fas fa-times-circle"></i> إلغاء الاشتراك</button>'
+                        + '<button class="btn btn-accent btn-sm" style="font-size:0.8em;padding:5px 14px;" onclick="openTripPayFromMember(\'' + memberIdString.replace(/'/g, "\\'").replace(/`/g, "\\`").replace(/"/g, '\\"') + '\',\'' + String(t.id).replace(/'/g, "\\'").replace(/`/g, "\\`").replace(/"/g, '\\"') + '\')"><i class="fas fa-coins"></i> تحديث الدفع</button>'
+                        + '<button class="btn btn-light btn-sm" style="font-size:0.8em;padding:5px 14px;" onclick="cancelTripSubscription(\'' + memberIdString.replace(/'/g, "\\'") + '\',\'' + String(t.id).replace(/'/g, "\\'") + '\')"><i class="fas fa-times-circle"></i> إلغاء الاشتراك</button>'
                         + '</div>';
                 } else {
-                    tripsSection += '<button class="btn btn-primary btn-sm" style="font-size:0.8em;padding:5px 14px;width:100%;" onclick="openTripPayFromMember(\'' + memberIdString + '\',\'' + t.id + '\', true)"><i class="fas fa-user-plus"></i> اشترك في الرحلة</button>';
+                    tripsSection += '<button class="btn btn-primary btn-sm" style="font-size:0.8em;padding:5px 14px;width:100%;" onclick="openTripPayFromMember(\'' + memberIdString.replace(/'/g, "\\'").replace(/`/g, "\\`").replace(/"/g, '\\"') + '\',\'' + String(t.id).replace(/'/g, "\\'").replace(/`/g, "\\`").replace(/"/g, '\\"') + '\', true)"><i class="fas fa-user-plus"></i> اشترك في الرحلة</button>';
                 }
 
                 tripsSection += '</div>';
@@ -2682,10 +2682,10 @@ function renderMembers() {
         if (m.whatsapp) qaButtons += '<a href="https://wa.me/' + normalizePhone(m.whatsapp) + '" target="_blank" class="mc-action-btn whatsapp"><i class="fab fa-whatsapp"></i>واتساب</a>';
         if (m.telegram) qaButtons += '<a href="https://t.me/' + (m.telegram || '').replace('@','') + '" target="_blank" class="mc-action-btn telegram"><i class="fab fa-telegram"></i>تليجرام</a>';
         if (m.loc || m.address) qaButtons += '<button class="mc-action-btn map" onclick="openAddressMapFor(\'' + (m.loc||'') + '\',\'' + encodeURIComponent(m.address||'') + '\')"><i class="fas fa-map-marked-alt"></i>الموقع</button>';
-        qaButtons += '<button class="mc-action-btn detail-btn" onclick="viewMemberDetail(\'' + memberIdString + '\')"><i class="fas fa-eye"></i>التفاصيل</button>';
-        qaButtons += '<button class="mc-action-btn trip-btn" onclick="manageMemberTrips(\'' + memberIdString + '\')"><i class="fas fa-bus"></i>رحلات</button>';
-        qaButtons += '<button class="mc-action-btn edit-btn" onclick="editMember(\'' + memberIdString + '\')"><i class="fas fa-edit"></i>تعديل</button>';
-        qaButtons += '<button class="mc-action-btn del-btn" onclick="deleteMember(\'' + memberIdString + '\')"><i class="fas fa-trash"></i>حذف</button>';
+        qaButtons += '<button class="mc-action-btn detail-btn" onclick="viewMemberDetail(\'' + memberIdString.replace(/'/g, "\\'").replace(/`/g, "\\`").replace(/"/g, '\\"') + '\')"><i class="fas fa-eye"></i>التفاصيل</button>';
+        qaButtons += '<button class="mc-action-btn trip-btn" onclick="manageMemberTrips(\'' + memberIdString.replace(/'/g, "\\'").replace(/`/g, "\\`").replace(/"/g, '\\"') + '\')"><i class="fas fa-bus"></i>رحلات</button>';
+        qaButtons += '<button class="mc-action-btn edit-btn" onclick="editMember(\'' + memberIdString.replace(/'/g, "\\'").replace(/`/g, "\\`").replace(/"/g, '\\"') + '\')"><i class="fas fa-edit"></i>تعديل</button>';
+        qaButtons += '<button class="mc-action-btn del-btn" onclick="deleteMember(\'' + memberIdString.replace(/'/g, "\\'").replace(/`/g, "\\`").replace(/"/g, '\\"') + '\')"><i class="fas fa-trash"></i>حذف</button>';
 
         var dobHtml = '';
         if (m.dob) {
@@ -3612,8 +3612,8 @@ function openTripPayFromMember(memberId, tripId, subscribe = false) {
     }
 
     document.getElementById('tripPayInfo').innerHTML = `
-        <p style="margin:0 0 6px; font-weight:700; font-size:0.95em; color:#1a237e;"><i class="fas fa-bus"></i> ${t.name}</p>
-        <p style="margin:2px 0; font-size:0.85em; color:#555;"><i class="fas fa-user"></i> المخدوم: <strong>${m.name}</strong></p>
+        <p style="margin:0 0 6px; font-weight:700; font-size:0.95em; color:#1a237e;"><i class="fas fa-bus"></i> ${t.name.replace(/`/g, '\\`')}</p>
+        <p style="margin:2px 0; font-size:0.85em; color:#555;"><i class="fas fa-user"></i> المخدوم: <strong>${m.name.replace(/`/g, '\\`')}</strong></p>
         <p style="margin:2px 0; font-size:0.85em; color:#555;"><i class="fas fa-tag"></i> التكلفة الكاملة: <strong>${cost} جنيه</strong></p>
         <p style="margin:2px 0; font-size:0.85em; color:#388e3c;"><i class="fas fa-check"></i> تم دفعه: <strong>${paid} جنيه</strong></p>
         <p style="margin:2px 0; font-size:0.85em; color:#e65100;"><i class="fas fa-clock"></i> المتبقي: <strong>${remaining > 0 ? remaining : 0} جنيه</strong></p>
@@ -3691,7 +3691,7 @@ function manageMemberTrips(memberId) {
     }
 
     let html = '<div style="max-height:60vh; overflow-y:auto;">';
-    html += '<h4 style="margin-bottom:16px; color:#1a237e;"><i class="fas fa-bus"></i> إدارة رحلات ' + m.name + '</h4>';
+    html += '<h4 style="margin-bottom:16px; color:#1a237e;"><i class="fas fa-bus"></i> إدارة رحلات ' + m.name.replace(/'/g, "\\'").replace(/`/g, "\\`") + '</h4>';
 
     serviceTrips.forEach(t => {
         const memberIds = normalizeTripMembers(t.members);
@@ -3712,17 +3712,17 @@ function manageMemberTrips(memberId) {
 
         html += '<div style="border:1px solid #ddd; border-radius:8px; padding:12px; margin-bottom:10px; background:#fafafa;">';
         html += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">';
-        html += '<strong>' + t.name + '</strong>';
+        html += '<strong>' + t.name.replace(/'/g, "\\'").replace(/`/g, "\\`") + '</strong>';
         html += status;
         html += '</div>';
 
         if (joined) {
             html += '<div style="display:flex; gap:8px; flex-wrap:wrap;">';
-            html += '<button class="btn btn-accent btn-sm" onclick="openTripPayFromMember(\'' + memberId + '\',\'' + t.id + '\')"><i class="fas fa-coins"></i> تعديل الدفع</button>';
-            html += '<button class="btn btn-danger btn-sm" onclick="cancelTripSubscription(\'' + memberId + '\',\'' + t.id + '\')"><i class="fas fa-times-circle"></i> إلغاء الاشتراك</button>';
+            html += '<button class="btn btn-accent btn-sm" onclick="openTripPayFromMember(\'' + memberId.replace(/'/g, "\\'").replace(/`/g, "\\`").replace(/"/g, '\\"') + '\',\'' + String(t.id).replace(/'/g, "\\'").replace(/`/g, "\\`").replace(/"/g, '\\"') + '\')"><i class="fas fa-coins"></i> تعديل الدفع</button>';
+            html += '<button class="btn btn-danger btn-sm" onclick="cancelTripSubscription(\'' + memberId.replace(/'/g, "\\'").replace(/`/g, "\\`").replace(/"/g, '\\"') + '\',\'' + String(t.id).replace(/'/g, "\\'").replace(/`/g, "\\`").replace(/"/g, '\\"') + '\')"><i class="fas fa-times-circle"></i> إلغاء الاشتراك</button>';
             html += '</div>';
         } else {
-            html += '<button class="btn btn-primary btn-sm" style="width:100%;" onclick="openTripPayFromMember(\'' + memberId + '\',\'' + t.id + '\', true)"><i class="fas fa-user-plus"></i> اشتراك بالرحلة</button>';
+            html += '<button class="btn btn-primary btn-sm" style="width:100%;" onclick="openTripPayFromMember(\'' + memberId.replace(/'/g, "\\'").replace(/`/g, "\\`").replace(/"/g, '\\"') + '\',\'' + String(t.id).replace(/'/g, "\\'").replace(/`/g, "\\`").replace(/"/g, '\\"') + '\', true)"><i class="fas fa-user-plus"></i> اشتراك بالرحلة</button>';
         }
 
         html += '</div>';
