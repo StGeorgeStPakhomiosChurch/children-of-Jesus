@@ -467,6 +467,7 @@
         .mc-action-btn.edit-btn  { background:#f3f4f6; color:#374151; }
         .mc-action-btn.del-btn   { background:#ffebee; color:#c62828; }
         .mc-action-btn.detail-btn{ background:#eef0fb; color:#1a237e; }
+        .mc-action-btn.trip-btn  { background:#fff8e1; color:#f57c00; }
 
         /* تذييل الكارت */
         .mc-footer {
@@ -1808,24 +1809,45 @@ function normalizeTripMembers(membersField) {
 const hasSubServices  = ["ملائكة","ابتدائي","إعدادي","ثانوي","شباب"];
 
 // ================================================================
-//  البيانات
+//  تصحيح بيانات الرحلات — تأكد من أن كل واحدة لها service
 // ================================================================
-let members, servants, trips, attendance;
+function fixTripsData() {
+    const mainServices = Object.keys(serviceTree);
+    const primaryService = mainServices[0] || 'كنيسة';
+    
+    trips = trips.map(t => ({
+        ...t,
+        service: t.service || primaryService,
+        targetType: t.targetType || 'members',
+        members: normalizeTripMembers(t.members || []),
+        payments: t.payments || {}
+    }));
+    console.log('Trips data fixed:', trips.length, 'trips');
+}
+
+// تهيئة البيانات
 
 async function initData() {
     try {
         console.log('Initializing data...');
         members = await loadData('cm_members', []);
         console.log('Members loaded');
-        const hashedPass = await hashPassword("admin123").catch(e => { console.error('Hash error:', e); return "admin123"; }); // fallback
+        const hashedPass = await hashPassword("admin123").catch(e => { console.error('Hash error:', e); return "admin123"; });
         servants = await loadData('cm_servants', [
             { id: "1", name: "الأدمن", email: "admin@church.com", pass: hashedPass,
               role: "Admin", services: ["all"], img: "https://i.pravatar.cc/150?u=admin" }
         ]);
         console.log('Servants loaded');
         trips = await loadData('cm_trips', []);
+        // Ensure all trips have service field
+        trips = trips.map(t => ({
+            ...t,
+            service: t.service || 'كنيسة',
+            members: normalizeTripMembers(t.members || [])
+        }));
         attendance = await loadData('cm_attendance', {});
-        console.log('Data initialization complete');
+        fixTripsData();
+        console.log('Data initialization complete, trips:', trips.length);
     } catch (e) {
         console.error('Error in initData:', e);
         // Fallback to localStorage
@@ -1835,7 +1857,14 @@ async function initData() {
               role: "Admin", services: ["all"], img: "https://i.pravatar.cc/150?u=admin" }
         ];
         trips = JSON.parse(localStorage.getItem('cm_trips')) || [];
+        // Ensure all trips have service field
+        trips = trips.map(t => ({
+            ...t,
+            service: t.service || 'كنيسة',
+            members: normalizeTripMembers(t.members || [])
+        }));
         attendance = JSON.parse(localStorage.getItem('cm_attendance')) || {};
+        fixTripsData();
         showToast("حدث خطأ في تحميل البيانات، تم استخدام البيانات المحلية", "error");
     }
 }
@@ -2577,9 +2606,12 @@ function renderMembers() {
         return;
     }
 
-    const serviceTrips = trips.filter(t => t.service === activeSub && t.targetType !== 'servants');
+    const serviceTrips = trips.filter(t => {
+        const match = (t.service === activeSub || t.service === activeMain) && t.targetType !== 'servants';
+        return match;
+    });
+    console.log('renderMembers - activeSub:', activeSub, 'serviceTrips count:', serviceTrips.length, 'trips total:', trips.length);
 
-    list.forEach(m => {
         const imgSrc = getMemberImgSrc(m);
         const memberIdString = String(m.id || '');
 
@@ -2651,6 +2683,7 @@ function renderMembers() {
         if (m.telegram) qaButtons += '<a href="https://t.me/' + (m.telegram || '').replace('@','') + '" target="_blank" class="mc-action-btn telegram"><i class="fab fa-telegram"></i>تليجرام</a>';
         if (m.loc || m.address) qaButtons += '<button class="mc-action-btn map" onclick="openAddressMapFor(\'' + (m.loc||'') + '\',\'' + encodeURIComponent(m.address||'') + '\')"><i class="fas fa-map-marked-alt"></i>الموقع</button>';
         qaButtons += '<button class="mc-action-btn detail-btn" onclick="viewMemberDetail(\'' + memberIdString + '\')"><i class="fas fa-eye"></i>التفاصيل</button>';
+        qaButtons += '<button class="mc-action-btn trip-btn" onclick="manageMemberTrips(\'' + memberIdString + '\')"><i class="fas fa-bus"></i>رحلات</button>';
         qaButtons += '<button class="mc-action-btn edit-btn" onclick="editMember(\'' + memberIdString + '\')"><i class="fas fa-edit"></i>تعديل</button>';
         qaButtons += '<button class="mc-action-btn del-btn" onclick="deleteMember(\'' + memberIdString + '\')"><i class="fas fa-trash"></i>حذف</button>';
 
@@ -3647,6 +3680,61 @@ function cancelTripSubscription(memberId, tripId) {
     showToast("تم إلغاء الاشتراك في الرحلة");
 }
 
+function manageMemberTrips(memberId) {
+    const m = members.find(x => String(x.id) === String(memberId));
+    if (!m) return;
+
+    const serviceTrips = trips.filter(t => t.service === m.grade);
+    if (serviceTrips.length === 0) {
+        showToast("لا توجد رحلات متاحة لهذه الخدمة", "error");
+        return;
+    }
+
+    let html = '<div style="max-height:60vh; overflow-y:auto;">';
+    html += '<h4 style="margin-bottom:16px; color:#1a237e;"><i class="fas fa-bus"></i> إدارة رحلات ' + m.name + '</h4>';
+
+    serviceTrips.forEach(t => {
+        const memberIds = normalizeTripMembers(t.members);
+        const joined = memberIds.includes(String(memberId));
+        const cost = parseFloat(t.cost) || 0;
+        const paid = parseFloat((t.payments || {})[memberId] || 0);
+        const remaining = cost - paid;
+        const isFullyPaid = cost > 0 && remaining <= 0;
+
+        let status = '';
+        if (!joined) {
+            status = '<span style="color:#666;">غير مشترك</span>';
+        } else if (isFullyPaid) {
+            status = '<span style="color:#388e3c;">مدفوع كامل</span>';
+        } else {
+            status = '<span style="color:#e65100;">متبقي: ' + remaining + ' جنيه</span>';
+        }
+
+        html += '<div style="border:1px solid #ddd; border-radius:8px; padding:12px; margin-bottom:10px; background:#fafafa;">';
+        html += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">';
+        html += '<strong>' + t.name + '</strong>';
+        html += status;
+        html += '</div>';
+
+        if (joined) {
+            html += '<div style="display:flex; gap:8px; flex-wrap:wrap;">';
+            html += '<button class="btn btn-accent btn-sm" onclick="openTripPayFromMember(\'' + memberId + '\',\'' + t.id + '\')"><i class="fas fa-coins"></i> تعديل الدفع</button>';
+            html += '<button class="btn btn-danger btn-sm" onclick="cancelTripSubscription(\'' + memberId + '\',\'' + t.id + '\')"><i class="fas fa-times-circle"></i> إلغاء الاشتراك</button>';
+            html += '</div>';
+        } else {
+            html += '<button class="btn btn-primary btn-sm" style="width:100%;" onclick="openTripPayFromMember(\'' + memberId + '\',\'' + t.id + '\', true)"><i class="fas fa-user-plus"></i> اشتراك بالرحلة</button>';
+        }
+
+        html += '</div>';
+    });
+
+    html += '</div>';
+
+    document.getElementById('tripDetailContent').innerHTML = html;
+    document.querySelector('#tripDetailModal .modal-header h3').innerHTML = '<i class="fas fa-bus"></i> إدارة رحلات المخدوم';
+    document.getElementById('tripDetailModal').style.display = 'block';
+}
+
 // ================================================================
 //  الإحصائيات
 // ================================================================
@@ -4218,6 +4306,7 @@ async function loadFromSheet() {
             if (Array.isArray(trips)) {
                 trips = trips.map(t => ({
                     ...t,
+                    service: t.service || activeMain || 'كنيسة',
                     members: normalizeTripMembers(t.members)
                 }));
             }
