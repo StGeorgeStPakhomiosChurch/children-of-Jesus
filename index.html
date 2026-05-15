@@ -1894,26 +1894,15 @@ function showToast(msg, type = "success") {
 // ================================================================
 //  تسجيل الدخول
 // ================================================================
+// ================================================================
+//  تسجيل الدخول
+// ================================================================
 async function handleLogin() {
     try {
         const email = document.getElementById('loginEmail').value.trim();
-        const pass  = document.getElementById('loginPass').value;
+        const pass = document.getElementById('loginPass').value;
 
         const hashedPass = await hashPassword(pass);
-
-        if (isSheetEnabled()) {
-            try {
-                const res  = await fetch(SHEET_API_URL + "?action=load", { method: "GET" });
-                const json = await res.json();
-                const data = (json && json.result) ? json.result : json;
-                if (json && json.ok && data && Array.isArray(data.servants) && data.servants.length > 0) {
-                    servants = data.servants;
-                    await saveDataToStorage('cm_servants', servants);
-                }
-            } catch (e) {
-                console.warn("Could not load servants from Sheets on login", e);
-            }
-        }
 
         let user = servants.find(u => u.email === email && u.pass === hashedPass);
         if (!user) {
@@ -1925,61 +1914,52 @@ async function handleLogin() {
         }
 
         if (user) {
-        // تحقق إن الحساب لم يعد معلقاً
-        if (user.pending) {
-            showToast("حسابك لا يزال قيد المراجعة — انتظر موافقة الأدمن", "error");
-            return;
+            if (user.pending) {
+                showToast("حسابك لا يزال قيد المراجعة — انتظر موافقة الأدمن", "error");
+                return;
+            }
+
+            currentUser = user;
+            localStorage.setItem('cm_session', JSON.stringify({ email: user.email, token: btoa(user.email + ':' + user.pass) }));
+
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-app').style.display = 'flex';
+
+            document.getElementById('userName').innerText = user.name;
+            document.getElementById('userRole').innerText = user.role;
+            document.getElementById('userAvatar').src = user.img || 'https://i.pravatar.cc/150?u=default';
+
+            const canAdmin = ['Admin', 'Priest'].includes(user.role);
+            const isLeader = user.role === 'ServiceLeader';
+
+            const roleNames = { Admin: 'أدمن', Priest: 'كاهن', ServiceLeader: 'أمين خدمة', Servant: 'خادم' };
+            document.getElementById('userRole').innerText = roleNames[user.role] || user.role;
+
+            if (canAdmin || isLeader) {
+                document.querySelectorAll('.admin-only').forEach(el => {
+                    el.style.display = el.tagName === 'BUTTON' || el.tagName === 'A' ? 'inline-flex' : '';
+                });
+                const btn = document.getElementById('btnTripServants');
+                if (btn) btn.style.display = 'inline-flex';
+            }
+
+            initServiceSelector();
+            document.getElementById('attendanceDate').valueAsDate = new Date();
+            goHome();
+
+            if (isSheetEnabled()) {
+                loadFromSheet().then(loaded => {
+                    if (loaded) {
+                        renderMembers();
+                        updateHomeStats();
+                    }
+                });
+            }
+
+            setTimeout(postLoginInit, 1500);
+        } else {
+            showToast("بيانات الدخول غير صحيحة", "error");
         }
-        currentUser = user;
-        // حفظ الجلسة في localStorage (بدون كلمة السر في النص الواضح)
-        localStorage.setItem('cm_session', JSON.stringify({ email: user.email, token: btoa(user.email + ':' + user.pass) }));
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('main-app').style.display = 'flex';
-        document.getElementById('userName').innerText  = user.name;
-        document.getElementById('userRole').innerText  = user.role;
-        document.getElementById('userAvatar').src      = user.img || 'https://i.pravatar.cc/150?u=default';
-
-        const canAdmin = ['Admin','Priest'].includes(user.role);
-        const isLeader = user.role === 'ServiceLeader';
-        const isServant = user.role === 'Servant';
-
-        // تعيين اسم الصلاحية بالعربي
-        const roleNames = { Admin:'أدمن', Priest:'كاهن', ServiceLeader:'أمين خدمة', Servant:'خادم' };
-        document.getElementById('userRole').innerText = roleNames[user.role] || user.role;
-
-        // إظهار زر إدارة الخدام في الهوم (للكاهن وأمين الخدمة فقط — الخادم لا يراه)
-        if (canAdmin || isLeader) {
-            document.querySelectorAll('.admin-only').forEach(el => {
-                // احترم نوع العنصر: block أو inline-flex أو grid
-                el.style.display = el.tagName === 'BUTTON' || el.tagName === 'A' ? 'inline-flex' : '';
-            });
-        }
-        if (canAdmin || isLeader) {
-            const btn = document.getElementById('btnTripServants');
-            if (btn) btn.style.display = 'inline-flex';
-        }
-
-        initServiceSelector();
-        document.getElementById('attendanceDate').valueAsDate = new Date();
-
-        // إظهار الهوم
-        goHome();
-
-        // تحميل البيانات من Google Sheets لو متاح
-        if (isSheetEnabled()) {
-            loadFromSheet().then(loaded => {
-                if (loaded) {
-                    renderMembers();
-                    updateHomeStats();
-                }
-            });
-        }
-
-        // تفعيل الإشعارات
-        setTimeout(postLoginInit, 1500);
-    } else {
-        showToast("بيانات الدخول غير صحيحة", "error");
-    }
     } catch (e) {
         console.error('Login error:', e);
         showToast("حدث خطأ في تسجيل الدخول", "error");
