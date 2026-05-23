@@ -1624,12 +1624,7 @@ async function handleLogin() {
     const email = document.getElementById('loginEmail').value.trim();
     const pass  = document.getElementById('loginPass').value;
 
-    if (!email || !pass) {
-        showToast('من فضلك أدخل الإيميل وكلمة المرور', 'error');
-        return;
-    }
-
-    // تحميل الخدام من Sheets أولاً لو متاح
+    // نحمل البيانات من Sheets أولاً عشان نضمن إن الخدام المضافين من أجهزة تانية موجودين
     if (isSheetEnabled()) {
         try {
             const res  = await fetch(SHEET_API_URL + "?action=load", { method: "GET" });
@@ -1648,38 +1643,51 @@ async function handleLogin() {
 
     if (user) {
         currentUser = user;
+        // حفظ الجلسة في localStorage
         localStorage.setItem('cm_session', JSON.stringify({ email: user.email, pass: user.pass }));
-
         document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('main-app').style.display    = 'flex';
-        document.getElementById('userAvatar').src = user.img || 'https://i.pravatar.cc/150?u=default';
-        document.getElementById('userName').innerText = user.name;
-
-        const roleNames = { Admin:'أدمن', Priest:'كاهن', ServiceLeader:'أمين خدمة', Servant:'خادم' };
-        document.getElementById('userRole').innerText = roleNames[user.role] || user.role;
+        document.getElementById('main-app').style.display = 'flex';
+        document.getElementById('userName').innerText  = user.name;
+        document.getElementById('userRole').innerText  = user.role;
+        document.getElementById('userAvatar').src      = user.img || 'https://i.pravatar.cc/150?u=default';
 
         const canAdmin = ['Admin','Priest'].includes(user.role);
         const isLeader = user.role === 'ServiceLeader';
+        const isServant = user.role === 'Servant';
 
+        // تعيين اسم الصلاحية بالعربي
+        const roleNames = { Admin:'أدمن', Priest:'كاهن', ServiceLeader:'أمين خدمة', Servant:'خادم' };
+        document.getElementById('userRole').innerText = roleNames[user.role] || user.role;
+
+        // إظهار زر إدارة الخدام في الهوم (للكاهن وأمين الخدمة فقط — الخادم لا يراه)
         if (canAdmin || isLeader) {
             document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'flex');
+        }
+        if (canAdmin || isLeader) {
             const btn = document.getElementById('btnTripServants');
             if (btn) btn.style.display = 'inline-flex';
         }
 
         initServiceSelector();
         document.getElementById('attendanceDate').valueAsDate = new Date();
+
+        // إظهار الهوم
         goHome();
 
+        // تحميل البيانات من Google Sheets لو متاح
         if (isSheetEnabled()) {
             loadFromSheet().then(loaded => {
-                if (loaded) { renderMembers(); updateHomeStats(); }
+                if (loaded) {
+                    renderMembers();
+                    updateHomeStats();
+                }
             });
         }
 
+        // تفعيل الإشعارات
         setTimeout(postLoginInit, 1500);
     } else {
-        showToast('بيانات الدخول غير صحيحة ❌', 'error');
+        showToast("بيانات الدخول غير صحيحة", "error");
     }
 }
 
@@ -2284,15 +2292,13 @@ function renderMembers() {
 
     list.forEach(function(m) {
         var imgSrc = getMemberImgSrc(m);
-
         var memberTrips = trips.filter(function(t){
             return t.service === activeSub && t.targetType !== 'servants' && (t.members||[]).includes(m.id);
         });
-
         var tripsHtml = '';
         if (memberTrips.length > 0) {
             tripsHtml += '<div style="margin-top:12px;border-top:2px solid #e8eaf6;padding-top:10px;">';
-            tripsHtml += '<p style="font-size:0.82em;font-weight:800;color:#1a237e;margin:0 0 8px;"><i class=\"fas fa-bus\" style=\"color:#d4af37;\"></i> الرحلات</p>';
+            tripsHtml += '<p style="font-size:0.82em;font-weight:800;color:#1a237e;margin:0 0 8px;">&#128652; الرحلات</p>';
             memberTrips.forEach(function(t){
                 var cost = parseFloat(t.cost)||0;
                 var paid = parseFloat((t.payments||{})[m.id]||0);
@@ -2302,7 +2308,7 @@ function renderMembers() {
                 var bd   = full ? '#a5d6a7' : '#ffcc80';
                 var badge = '';
                 if (full) {
-                    badge = '<span style="background:#e8f5e9;color:#388e3c;font-size:0.78em;font-weight:700;padding:2px 8px;border-radius:20px;"><i class=\"fas fa-check-circle\"></i> مدفوع</span>';
+                    badge = '<span style="background:#e8f5e9;color:#388e3c;font-size:0.78em;font-weight:700;padding:2px 8px;border-radius:20px;">&#10003; مدفوع</span>';
                 } else if (cost > 0) {
                     badge = '<span style="background:#fff3e0;color:#e65100;font-size:0.78em;font-weight:700;padding:2px 8px;border-radius:20px;">متبقي: ' + rem + ' ج</span>';
                 } else {
@@ -2316,38 +2322,37 @@ function renderMembers() {
                     if (!full) payRow += '<span style="color:#e65100;">متبقي: ' + rem + ' ج</span>';
                     payRow += '</div>';
                 }
+                var mid = JSON.stringify(m.id);
+                var tid = JSON.stringify(t.id);
+                var tname = t.name || '';
                 tripsHtml += '<div style="background:' + bg + ';border:1px solid ' + bd + ';border-radius:10px;padding:8px 12px;margin-bottom:6px;">';
                 tripsHtml += '<div style="display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;">';
-                tripsHtml += '<span style="font-size:0.85em;font-weight:700;color:#1a237e;">' + t.name + '</span>' + badge + '</div>';
+                tripsHtml += '<span style="font-size:0.85em;font-weight:700;color:#1a237e;">' + tname + '</span>' + badge + '</div>';
                 tripsHtml += payRow;
-                tripsHtml += '<button class="btn btn-accent btn-sm" style="margin-top:6px;font-size:0.78em;padding:4px 10px;width:100%;"';
-                tripsHtml += ' onclick="openTripPayFromMember(' + JSON.stringify(m.id) + ',' + JSON.stringify(t.id) + ')">';
-                tripsHtml += '<i class=\"fas fa-coins\"></i> تسجيل دفع</button>';
+                tripsHtml += '<button class="btn btn-accent btn-sm" style="margin-top:6px;font-size:0.78em;padding:4px 10px;width:100%;" onclick="openTripPayFromMember(' + mid + ',' + tid + ')">تسجيل دفع</button>';
                 tripsHtml += '</div>';
             });
             tripsHtml += '</div>';
         } else {
-            tripsHtml = '<div style="margin-top:10px;border-top:1px solid #f0f0f0;padding-top:8px;text-align:center;">';
+            tripsHtml  = '<div style="margin-top:10px;border-top:1px solid #f0f0f0;padding-top:8px;text-align:center;">';
             tripsHtml += '<p style="font-size:0.8em;color:#ccc;margin:4px 0;">غير مشترك في رحلات</p></div>';
         }
-
         var card = document.createElement('div');
         card.className = 'm-card';
-        card.innerHTML = '<img src="' + imgSrc + '"'
-            + ' onerror="this.src='https://ui-avatars.com/api/?name=' + encodeURIComponent(m.name) + '&background=1a237e&color=fff&size=300'"'
-            + ' onclick="zoomImg(' + JSON.stringify(imgSrc) + ')" alt="' + m.name + '">'
-            + '<div class="m-card-body">'
-            + '<h3>' + m.name + '</h3>'
-            + '<p style="margin:4px 0;font-size:0.85em;color:#666;"><i class="fas fa-graduation-cap" style="color:var(--primary);"></i> ' + (m.grade||'') + '</p>'
-            + '<p style="margin:4px 0;font-size:0.85em;color:#666;"><i class="fas fa-hand-holding-heart" style="color:var(--accent);"></i> ' + (m.conf||'') + '</p>'
-            + tripsHtml
-            + '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid #f0f0f0;">'
-            + '<button class="btn btn-light btn-sm" onclick="viewMemberDetail(' + JSON.stringify(m.id) + ')"><i class="fas fa-eye"></i> التفاصيل</button>'
-            + '<div style="display:flex;gap:6px;">'
-            + '<button class="btn btn-light btn-sm" onclick="editMember(' + JSON.stringify(m.id) + ')"><i class="fas fa-edit"></i></button>'
-            + '<button class="btn btn-danger btn-sm" onclick="deleteMember(' + JSON.stringify(m.id) + ')"><i class="fas fa-trash"></i></button>'
-            + '</div></div></div>';
-
+        var imgErr = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(m.name) + '&background=1a237e&color=fff&size=300';
+        var mid2 = JSON.stringify(m.id);
+        card.innerHTML = '<img src="' + imgSrc + '" onerror="this.src=&quot;' + imgErr + '&quot;" onclick="zoomImg(&quot;' + imgSrc + '&quot;)" alt="' + m.name + '">' +
+            '<div class="m-card-body">' +
+            '<h3>' + m.name + '</h3>' +
+            '<p style="margin:4px 0;font-size:0.85em;color:#666;">' + (m.grade||'') + '</p>' +
+            '<p style="margin:4px 0;font-size:0.85em;color:#666;">' + (m.conf||'') + '</p>' +
+            tripsHtml +
+            '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid #f0f0f0;">' +
+            '<button class="btn btn-light btn-sm" onclick="viewMemberDetail(' + mid2 + ')">التفاصيل</button>' +
+            '<div style="display:flex;gap:6px;">' +
+            '<button class="btn btn-light btn-sm" onclick="editMember(' + mid2 + ')">&#9998;</button>' +
+            '<button class="btn btn-danger btn-sm" onclick="deleteMember(' + mid2 + ')">&#128465;</button>' +
+            '</div></div></div>';
         grid.appendChild(card);
     });
 });
