@@ -25,6 +25,18 @@ body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:var(--bg);color:v
 a{text-decoration:none;color:inherit}
 button{cursor:pointer;font-family:inherit}
 
+/* ===== FIRST-TIME SETUP ===== */
+#setupScreen{display:none;align-items:center;justify-content:center;min-height:100vh;
+  background:linear-gradient(135deg,#1a237e 0%,#283593 60%,#3949ab 100%)}
+.setup-box{background:#fff;border-radius:24px;padding:40px 36px;width:100%;max-width:460px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.3);text-align:center}
+.setup-logo{width:80px;height:80px;background:var(--accent);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:2em}
+.setup-box h2{color:var(--primary);margin-bottom:6px;font-size:1.4em}
+.setup-box p{color:var(--muted);font-size:0.88em;margin-bottom:28px}
+.setup-badge{display:inline-block;background:#e8f5e9;color:#388e3c;border-radius:20px;
+  padding:4px 14px;font-size:0.8em;font-weight:700;margin-bottom:20px;border:1px solid #a5d6a7}
+
 /* ===== LOGIN ===== */
 #loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;
   background:linear-gradient(135deg,#1a237e 0%,#283593 60%,#3949ab 100%)}
@@ -73,6 +85,7 @@ button{cursor:pointer;font-family:inherit}
 .drawer-header img{width:60px;height:60px;border-radius:50%;border:3px solid var(--accent);object-fit:cover}
 .drawer-header .dname{font-weight:700;font-size:1.05em;margin-top:8px}
 .drawer-header .drole{font-size:0.8em;opacity:.8}
+.drawer-header .dservices{font-size:0.75em;opacity:.7;margin-top:4px}
 .drawer-nav{padding:12px 0}
 .drawer-nav a{display:flex;align-items:center;gap:12px;padding:13px 20px;
   color:var(--text);font-size:0.95em;border-radius:0;transition:.15s}
@@ -92,6 +105,8 @@ button{cursor:pointer;font-family:inherit}
   color:#fff;border-radius:var(--radius);padding:20px;margin-bottom:16px}
 .home-greeting h2{font-size:1.2em;margin-bottom:4px}
 .home-greeting p{font-size:0.85em;opacity:.8}
+.home-greeting .svc-tag{font-size:0.78em;background:rgba(255,255,255,0.2);
+  border-radius:20px;padding:3px 10px;display:inline-block;margin-top:6px}
 .stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px}
 .stat-card{background:var(--card);border-radius:var(--radius);padding:16px;
   box-shadow:var(--shadow);text-align:center;border-top:4px solid var(--primary)}
@@ -184,6 +199,9 @@ button{cursor:pointer;font-family:inherit}
 .servant-card .info .name{font-weight:700;font-size:0.95em}
 .servant-card .info .role-badge{font-size:0.75em;padding:2px 8px;border-radius:20px;
   background:#e8eaf6;color:var(--primary);font-weight:700;display:inline-block;margin-top:2px}
+.servant-card .info .svc-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.servant-card .info .svc-tag{font-size:0.7em;padding:1px 7px;border-radius:10px;
+  background:#f0f4ff;color:#3949ab;border:1px solid #c5cae9}
 
 /* MODAL */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;
@@ -219,6 +237,21 @@ button{cursor:pointer;font-family:inherit}
 .service-selector select:focus{border-color:var(--primary)}
 .service-label{font-size:0.85em;font-weight:700;color:var(--primary)}
 
+/* SERVICE CHECKBOXES */
+.svc-check-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:8px}
+.svc-check-item{display:flex;align-items:center;gap:8px;padding:8px 10px;
+  border:2px solid var(--border);border-radius:9px;cursor:pointer;font-size:0.83em;transition:.15s}
+.svc-check-item input{accent-color:var(--primary);cursor:pointer}
+.svc-check-item:hover{border-color:#9fa8da;background:#f8f9ff}
+.svc-check-item.selected{border-color:var(--primary);background:#e8eaf6}
+.svc-group-title{font-size:0.78em;font-weight:800;color:var(--primary);
+  text-transform:uppercase;letter-spacing:.5px;margin:10px 0 5px;
+  padding:4px 8px;background:#e8eaf6;border-radius:6px}
+.svc-all-toggle{display:flex;align-items:center;gap:8px;padding:8px 12px;
+  border:2px solid var(--accent);border-radius:9px;cursor:pointer;font-size:0.85em;
+  font-weight:700;color:var(--primary);background:#fffde7;margin-bottom:10px}
+.svc-all-toggle input{accent-color:var(--primary)}
+
 /* TOAST */
 #toast{position:fixed;bottom:24px;right:50%;transform:translateX(50%);
   background:#323232;color:#fff;padding:12px 22px;border-radius:10px;
@@ -241,7 +274,7 @@ button{cursor:pointer;font-family:inherit}
 /* FILTER TABS */
 .filter-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
 .filter-tab{padding:6px 14px;border-radius:20px;border:2px solid var(--border);
-  background:#fff;font-size:0.82em;cursor:pointer;font-weight:600;transition:.15s}
+  background:#fff;font-size:0.82em;cursor:pointer;font-weight:600;transition:.15px}
 .filter-tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
 
 /* DETAIL VIEW */
@@ -264,18 +297,74 @@ button{cursor:pointer;font-family:inherit}
 .pay-info-box .row{display:flex;justify-content:space-between;font-size:0.88em;margin-bottom:6px}
 .pay-info-box .big{font-size:1.3em;font-weight:800;color:var(--primary)}
 
+/* INFO BOX */
+.info-box{border-radius:12px;padding:12px 16px;margin-bottom:14px;font-size:0.85em;
+  display:flex;align-items:flex-start;gap:10px}
+.info-box.blue{background:#e8eaf6;border:1px solid #9fa8da;color:#1a237e}
+.info-box.orange{background:#fff3e0;border:1px solid #ffcc80;color:#e65100}
+
 @media(max-width:480px){
   .form-row{grid-template-columns:1fr}
   .detail-grid{grid-template-columns:1fr}
   .stats-grid{grid-template-columns:1fr 1fr}
   .members-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+  .svc-check-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
 <body>
 
+<!-- ===== FIRST TIME SETUP ===== -->
+<div id="setupScreen">
+  <div class="setup-box">
+    <div class="setup-logo">✝</div>
+    <h2>Children of Jesus</h2>
+    <p>أبناء يسوع</p>
+    <div class="setup-badge"><i class="fas fa-star"></i> الإعداد الأول للنظام</div>
+    <div class="info-box blue" style="text-align:right;margin-bottom:20px">
+      <i class="fas fa-info-circle" style="margin-top:2px;flex-shrink:0"></i>
+      <span>سيتم إنشاء أول حساب في النظام. يجب أن يكون المسجّل <strong>كاهناً</strong> أو <strong>أمين خدمة</strong>.</span>
+    </div>
+    <div class="form-group">
+      <label>الاسم الكامل *</label>
+      <div class="input-wrap" style="margin-bottom:0">
+        <i class="fas fa-user icon"></i>
+        <input type="text" id="setupName" placeholder="اسمك الكامل">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>الإيميل *</label>
+      <div class="input-wrap" style="margin-bottom:0">
+        <i class="fas fa-envelope icon"></i>
+        <input type="email" id="setupEmail" placeholder="example@email.com">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>كلمة المرور *</label>
+      <div class="input-wrap" style="margin-bottom:0">
+        <i class="fas fa-lock icon"></i>
+        <input type="password" id="setupPass" placeholder="كلمة مرور قوية">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>الدور *</label>
+      <div class="input-wrap" style="margin-bottom:0">
+        <i class="fas fa-id-badge icon"></i>
+        <select id="setupRole" style="width:100%;padding:13px 44px 13px 16px;border:2px solid var(--border);border-radius:12px;font-size:0.95em;outline:none;font-family:inherit;direction:rtl;appearance:auto">
+          <option value="Priest">كاهن</option>
+          <option value="ServiceLeader">أمين خدمة</option>
+        </select>
+      </div>
+    </div>
+    <div id="setupError" class="login-error"></div>
+    <button class="btn-login" onclick="doSetup()" style="margin-top:10px">
+      <i class="fas fa-check-circle"></i> إنشاء الحساب الأول
+    </button>
+  </div>
+</div>
+
 <!-- ===== LOGIN ===== -->
-<div id="loginScreen">
+<div id="loginScreen" style="display:none">
   <div class="login-box">
     <div class="login-logo">✝</div>
     <h2>Children of Jesus</h2>
@@ -292,7 +381,6 @@ button{cursor:pointer;font-family:inherit}
     </div>
     <button class="btn-login" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> دخول</button>
     <div class="login-links">
-      <a href="#" onclick="showRegisterModal()">تسجيل خادم جديد</a> |
       <a href="#" onclick="forgotPass()">نسيت كلمة السر؟</a>
     </div>
   </div>
@@ -306,7 +394,7 @@ button{cursor:pointer;font-family:inherit}
     <div class="title" id="pageTitle">الرئيسية</div>
     <div class="user-info">
       <span id="topUserName"></span>
-      <img id="topUserImg" src="https://i.pravatar.cc/150?u=x" alt="">
+      <img id="topUserImg" src="" alt="">
     </div>
   </div>
 
@@ -317,6 +405,7 @@ button{cursor:pointer;font-family:inherit}
       <img id="drawerImg" src="">
       <div class="dname" id="drawerName"></div>
       <div class="drole" id="drawerRole"></div>
+      <div class="dservices" id="drawerServices"></div>
     </div>
     <nav class="drawer-nav">
       <a href="#" onclick="navTo('home')"><i class="fas fa-home"></i> الرئيسية</a>
@@ -324,7 +413,7 @@ button{cursor:pointer;font-family:inherit}
       <a href="#" onclick="navTo('attendance')"><i class="fas fa-clipboard-check"></i> الحضور</a>
       <a href="#" onclick="navTo('trips')"><i class="fas fa-bus"></i> الرحلات</a>
       <hr>
-      <a href="#" onclick="navTo('servants')" id="navServants"><i class="fas fa-user-tie"></i> الخدام</a>
+      <a href="#" onclick="navTo('servants')" id="navServants" class="admin-only"><i class="fas fa-user-tie"></i> الخدام</a>
       <hr>
       <button class="logout-btn" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
     </nav>
@@ -338,6 +427,7 @@ button{cursor:pointer;font-family:inherit}
       <div class="home-greeting">
         <h2 id="greetName">أهلاً!</h2>
         <p id="greetDate"></p>
+        <div id="greetServices" class="svc-tag" style="display:none"></div>
       </div>
       <div class="stats-grid">
         <div class="stat-card"><div class="num" id="statMembers">0</div><div class="lbl">مخدوم</div></div>
@@ -347,7 +437,7 @@ button{cursor:pointer;font-family:inherit}
         <button class="home-btn" onclick="navTo('members')"><i class="fas fa-users"></i><span>المخدومين</span></button>
         <button class="home-btn" onclick="navTo('attendance')"><i class="fas fa-clipboard-check"></i><span>الحضور</span></button>
         <button class="home-btn" onclick="navTo('trips')"><i class="fas fa-bus"></i><span>الرحلات</span></button>
-        <button class="home-btn admin-only" onclick="navTo('servants')" style="display:none"><i class="fas fa-user-tie"></i><span>الخدام</span></button>
+        <button class="home-btn admin-only" onclick="navTo('servants')"><i class="fas fa-user-tie"></i><span>الخدام</span></button>
       </div>
     </div>
 
@@ -398,7 +488,7 @@ button{cursor:pointer;font-family:inherit}
     <div class="page" id="pageServants">
       <div class="page-header">
         <h3><i class="fas fa-user-tie"></i> الخدام</h3>
-        <button class="btn btn-primary" onclick="showRegisterModal(true)"><i class="fas fa-plus"></i> خادم جديد</button>
+        <button class="btn btn-primary admin-only" onclick="showRegisterModal(true)"><i class="fas fa-plus"></i> خادم جديد</button>
       </div>
       <div id="servantsContainer"></div>
     </div>
@@ -561,7 +651,7 @@ button{cursor:pointer;font-family:inherit}
 
 <!-- Register Modal -->
 <div class="modal-overlay" id="registerModal">
-  <div class="modal" style="max-width:400px">
+  <div class="modal" style="max-width:480px">
     <div class="modal-header">
       <h4 id="registerTitle">تسجيل خادم جديد</h4>
       <button class="modal-close" onclick="closeModal('registerModal')">✕</button>
@@ -587,6 +677,20 @@ button{cursor:pointer;font-family:inherit}
           <option value="Priest">كاهن</option>
           <option value="Admin">أدمن</option>
         </select>
+      </div>
+
+      <!-- Services Selection -->
+      <div id="rServicesGroup">
+        <div class="section-title">الخدمات التي يخدم بها <span style="color:#d32f2f">*</span></div>
+        <div class="info-box blue" style="margin-bottom:10px">
+          <i class="fas fa-info-circle" style="margin-top:2px;flex-shrink:0"></i>
+          <span>الخادم سيرى فقط بيانات المخدومين في الخدمات المحددة.</span>
+        </div>
+        <label class="svc-all-toggle" id="svcAllLabel">
+          <input type="checkbox" id="rSvcAll" onchange="toggleAllServices(this.checked)">
+          <span>جميع الخدمات (صلاحية كاملة)</span>
+        </label>
+        <div id="rServicesGrid"></div>
       </div>
     </div>
     <div class="modal-footer">
@@ -619,6 +723,7 @@ const serviceTree = {
   "مرضى":           ["مرضى"],
 };
 const allGrades = Object.values(serviceTree).flat();
+const allMainServices = Object.keys(serviceTree);
 
 const ROLE_NAMES = {Admin:'أدمن', Priest:'كاهن', ServiceLeader:'أمين خدمة', Servant:'خادم'};
 
@@ -629,24 +734,68 @@ function save(key, val) {
   try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){}
 }
 
-let servants = load('coj_servants', [{
-  id:'1', name:'الأدمن', email:'admin@church.com', pass:'admin123',
-  role:'Admin', services:['all'], img:''
-}]);
-let members  = load('coj_members', []);
-let trips    = load('coj_trips', []);
+let servants   = load('coj_servants', []);
+let members    = load('coj_members', []);
+let trips      = load('coj_trips', []);
 let attendance = load('coj_attendance', {});
 
-let currentUser = null;
+let currentUser     = null;
 let editingMemberId = null;
-let editingTripId = null;
-let payContext = null; // {memberId, tripId}
+let editingTripId   = null;
+let payContext      = null;
 
 function saveAll() {
   save('coj_servants', servants);
   save('coj_members', members);
   save('coj_trips', trips);
   save('coj_attendance', attendance);
+}
+
+// ================================================================
+//  ACCESS CONTROL HELPERS
+// ================================================================
+
+// Check if user has access to a main service category
+function userCanAccessMainService(user, mainSvc) {
+  if (!user) return false;
+  if (user.services && user.services.includes('all')) return true;
+  // Admin/Priest always see all
+  if (['Admin','Priest'].includes(user.role)) return true;
+  const svcs = user.services || [];
+  // if any grade in this mainSvc is in user's allowed services
+  return (serviceTree[mainSvc] || []).some(g => svcs.includes(g));
+}
+
+// Get grades user can access
+function getUserGrades(user) {
+  if (!user) return [];
+  if (user.services && user.services.includes('all')) return allGrades;
+  if (['Admin','Priest'].includes(user.role)) return allGrades;
+  const svcs = user.services || [];
+  // Expand main service names to grades
+  let grades = [];
+  svcs.forEach(s => {
+    if (serviceTree[s]) {
+      grades = grades.concat(serviceTree[s]);
+    } else {
+      grades.push(s); // individual grade
+    }
+  });
+  return [...new Set(grades)];
+}
+
+// Get main services user can access
+function getUserMainServices(user) {
+  if (!user) return [];
+  if (user.services && user.services.includes('all')) return allMainServices;
+  if (['Admin','Priest'].includes(user.role)) return allMainServices;
+  return allMainServices.filter(ms => userCanAccessMainService(user, ms));
+}
+
+// Get members visible to current user
+function getVisibleMembers() {
+  const grades = getUserGrades(currentUser);
+  return members.filter(m => grades.includes(m.grade));
 }
 
 // ================================================================
@@ -662,13 +811,8 @@ function toast(msg, type='success') {
   t._to = setTimeout(() => t.className = '', 3000);
 }
 
-function closeModal(id) {
-  document.getElementById(id).classList.remove('open');
-}
-
-function openModal(id) {
-  document.getElementById(id).classList.add('open');
-}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
 
 function imgSrc(m) {
   if (m.img) return m.img;
@@ -694,6 +838,39 @@ function zoomImg(src) {
 }
 
 // ================================================================
+//  FIRST-TIME SETUP
+// ================================================================
+function doSetup() {
+  const name  = document.getElementById('setupName').value.trim();
+  const email = document.getElementById('setupEmail').value.trim();
+  const pass  = document.getElementById('setupPass').value;
+  const role  = document.getElementById('setupRole').value;
+  const err   = document.getElementById('setupError');
+
+  err.style.display = 'none';
+  if (!name || !email || !pass) {
+    err.textContent = 'جميع الحقول مطلوبة';
+    err.style.display = 'block';
+    return;
+  }
+  if (pass.length < 6) {
+    err.textContent = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+    err.style.display = 'block';
+    return;
+  }
+
+  const firstServant = { id: uid(), name, email, pass, role, services: ['all'], img: '' };
+  servants.push(firstServant);
+  saveAll();
+
+  currentUser = firstServant;
+  save('coj_session', { email: firstServant.email, pass: firstServant.pass });
+  document.getElementById('setupScreen').style.display = 'none';
+  startApp();
+  toast('مرحباً ' + name + '! تم إنشاء الحساب بنجاح 🎉');
+}
+
+// ================================================================
 //  LOGIN
 // ================================================================
 function doLogin() {
@@ -716,7 +893,8 @@ function doLogin() {
   }
 
   currentUser = user;
-  save('coj_session', {email: user.email, pass: user.pass});
+  save('coj_session', { email: user.email, pass: user.pass });
+  document.getElementById('loginScreen').style.display = 'none';
   startApp();
 }
 
@@ -741,25 +919,36 @@ function togglePass() {
 }
 
 function forgotPass() {
-  toast('تواصل مع الأدمن لإعادة ضبط كلمة المرور', 'error');
+  toast('تواصل مع أمين الخدمة أو الكاهن لإعادة ضبط كلمة المرور', 'error');
 }
 
 // ================================================================
 //  APP START
 // ================================================================
 function startApp() {
-  document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
 
   const u = currentUser;
+  const avatarUrl = u.img || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(u.name) + '&background=1a237e&color=fff&size=80';
   document.getElementById('topUserName').textContent = u.name;
-  document.getElementById('topUserImg').src = u.img || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(u.name) + '&background=1a237e&color=fff&size=80';
+  document.getElementById('topUserImg').src = avatarUrl;
   document.getElementById('drawerName').textContent = u.name;
   document.getElementById('drawerRole').textContent = ROLE_NAMES[u.role] || u.role;
-  document.getElementById('drawerImg').src = document.getElementById('topUserImg').src;
+  document.getElementById('drawerImg').src = avatarUrl;
+
+  // Show services in drawer
+  const svcEl = document.getElementById('drawerServices');
+  const hasAll = u.services && u.services.includes('all');
+  if (hasAll || ['Admin','Priest'].includes(u.role)) {
+    svcEl.textContent = 'جميع الخدمات';
+  } else {
+    svcEl.textContent = 'الخدمات: ' + (u.services||[]).join('، ');
+  }
 
   const isAdmin = ['Admin','Priest','ServiceLeader'].includes(u.role);
-  document.querySelectorAll('.admin-only').forEach(el => el.style.display = isAdmin ? '' : 'none');
+  document.querySelectorAll('.admin-only').forEach(el => {
+    el.style.display = isAdmin ? '' : 'none';
+  });
 
   initGradeSelect('mGrade');
   document.getElementById('attDate').valueAsDate = new Date();
@@ -789,29 +978,39 @@ function navTo(page) {
 // ================================================================
 //  DRAWER
 // ================================================================
-function openDrawer()  { document.getElementById('drawer').classList.add('open'); document.getElementById('drawerOverlay').classList.add('open'); }
-function closeDrawer() { document.getElementById('drawer').classList.remove('open'); document.getElementById('drawerOverlay').classList.remove('open'); }
+function openDrawer()  {
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+}
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+}
 
 // ================================================================
-//  SERVICE SELECTORS
+//  SERVICE SELECTORS (filtered by user access)
 // ================================================================
 function initServiceSelectors() {
+  const accessible = getUserMainServices(currentUser);
+
   ['mainSvc','attMainSvc'].forEach(id => {
     const sel = document.getElementById(id);
     sel.innerHTML = '';
-    Object.keys(serviceTree).forEach(s => {
+    accessible.forEach(s => {
       const o = document.createElement('option');
       o.value = s; o.textContent = s;
       sel.appendChild(o);
     });
   });
+
   onMainSvcChange();
   onAttMainSvcChange();
 }
 
 function fillSubSelect(mainVal, subId) {
   const sel = document.getElementById(subId);
-  const grades = serviceTree[mainVal] || [];
+  const userGrades = getUserGrades(currentUser);
+  const grades = (serviceTree[mainVal] || []).filter(g => userGrades.includes(g));
   sel.innerHTML = '';
   grades.forEach(g => {
     const o = document.createElement('option');
@@ -832,13 +1031,8 @@ function onAttMainSvcChange() {
   renderAttendance();
 }
 
-function currentGrade() {
-  return document.getElementById('subSvc').value;
-}
-
-function currentAttGrade() {
-  return document.getElementById('attSubSvc').value;
-}
+function currentGrade()    { return document.getElementById('subSvc').value; }
+function currentAttGrade() { return document.getElementById('attSubSvc').value; }
 
 // ================================================================
 //  HOME
@@ -848,8 +1042,22 @@ function renderHome() {
   document.getElementById('greetName').textContent = 'أهلاً ' + u.name + ' 👋';
   const now = new Date();
   document.getElementById('greetDate').textContent = now.toLocaleDateString('ar-EG', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
-  document.getElementById('statMembers').textContent = members.length;
-  document.getElementById('statTrips').textContent   = trips.length;
+
+  const hasAll = u.services && u.services.includes('all');
+  const greetSvc = document.getElementById('greetServices');
+  if (!hasAll && !['Admin','Priest'].includes(u.role)) {
+    greetSvc.textContent = '📌 خدماتك: ' + (u.services||[]).join('، ');
+    greetSvc.style.display = 'inline-block';
+  } else {
+    greetSvc.style.display = 'none';
+  }
+
+  const visibleMembers = getVisibleMembers();
+  const visibleTrips   = trips.filter(t =>
+    (t.members||[]).some(mid => visibleMembers.find(m => m.id === mid))
+  );
+  document.getElementById('statMembers').textContent = visibleMembers.length;
+  document.getElementById('statTrips').textContent   = visibleTrips.length;
 }
 
 // ================================================================
@@ -857,8 +1065,9 @@ function renderHome() {
 // ================================================================
 function initGradeSelect(selId) {
   const sel = document.getElementById(selId);
+  const userGrades = getUserGrades(currentUser);
   sel.innerHTML = '';
-  allGrades.forEach(g => {
+  userGrades.forEach(g => {
     const o = document.createElement('option');
     o.value = g; o.textContent = g;
     sel.appendChild(o);
@@ -872,6 +1081,13 @@ function renderMembers() {
   const grid   = document.getElementById('membersGrid');
   const grade  = currentGrade();
   const search = (document.getElementById('memberSearch').value || '').trim().toLowerCase();
+
+  // Only show members in grades user can access
+  const userGrades = getUserGrades(currentUser);
+  if (!userGrades.includes(grade)) {
+    grid.innerHTML = '<div class="empty"><i class="fas fa-lock"></i><p>ليس لديك صلاحية لعرض هذه الفرقة</p></div>';
+    return;
+  }
 
   let list = members.filter(m => m.grade === grade);
   if (search) list = list.filter(m => m.name.toLowerCase().includes(search) || (m.phone||'').includes(search));
@@ -887,7 +1103,6 @@ function renderMembers() {
     const card = document.createElement('div');
     card.className = 'm-card';
 
-    // Image
     const img = document.createElement('img');
     img.src = src;
     img.alt = m.name;
@@ -895,7 +1110,6 @@ function renderMembers() {
     img.onclick = function() { zoomImg(src); };
     card.appendChild(img);
 
-    // Body
     const body = document.createElement('div');
     body.className = 'm-card-body';
     body.innerHTML = '<h3>' + m.name + '</h3>' +
@@ -952,7 +1166,6 @@ function renderMembers() {
       body.appendChild(tripsDiv);
     }
 
-    // Actions
     const actions = document.createElement('div');
     actions.className = 'm-card-actions';
 
@@ -986,29 +1199,31 @@ function renderMembers() {
 function openMemberModal(id) {
   editingMemberId = id || null;
   document.getElementById('memberModalTitle').textContent = id ? 'تعديل مخدوم' : 'إضافة مخدوم';
+  initGradeSelect('mGrade');
 
   if (id) {
     const m = members.find(x => x.id === id);
     if (!m) return;
-    document.getElementById('mName').value    = m.name || '';
-    document.getElementById('mGender').value  = m.gender || 'ذكر';
-    document.getElementById('mDob').value     = m.dob || '';
-    document.getElementById('mGrade').value   = m.grade || '';
-    document.getElementById('mConf').value    = m.conf || '';
-    document.getElementById('mPhone').value   = m.phone || '';
-    document.getElementById('mWhatsapp').value= m.whatsapp || '';
-    document.getElementById('mAddress').value = m.address || '';
-    document.getElementById('mNotes').value   = m.notes || '';
-    document.getElementById('mFName').value   = m.fName || '';
-    document.getElementById('mFPhone').value  = m.fPhone || '';
-    document.getElementById('mMoName').value  = m.moName || '';
-    document.getElementById('mMoPhone').value = m.moPhone || '';
+    document.getElementById('mName').value     = m.name || '';
+    document.getElementById('mGender').value   = m.gender || 'ذكر';
+    document.getElementById('mDob').value      = m.dob || '';
+    document.getElementById('mGrade').value    = m.grade || '';
+    document.getElementById('mConf').value     = m.conf || '';
+    document.getElementById('mPhone').value    = m.phone || '';
+    document.getElementById('mWhatsapp').value = m.whatsapp || '';
+    document.getElementById('mAddress').value  = m.address || '';
+    document.getElementById('mNotes').value    = m.notes || '';
+    document.getElementById('mFName').value    = m.fName || '';
+    document.getElementById('mFPhone').value   = m.fPhone || '';
+    document.getElementById('mMoName').value   = m.moName || '';
+    document.getElementById('mMoPhone').value  = m.moPhone || '';
   } else {
-    document.getElementById('mName').value = '';
-    document.getElementById('mGender').value = 'ذكر';
-    document.getElementById('mDob').value = '';
-    document.getElementById('mGrade').value = currentGrade();
-    ['mConf','mPhone','mWhatsapp','mAddress','mNotes','mFName','mFPhone','mMoName','mMoPhone'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('mName').value    = '';
+    document.getElementById('mGender').value  = 'ذكر';
+    document.getElementById('mDob').value     = '';
+    document.getElementById('mGrade').value   = currentGrade();
+    ['mConf','mPhone','mWhatsapp','mAddress','mNotes','mFName','mFPhone','mMoName','mMoPhone']
+      .forEach(fid => document.getElementById(fid).value = '');
   }
   openModal('memberModal');
 }
@@ -1071,7 +1286,6 @@ function openDetail(id) {
 
   html += '<div class="detail-grid">';
 
-  // Basic
   html += '<div class="detail-section"><h5>البيانات الأساسية</h5>';
   if (m.gender)  html += '<div class="detail-row"><strong>النوع</strong>' + m.gender + '</div>';
   if (m.dob)     html += '<div class="detail-row"><strong>الميلاد</strong>' + formatDate(m.dob) + ' (' + calcAge(m.dob) + ')</div>';
@@ -1080,13 +1294,11 @@ function openDetail(id) {
   if (m.notes)   html += '<div class="detail-row"><strong>ملاحظات</strong>' + m.notes + '</div>';
   html += '</div>';
 
-  // Contact
   html += '<div class="detail-section"><h5>التواصل</h5>';
   if (m.phone)    html += '<div class="detail-row"><strong>موبايل</strong><a href="tel:' + m.phone + '">' + m.phone + '</a></div>';
   if (m.whatsapp) html += '<div class="detail-row"><strong>واتساب</strong><a href="https://wa.me/2' + m.whatsapp + '" target="_blank" style="color:#25d366">' + m.whatsapp + '</a></div>';
   html += '</div>';
 
-  // Family
   html += '<div class="detail-section"><h5>الأب</h5>';
   if (m.fName)  html += '<div class="detail-row"><strong>الاسم</strong>' + m.fName + '</div>';
   if (m.fPhone) html += '<div class="detail-row"><strong>الموبايل</strong><a href="tel:' + m.fPhone + '">' + m.fPhone + '</a></div>';
@@ -1099,7 +1311,6 @@ function openDetail(id) {
 
   html += '</div>';
 
-  // Trips
   const memberTrips = trips.filter(t => (t.members||[]).includes(m.id));
   html += '<div style="margin-top:14px;border-top:2px solid #e8eaf6;padding-top:12px">';
   html += '<p style="font-size:0.85em;font-weight:800;color:var(--primary);margin-bottom:8px"><i class="fas fa-bus" style="color:#d4af37"></i> الرحلات</p>';
@@ -1141,9 +1352,16 @@ function renderAttendance() {
   const grade  = currentAttGrade();
   const date   = document.getElementById('attDate').value;
   const grid   = document.getElementById('attGrid');
-  const list   = members.filter(m => m.grade === grade);
+  const userGrades = getUserGrades(currentUser);
 
+  if (!userGrades.includes(grade)) {
+    grid.innerHTML = '<div class="empty"><i class="fas fa-lock"></i><p>ليس لديك صلاحية لعرض هذه الفرقة</p></div>';
+    return;
+  }
+
+  const list = members.filter(m => m.grade === grade);
   grid.innerHTML = '';
+
   if (list.length === 0) {
     grid.innerHTML = '<div class="empty"><i class="fas fa-users"></i><p>لا يوجد مخدومين في هذه الفرقة</p></div>';
     return;
@@ -1194,7 +1412,6 @@ function setAtt(memberId, grade, date, status) {
   }
   saveAll();
 
-  // Update UI
   const row = document.getElementById('attrow_' + memberId);
   if (!row) return;
   const cur = attendance[key][memberId] || '';
@@ -1210,18 +1427,30 @@ function saveAttendance() {
 }
 
 // ================================================================
-//  TRIPS
+//  TRIPS (show only trips with members in user's grades)
 // ================================================================
 function renderTrips() {
   const container = document.getElementById('tripsContainer');
   container.innerHTML = '';
 
-  if (trips.length === 0) {
+  const visibleMembers = getVisibleMembers();
+  const visibleMemberIds = new Set(visibleMembers.map(m => m.id));
+
+  // Filter trips to only those containing at least one visible member
+  // OR admin/priest see all trips
+  const isAdmin = ['Admin','Priest'].includes(currentUser.role) ||
+    (currentUser.services && currentUser.services.includes('all'));
+
+  const visibleTrips = isAdmin ? trips : trips.filter(t =>
+    (t.members||[]).some(mid => visibleMemberIds.has(mid))
+  );
+
+  if (visibleTrips.length === 0) {
     container.innerHTML = '<div class="empty"><i class="fas fa-bus"></i><p>لا توجد رحلات حتى الآن</p></div>';
     return;
   }
 
-  trips.slice().reverse().forEach(t => {
+  visibleTrips.slice().reverse().forEach(t => {
     const card = document.createElement('div');
     card.className = 'trip-card';
 
@@ -1243,7 +1472,6 @@ function renderTrips() {
       '<button class="btn btn-danger btn-sm" onclick="deleteTrip(\'' + t.id + '\')"><i class="fas fa-trash"></i></button>' +
       '</div></div>';
 
-    // Members chips
     if (count > 0) {
       const chipsDiv = document.createElement('div');
       chipsDiv.className = 'trip-members-preview';
@@ -1280,7 +1508,7 @@ function openTripModal(id) {
     document.getElementById('tDest').value = t.dest||'';
     buildTripMembers(t.members||[]);
   } else {
-    ['tName','tDate','tCost','tDest'].forEach(id=>document.getElementById(id).value='');
+    ['tName','tDate','tCost','tDest'].forEach(fid=>document.getElementById(fid).value='');
     buildTripMembers([]);
   }
   openModal('tripModal');
@@ -1289,7 +1517,8 @@ function openTripModal(id) {
 function buildTripMembers(selected) {
   const grid = document.getElementById('tripMembersGrid');
   grid.innerHTML = '';
-  members.forEach(m => {
+  const visibleMembers = getVisibleMembers();
+  visibleMembers.forEach(m => {
     const item = document.createElement('label');
     item.className = 'check-item' + (selected.includes(m.id) ? ' selected' : '');
 
@@ -1409,9 +1638,24 @@ function renderServants() {
 
     const info = document.createElement('div');
     info.className = 'info';
+
+    const hasAll = s.services && s.services.includes('all');
+    const svcText = hasAll ? ['جميع الخدمات'] : (s.services || []);
+
     info.innerHTML = '<div class="name">' + s.name + '</div>' +
       '<span class="role-badge">' + (ROLE_NAMES[s.role]||s.role) + '</span>' +
       '<div style="font-size:0.78em;color:var(--muted);margin-top:2px">' + s.email + '</div>';
+
+    // Service tags
+    const svcTagsDiv = document.createElement('div');
+    svcTagsDiv.className = 'svc-tags';
+    svcText.forEach(sv => {
+      const tag = document.createElement('span');
+      tag.className = 'svc-tag';
+      tag.textContent = sv;
+      svcTagsDiv.appendChild(tag);
+    });
+    info.appendChild(svcTagsDiv);
 
     const actions = document.createElement('div');
     actions.style.cssText = 'display:flex;gap:6px';
@@ -1431,11 +1675,75 @@ function renderServants() {
   });
 }
 
+// ================================================================
+//  SERVICES CHECKBOX GRID IN REGISTER MODAL
+// ================================================================
+function buildServicesGrid() {
+  const grid = document.getElementById('rServicesGrid');
+  grid.innerHTML = '';
+
+  Object.entries(serviceTree).forEach(([mainSvc, grades]) => {
+    const title = document.createElement('div');
+    title.className = 'svc-group-title';
+    title.textContent = mainSvc;
+    grid.appendChild(title);
+
+    const gradeGrid = document.createElement('div');
+    gradeGrid.className = 'svc-check-grid';
+
+    grades.forEach(g => {
+      const label = document.createElement('label');
+      label.className = 'svc-check-item';
+
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.value = g;
+      cb.className = 'svc-grade-cb';
+      cb.onchange = function() {
+        label.classList.toggle('selected', this.checked);
+        // Uncheck "all" if individual grade unchecked
+        if (!this.checked) {
+          document.getElementById('rSvcAll').checked = false;
+        }
+      };
+
+      label.appendChild(cb);
+      label.appendChild(document.createTextNode(g));
+      gradeGrid.appendChild(label);
+    });
+
+    grid.appendChild(gradeGrid);
+  });
+}
+
+function toggleAllServices(checked) {
+  document.querySelectorAll('.svc-grade-cb').forEach(cb => {
+    cb.checked = checked;
+    cb.closest('label').classList.toggle('selected', checked);
+  });
+}
+
+function getSelectedServices() {
+  const allChecked = document.getElementById('rSvcAll').checked;
+  if (allChecked) return ['all'];
+  return Array.from(document.querySelectorAll('.svc-grade-cb:checked')).map(cb => cb.value);
+}
+
+// ================================================================
+//  REGISTER
+// ================================================================
 function showRegisterModal(fromApp) {
-  ['rName','rEmail','rPass'].forEach(id=>document.getElementById(id).value='');
+  ['rName','rEmail','rPass'].forEach(fid => document.getElementById(fid).value = '');
+  document.getElementById('rSvcAll').checked = false;
+
   const isAdmin = currentUser && ['Admin','Priest'].includes(currentUser.role);
   document.getElementById('rRoleGroup').style.display = (fromApp && isAdmin) ? '' : 'none';
+
+  // Show services selection always when registering from app
+  document.getElementById('rServicesGroup').style.display = fromApp ? '' : 'none';
+
   document.getElementById('registerTitle').textContent = fromApp ? 'إضافة خادم جديد' : 'تسجيل خادم جديد';
+  buildServicesGrid();
   openModal('registerModal');
 }
 
@@ -1444,13 +1752,23 @@ function doRegister() {
   const email = document.getElementById('rEmail').value.trim();
   const pass  = document.getElementById('rPass').value;
   const role  = document.getElementById('rRole').value || 'Servant';
+  const fromApp = document.getElementById('rServicesGroup').style.display !== 'none';
 
   if (!name||!email||!pass) { toast('جميع الحقول مطلوبة','error'); return; }
   if (servants.find(s=>s.email.toLowerCase()===email.toLowerCase())) {
     toast('الإيميل ده مسجّل قبل كده','error'); return;
   }
 
-  servants.push({ id:uid(), name, email, pass, role, services:['all'], img:'' });
+  let services = ['all'];
+  if (fromApp) {
+    services = getSelectedServices();
+    if (services.length === 0) {
+      toast('من فضلك اختر خدمة واحدة على الأقل','error');
+      return;
+    }
+  }
+
+  servants.push({ id: uid(), name, email, pass, role, services, img: '' });
   saveAll();
   closeModal('registerModal');
   if (currentUser) renderServants();
@@ -1478,14 +1796,24 @@ document.addEventListener('keydown', function(e) {
 });
 
 // ================================================================
-//  AUTO LOGIN
+//  BOOT
 // ================================================================
 (function() {
+  // No servants at all → show first-time setup
+  if (servants.length === 0) {
+    document.getElementById('setupScreen').style.display = 'flex';
+    document.getElementById('loginScreen').style.display = 'none';
+    return;
+  }
+
+  // Try auto-login from session
   const session = load('coj_session', null);
   if (session) {
     const user = servants.find(u => u.email === session.email && u.pass === session.pass);
     if (user) { currentUser = user; startApp(); return; }
   }
+
+  // Show login
   document.getElementById('loginScreen').style.display = 'flex';
 })();
 </script>
